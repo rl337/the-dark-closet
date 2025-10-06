@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "the-dark-closet"
+version = "0.1.0"
+description = "A Pygame adventure where a boy conquers a fantasy world."
+authors = ["The Dark Closet Team <maintainers@example.com>"]
+readme = "README.md"
+packages = [{ include = "the_dark_closet", from = "src" }]
+
+[tool.poetry.dependencies]
+python = ">=3.10,<4.0"
+pygame-ce = "^2.5"
+
+[tool.poetry.group.dev.dependencies]
+black = "^24.10.0"
+ruff = "^0.6.9"
+
+[tool.poetry.scripts]
+# Run with: poetry run the-dark-closet
+the-dark-closet = "the_dark_closet.__main__:main"
+
+[build-system]
+requires = ["poetry-core>=1.9.0"]
+build-backend = "poetry.core.masonry.api"
