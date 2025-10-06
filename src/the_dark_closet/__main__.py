@@ -25,6 +25,14 @@ def main() -> int:
         max_frames = int(max_frames_env) if max_frames_env is not None else None
     except ValueError:
         max_frames = None
+    # Allow autostart of side scroller from env
+    if os.environ.get("TDC_AUTOSTART") == "sidescroller":
+        try:
+            from .game import SideScrollerScene
+        except Exception:
+            SideScrollerScene = None  # type: ignore
+        if SideScrollerScene is not None:
+            app.switch_scene(SideScrollerScene(app))
     return app.run(max_frames=max_frames)
 
 
