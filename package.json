@@ -1,0 +1,26 @@
+{
+  "name": "workspace",
+  "version": "1.0.0",
+  "description": "A small Pygame project managed with Poetry. You play a boy who discovers a portal in his closet and, rather than seeking wonder, chooses conquest.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "sprites:idle": "node scripts/generate_sprites.js /workspace/config/dark_weirdo.json idle",
+    "sprites:talk": "node scripts/generate_sprites.js /workspace/config/dark_weirdo.json talk"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rl337/the-dark-closet.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/rl337/the-dark-closet/issues"
+  },
+  "homepage": "https://github.com/rl337/the-dark-closet#readme",
+  "dependencies": {
+    "glob": "^11.0.3",
+    "sharp": "^0.34.4"
+  }
+}

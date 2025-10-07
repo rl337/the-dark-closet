@@ -1,0 +1,54 @@
+{
+  "name": "dark-weirdo",
+  "canvas": { "width": 256, "height": 256 },
+  "assetsRoot": "/workspace/assets/parts/dark-weirdo",
+  "outputRoot": "/workspace/output/frames/dark-weirdo",
+  "parts": {
+    "torso": "body/torso.png",
+    "left-arm": "body/left-arm.png",
+    "right-arm": "body/right-arm.png",
+    "left-leg": "body/left-leg.png",
+    "right-leg": "body/right-leg.png",
+    "head": "body/head.png",
+    "helmet": "gear/helmet_trash_bin.png",
+    "torso_bucket": "gear/torso_bucket.png",
+    "eyes_open": "face/eyes/eyes_open.png",
+    "eyes_closed": "face/eyes/eyes_closed.png",
+    "eyes_angry": "face/eyes/eyes_angry.png",
+    "mouth_neutral": "face/mouths/mouth_neutral.png",
+    "mouth_open": "face/mouths/mouth_open.png",
+    "mouth_smirk": "face/mouths/mouth_smirk.png"
+  },
+  "layerOrder": [
+    "left-leg",
+    "right-leg",
+    "torso",
+    "torso_bucket",
+    "left-arm",
+    "right-arm",
+    "head",
+    "eyes",
+    "mouth",
+    "helmet"
+  ],
+  "animations": {
+    "idle": {
+      "frames": [
+        { "transforms": { "left-arm": { "dx": 0, "dy": 0 }, "right-arm": { "dx": 0, "dy": 2 }, "left-leg": { "dx": 0, "dy": 0 }, "right-leg": { "dx": 0, "dy": 1 } }, "face": { "eyes": "eyes_open", "mouth": "mouth_neutral" } },
+        { "transforms": { "left-arm": { "dx": 0, "dy": 1 }, "right-arm": { "dx": 0, "dy": 0 }, "left-leg": { "dx": 0, "dy": 1 }, "right-leg": { "dx": 0, "dy": 0 } }, "face": { "eyes": "eyes_open", "mouth": "mouth_neutral" } },
+        { "transforms": { "left-arm": { "dx": 0, "dy": 2 }, "right-arm": { "dx": 0, "dy": 0 }, "left-leg": { "dx": 0, "dy": 0 }, "right-leg": { "dx": 0, "dy": 2 } }, "face": { "eyes": "eyes_open", "mouth": "mouth_neutral" } },
+        { "transforms": { "left-arm": { "dx": 0, "dy": 1 }, "right-arm": { "dx": 0, "dy": 1 }, "left-leg": { "dx": 0, "dy": 1 }, "right-leg": { "dx": 0, "dy": 1 } }, "face": { "eyes": "eyes_open", "mouth": "mouth_neutral" } }
+      ]
+    },
+    "talk": {
+      "frames": [
+        { "transforms": {}, "face": { "eyes": "eyes_open", "mouth": "mouth_open" } },
+        { "transforms": {}, "face": { "eyes": "eyes_open", "mouth": "mouth_neutral" } },
+        { "transforms": {}, "face": { "eyes": "eyes_open", "mouth": "mouth_smirk" } },
+        { "transforms": {}, "face": { "eyes": "eyes_closed", "mouth": "mouth_open" } },
+        { "transforms": {}, "face": { "eyes": "eyes_open", "mouth": "mouth_neutral" } }
+      ]
+    }
+  }
+}
+
