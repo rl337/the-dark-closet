@@ -1,11 +1,9 @@
-name: Publish action screenshots to GitHub Pages
+name: CI and Publish to GitHub Pages
 
 on:
   push:
     branches:
       - main
-      - master
-      - '**/automated-character-action-tests*'
   workflow_dispatch:
 
 permissions:
@@ -28,23 +26,42 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+          cache: 'poetry'
 
-      - name: Install dependencies
+      - name: Install Poetry
+        uses: abatilo/actions-poetry@v3
+        with:
+          poetry-version: '1.8.3'
+
+      - name: Install dependencies (with dev)
         run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          poetry --version
+          poetry install --with dev --no-interaction --no-ansi
 
-      - name: Generate screenshots site
+      - name: Run mypy
+        env:
+          PYTHONPATH: src
+        run: |
+          poetry run mypy src scripts
+
+      - name: Run pylint
+        env:
+          PYTHONPATH: src
+        run: |
+          poetry run pylint src/the_dark_closet scripts
+
+      - name: Generate screenshots site (docs/)
         env:
           SDL_VIDEODRIVER: dummy
           SDL_AUDIODRIVER: dummy
+          PYTHONPATH: src
         run: |
-          python scripts/run_action_tests.py
+          poetry run python scripts/run_action_tests.py
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: site
+          path: docs
 
   deploy:
     needs: build
