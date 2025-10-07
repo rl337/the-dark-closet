@@ -27,14 +27,14 @@ jobs:
         with:
           python-version: '3.11'
           cache: 'poetry'
+          cache-dependency-path: 'poetry.lock'
 
       - name: Install Poetry
-        uses: abatilo/actions-poetry@v3
+        uses: snok/install-poetry@v1
         with:
-          poetry-version: '1.8.3'
-
-      - name: Ensure Poetry is in PATH
-        run: echo "$HOME/.local/bin" >> $GITHUB_PATH
+          version: 1.8.3
+          virtualenvs-create: true
+          virtualenvs-in-project: true
 
       - name: Install dependencies (with dev)
         run: |
