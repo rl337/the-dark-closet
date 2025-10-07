@@ -72,19 +72,25 @@ TILE_METAL = "#"
 TILE_BRICK = "B"
 TILE_PLATFORM = "-"  # one-way (from above only)
 TILE_LADDER = "H"
+TILE_BOUNDARY = "X"  # impassable, unbreakable level boundary
 
 
 class SideScrollerScene(Scene):
-    def __init__(self, app: "GameApp") -> None:
+    def __init__(self, app: "GameApp", world_tiles: Optional[List[str]] = None, player_spawn_px: Optional[Tuple[int, int]] = None) -> None:
         super().__init__(app)
-        self.world_tiles: List[str] = self._build_world()
+        self.world_tiles: List[str] = world_tiles if world_tiles is not None else self._build_world()
         self.world_cols = max(len(row) for row in self.world_tiles)
         self.world_rows = len(self.world_tiles)
         self.world_width_px = self.world_cols * TILE_SIZE
         self.world_height_px = self.world_rows * TILE_SIZE
 
         # Player properties
-        self.player_rect = pygame.Rect(3 * TILE_SIZE, (self.world_height_px - 5 * TILE_SIZE), 26, 30)
+        if player_spawn_px is None:
+            spawn_x = 3 * TILE_SIZE
+            spawn_y = self.world_height_px - 5 * TILE_SIZE
+        else:
+            spawn_x, spawn_y = player_spawn_px
+        self.player_rect = pygame.Rect(spawn_x, spawn_y, 26, 30)
         self.player_velocity_x: float = 0.0
         self.player_velocity_y: float = 0.0
         self.player_speed_px_per_sec: float = 220.0
@@ -251,7 +257,7 @@ class SideScrollerScene(Scene):
         # Horizontal movement and collisions (solid tiles only)
         self.player_rect.x += int(self.player_velocity_x * delta_seconds)
         for tx, ty, t, tile_rect in self._tiles_overlapping_rect(self.player_rect):
-            if t in (TILE_METAL, TILE_BRICK):
+            if t in (TILE_METAL, TILE_BRICK, TILE_BOUNDARY):
                 if self.player_velocity_x > 0 and self.player_rect.right > tile_rect.left:
                     self.player_rect.right = tile_rect.left
                 elif self.player_velocity_x < 0 and self.player_rect.left < tile_rect.right:
@@ -271,7 +277,7 @@ class SideScrollerScene(Scene):
                     self._set_tile(tx, ty, TILE_EMPTY)
                     continue
 
-            if t in (TILE_METAL, TILE_BRICK):
+            if t in (TILE_METAL, TILE_BRICK, TILE_BOUNDARY):
                 if self.player_velocity_y > 0 and self.player_rect.bottom > tile_rect.top:
                     self.player_rect.bottom = tile_rect.top
                     self.player_velocity_y = 0
@@ -361,6 +367,8 @@ class SideScrollerScene(Scene):
                     pygame.draw.rect(surface, (190, 190, 200), platform_rect)
                 elif t == TILE_LADDER:
                     pygame.draw.rect(surface, (210, 180, 80), rect)
+                elif t == TILE_BOUNDARY:
+                    pygame.draw.rect(surface, (80, 120, 160), rect)
 
     def _draw_foreground(self, surface: pygame.Surface) -> None:
         factor_fore = 1.2
@@ -462,4 +470,76 @@ class GameApp:
                     self._running = False
 
         pygame.quit()
+        return 0
+
+    def run_scripted(
+        self,
+        total_frames: int,
+        keys_for_frame: Optional[callable] = None,
+        capture_callback: Optional[callable] = None,
+    ) -> int:
+        """
+        Deterministic, headless-friendly loop for test scenarios.
+        - keys_for_frame(frame_index) -> Set[int] of pygame.K_* to hold pressed
+        - capture_callback(frame_index, surface) -> None to save screenshots
+        """
+        # Use fixed timestep for determinism
+        delta_seconds = 1.0 / float(self.config.target_fps)
+        pressed_prev: set[int] = set()
+
+        # Provide a proxy that emulates pygame.key.get_pressed() based on a dynamic set
+        class _PressedProxy:
+            def __init__(self, pressed_keys: set[int]) -> None:
+                self._pressed_keys = pressed_keys
+
+            def __getitem__(self, key_code: int) -> int:
+                return 1 if key_code in self._pressed_keys else 0
+
+        original_get_pressed = pygame.key.get_pressed
+
+        for frame in range(total_frames):
+            desired_pressed: set[int] = set()
+            if keys_for_frame is not None:
+                try:
+                    desired = keys_for_frame(frame)
+                    if desired:
+                        desired_pressed = set(desired)
+                except Exception:
+                    desired_pressed = set()
+
+            # Inject synthetic KEYDOWN/KEYUP events to mirror desired key state
+            # Issue KEYUP for keys no longer pressed
+            for key in (pressed_prev - desired_pressed):
+                pygame.event.post(pygame.event.Event(pygame.KEYUP, {"key": key}))
+            # Issue KEYDOWN for newly pressed keys
+            for key in (desired_pressed - pressed_prev):
+                pygame.event.post(pygame.event.Event(pygame.KEYDOWN, {"key": key}))
+            pressed_prev = desired_pressed
+
+            # Monkey-patch get_pressed to reflect our desired state for this frame
+            pygame.key.get_pressed = lambda: _PressedProxy(desired_pressed)  # type: ignore[assignment]
+
+            # Process event queue
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.key.get_pressed = original_get_pressed  # restore
+                    return 0
+                elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                    pygame.key.get_pressed = original_get_pressed  # restore
+                    return 0
+                elif self._current_scene is not None:
+                    self._current_scene.handle_event(event)
+
+            # Update and draw
+            if self._current_scene is not None:
+                self._current_scene.update(delta_seconds)
+                self._current_scene.draw(self._screen)
+
+            pygame.display.flip()
+
+            if capture_callback is not None:
+                capture_callback(frame, self._screen)
+
+        # Restore original get_pressed after loop
+        pygame.key.get_pressed = original_get_pressed  # type: ignore[assignment]
         return 0

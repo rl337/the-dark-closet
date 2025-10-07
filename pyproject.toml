@@ -13,11 +13,40 @@ pygame-ce = "^2.5"
 [tool.poetry.group.dev.dependencies]
 black = "^24.10.0"
 ruff = "^0.6.9"
+mypy = "^1.11.2"
+pylint = "^3.2.7"
+types-setuptools = "^75.1.0.20241025"
 
 [tool.poetry.scripts]
 # Run with: poetry run the-dark-closet
 the-dark-closet = "the_dark_closet.__main__:main"
+tdc-tests = "scripts.run_action_tests:main"
 
 [build-system]
 requires = ["poetry-core>=1.9.0"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.mypy]
+python_version = "3.11"
+strict = false
+ignore_missing_imports = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+show_error_codes = true
+pretty = true
+
+[tool.pylint.MASTER]
+ignore = [".venv", "build", "dist"]
+jobs = 0
+
+[tool.pylint.MESSAGES CONTROL]
+disable = [
+  "missing-module-docstring",
+  "missing-class-docstring",
+  "missing-function-docstring",
+]
+
+[tool.pylint.BASIC]
+good-names = [
+  "dx", "dy", "x", "y", "tx", "ty",
+]
