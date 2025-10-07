@@ -1,9 +1,8 @@
 from __future__ import annotations
 
 import os
-from dataclasses import dataclass
 from pathlib import Path
-from typing import Callable, Iterable, List, Optional, Sequence, Tuple
+from typing import Callable, Iterable, List, Tuple
 
 # Ensure we can import from src layout
 import sys
@@ -199,7 +198,7 @@ def generate_index(out_dir: Path) -> None:
 
 def main() -> int:
     # Output root for the website (consumed by GitHub Pages workflow)
-    out_root = Path(os.environ.get("TDC_SITE_DIR", "site"))
+    out_root = Path(os.environ.get("TDC_SITE_DIR", "docs"))
     screens_dir = out_root / "screens"
 
     for _, fn in ALL_TESTS:
