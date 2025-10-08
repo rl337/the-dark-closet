@@ -54,7 +54,7 @@ def run_action(
     name: str,
     world: List[str],
     total_frames: int,
-    keys_for_frame: Callable[[int], Iterable[int]],
+    keys_for_frame: Callable[[int], set[int]],
     spawn_px: Tuple[int, int],
     out_dir: Path,
 ) -> None:

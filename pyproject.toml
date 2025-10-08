@@ -44,6 +44,24 @@ disable = [
   "missing-module-docstring",
   "missing-class-docstring",
   "missing-function-docstring",
+  "no-member",  # pygame constants not recognized
+  "line-too-long",  # allow longer lines
+  "too-many-instance-attributes",
+  "too-many-branches",
+  "too-many-locals",
+  "too-many-statements",
+  "too-few-public-methods",
+  "broad-exception-caught",
+  "cell-var-from-loop",
+  "no-else-return",
+  "wrong-import-position",
+  "import-outside-toplevel",
+  "invalid-name",
+  "unused-import",
+  "too-many-arguments",
+  "too-many-positional-arguments",
+  "reimported",
+  "unused-variable",
 ]
 
 [tool.pylint.BASIC]

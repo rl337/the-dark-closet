@@ -3,7 +3,7 @@ from __future__ import annotations
 import os
 import os
 from dataclasses import dataclass
-from typing import Optional, List, Tuple, Callable
+from typing import Optional, List, Tuple, Callable, Any
 
 import pygame
 
@@ -517,7 +517,7 @@ class GameApp:
             pressed_prev = desired_pressed
 
             # Monkey-patch get_pressed to reflect our desired state for this frame
-            pygame.key.get_pressed = lambda: _PressedProxy(desired_pressed)
+            pygame.key.get_pressed = lambda: _PressedProxy(desired_pressed)  # type: ignore[assignment,return-value]
 
             # Process event queue
             for event in pygame.event.get():
