@@ -3,7 +3,7 @@ from __future__ import annotations
 import os
 import os
 from dataclasses import dataclass
-from typing import Optional, List, Tuple
+from typing import Optional, List, Tuple, Callable
 
 import pygame
 
@@ -475,8 +475,8 @@ class GameApp:
     def run_scripted(
         self,
         total_frames: int,
-        keys_for_frame: Optional[callable] = None,
-        capture_callback: Optional[callable] = None,
+        keys_for_frame: Optional[Callable[[int], set[int]]] = None,
+        capture_callback: Optional[Callable[[int, pygame.Surface], None]] = None,
     ) -> int:
         """
         Deterministic, headless-friendly loop for test scenarios.
@@ -517,7 +517,7 @@ class GameApp:
             pressed_prev = desired_pressed
 
             # Monkey-patch get_pressed to reflect our desired state for this frame
-            pygame.key.get_pressed = lambda: _PressedProxy(desired_pressed)  # type: ignore[assignment]
+            pygame.key.get_pressed = lambda: _PressedProxy(desired_pressed)
 
             # Process event queue
             for event in pygame.event.get():
@@ -541,5 +541,5 @@ class GameApp:
                 capture_callback(frame, self._screen)
 
         # Restore original get_pressed after loop
-        pygame.key.get_pressed = original_get_pressed  # type: ignore[assignment]
+        pygame.key.get_pressed = original_get_pressed
         return 0
