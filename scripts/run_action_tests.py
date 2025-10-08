@@ -2,10 +2,11 @@ from __future__ import annotations
 
 import os
 from pathlib import Path
-from typing import Callable, Iterable, List, Tuple
+from typing import Callable, List, Tuple
 
 # Ensure we can import from src layout
 import sys
+
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
@@ -30,7 +31,9 @@ def rect_room(width_tiles: int, height_tiles: int) -> List[str]:
     for r in range(height_tiles):
         line = [TILE_EMPTY] * width_tiles
         for c in range(width_tiles):
-            is_border = r == 0 or r == height_tiles - 1 or c == 0 or c == width_tiles - 1
+            is_border = (
+                r == 0 or r == height_tiles - 1 or c == 0 or c == width_tiles - 1
+            )
             if is_border:
                 line[c] = TILE_BOUNDARY
         rows.append("".join(line))
@@ -64,7 +67,9 @@ def run_action(
         os.environ["SDL_VIDEODRIVER"] = "dummy"
     os.environ.setdefault("SDL_AUDIODRIVER", "dummy")
 
-    config = GameConfig(window_width=400, window_height=300, window_title=name, target_fps=30)
+    config = GameConfig(
+        window_width=400, window_height=300, window_title=name, target_fps=30
+    )
     app = GameApp(config)
     scene = SideScrollerScene(app, world_tiles=world, player_spawn_px=spawn_px)
     app.switch_scene(scene)
@@ -82,7 +87,11 @@ def run_action(
                 save_surface(surface, out / f"{name}_t{k}.png")
 
     out_dir.mkdir(parents=True, exist_ok=True)
-    app.run_scripted(total_frames=total_frames, keys_for_frame=keys_for_frame, capture_callback=capture)
+    app.run_scripted(
+        total_frames=total_frames,
+        keys_for_frame=keys_for_frame,
+        capture_callback=capture,
+    )
 
 
 def test_move_left_right(out_dir: Path) -> None:
@@ -96,7 +105,14 @@ def test_move_left_right(out_dir: Path) -> None:
             return {pygame.K_LEFT}
         return set()
 
-    run_action("move_left_right", room, total_frames=60, keys_for_frame=keys, spawn_px=spawn_px, out_dir=out_dir)
+    run_action(
+        "move_left_right",
+        room,
+        total_frames=60,
+        keys_for_frame=keys,
+        spawn_px=spawn_px,
+        out_dir=out_dir,
+    )
 
 
 def test_jump(out_dir: Path) -> None:
@@ -109,7 +125,14 @@ def test_jump(out_dir: Path) -> None:
     def keys(frame: int):
         return {pygame.K_SPACE} if frame in {5, 20, 35} else set()
 
-    run_action("jump", room, total_frames=50, keys_for_frame=keys, spawn_px=spawn_px, out_dir=out_dir)
+    run_action(
+        "jump",
+        room,
+        total_frames=50,
+        keys_for_frame=keys,
+        spawn_px=spawn_px,
+        out_dir=out_dir,
+    )
 
 
 def test_break_brick(out_dir: Path) -> None:
@@ -125,7 +148,14 @@ def test_break_brick(out_dir: Path) -> None:
         # a few jumps to ensure collision
         return {pygame.K_SPACE} if frame in {6, 18, 30} else set()
 
-    run_action("break_brick", room, total_frames=40, keys_for_frame=keys, spawn_px=spawn_px, out_dir=out_dir)
+    run_action(
+        "break_brick",
+        room,
+        total_frames=40,
+        keys_for_frame=keys,
+        spawn_px=spawn_px,
+        out_dir=out_dir,
+    )
 
 
 def test_ladders(out_dir: Path) -> None:
@@ -147,7 +177,14 @@ def test_ladders(out_dir: Path) -> None:
             return {pygame.K_DOWN}
         return set()
 
-    run_action("ladders", room, total_frames=60, keys_for_frame=keys, spawn_px=spawn_px, out_dir=out_dir)
+    run_action(
+        "ladders",
+        room,
+        total_frames=60,
+        keys_for_frame=keys,
+        spawn_px=spawn_px,
+        out_dir=out_dir,
+    )
 
 
 ALL_TESTS = [
@@ -164,26 +201,38 @@ def generate_index(out_dir: Path) -> None:
     tests = [name for name, _ in ALL_TESTS]
     html_parts: List[str] = []
     html_parts.append("<!DOCTYPE html>")
-    html_parts.append("<html lang=\"en\">")
+    html_parts.append('<html lang="en">')
     html_parts.append("<head>")
-    html_parts.append("  <meta charset=\"utf-8\">")
-    html_parts.append("  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">")
+    html_parts.append('  <meta charset="utf-8">')
+    html_parts.append(
+        '  <meta name="viewport" content="width=device-width, initial-scale=1">'
+    )
     html_parts.append("  <title>Action Tests</title>")
-    html_parts.append("  <style>\nbody{font-family:system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; background:#0b0e12; color:#e6e9ef; margin:0; padding:24px;}\n.grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:16px;}\n.card{background:#11151c; border:1px solid #222835; border-radius:10px; padding:12px;}\n.card h2{font-size:16px; margin:0 0 8px 0;}\n.thumb{display:block; width:100%; height:auto; background:#0b0e12; border-radius:6px; border:1px solid #1f2532; margin-bottom:6px;}\n.row{display:flex; gap:8px; flex-wrap:wrap;}\n.row img{flex:1 1 110px; min-width:110px; max-width:calc(50% - 8px);}\nsmall{color:#98a2b3;}\nfooter{margin-top:24px; color:#98a2b3;}\n  </style>")
+    html_parts.append(
+        "  <style>\nbody{font-family:system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; background:#0b0e12; color:#e6e9ef; margin:0; padding:24px;}\n.grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:16px;}\n.card{background:#11151c; border:1px solid #222835; border-radius:10px; padding:12px;}\n.card h2{font-size:16px; margin:0 0 8px 0;}\n.thumb{display:block; width:100%; height:auto; background:#0b0e12; border-radius:6px; border:1px solid #1f2532; margin-bottom:6px;}\n.row{display:flex; gap:8px; flex-wrap:wrap;}\n.row img{flex:1 1 110px; min-width:110px; max-width:calc(50% - 8px);}\nsmall{color:#98a2b3;}\nfooter{margin-top:24px; color:#98a2b3;}\n  </style>"
+    )
     html_parts.append("</head>")
     html_parts.append("<body>")
     html_parts.append("  <h1>Headless Action Tests</h1>")
-    html_parts.append("  <p>Automatically generated screenshots demonstrating basic character actions in small enclosed rooms.</p>")
-    html_parts.append("  <div class=\"grid\">")
+    html_parts.append(
+        "  <p>Automatically generated screenshots demonstrating basic character actions in small enclosed rooms.</p>"
+    )
+    html_parts.append('  <div class="grid">')
 
     for name in tests:
         base = f"screens/{name}/{name}"
-        images = [f"{base}_before.png", f"{base}_t1.png", f"{base}_t2.png", f"{base}_t3.png", f"{base}_after.png"]
-        html_parts.append("    <div class=\"card\">")
+        images = [
+            f"{base}_before.png",
+            f"{base}_t1.png",
+            f"{base}_t2.png",
+            f"{base}_t3.png",
+            f"{base}_after.png",
+        ]
+        html_parts.append('    <div class="card">')
         html_parts.append(f"      <h2>{name}</h2>")
-        html_parts.append("      <div class=\"row\">")
+        html_parts.append('      <div class="row">')
         for img in images:
-            html_parts.append(f"        <img class=\"thumb\" src=\"{img}\" alt=\"{name}\">")
+            html_parts.append(f'        <img class="thumb" src="{img}" alt="{name}">')
         html_parts.append("      </div>")
         html_parts.append("      <small>before, t1, t2, t3, after</small>")
         html_parts.append("    </div>")

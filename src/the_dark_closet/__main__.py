@@ -1,5 +1,4 @@
 import os
-import sys
 
 # Hide pygame's support prompt to keep CLI output clean
 os.environ.setdefault("PYGAME_HIDE_SUPPORT_PROMPT", "1")
