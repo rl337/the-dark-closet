@@ -25,26 +25,31 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: "3.11"
 
-      - name: Install uv
-        uses: astral-sh/setup-uv@v4
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: latest
+          virtualenvs-create: false
+          virtualenvs-in-project: false
 
       - name: Install dependencies
         run: |
-          uv pip install --system -e .[dev]
+          poetry install --no-interaction --no-root
+          poetry install --no-interaction
 
       - name: Run mypy
         env:
           PYTHONPATH: src
         run: |
-          mypy src scripts
+          poetry run mypy src scripts
 
       - name: Run pylint
         env:
           PYTHONPATH: src
         run: |
-          pylint src/the_dark_closet scripts
+          poetry run pylint src/the_dark_closet scripts
 
       - name: Generate screenshots site (docs/)
         env:
@@ -52,7 +57,7 @@ jobs:
           SDL_AUDIODRIVER: dummy
           PYTHONPATH: src
         run: |
-          python scripts/run_action_tests.py
+          poetry run python scripts/run_action_tests.py
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
