@@ -1,9 +1,8 @@
 from __future__ import annotations
 
 import os
-import os
 from dataclasses import dataclass
-from typing import Optional, List, Tuple, Callable, Any
+from typing import Optional, List, Tuple, Callable
 from abc import ABC, abstractmethod
 
 import pygame
@@ -102,12 +101,22 @@ class MenuScene(Scene):
         assert self.title_font is not None and self.body_font is not None
 
         title = self.title_font.render("The Dark Closet", True, (220, 220, 230))
-        subtitle = self.body_font.render("Press Enter to step through the portal", True, (200, 200, 210))
+        subtitle = self.body_font.render(
+            "Press Enter to step through the portal", True, (200, 200, 210)
+        )
         hint = self.body_font.render("Esc to quit", True, (160, 160, 170))
 
-        surface.blit(title, title.get_rect(center=(self.app.width // 2, self.app.height // 2 - 40)))
-        surface.blit(subtitle, subtitle.get_rect(center=(self.app.width // 2, self.app.height // 2 + 20)))
-        surface.blit(hint, hint.get_rect(center=(self.app.width // 2, self.app.height // 2 + 70)))
+        surface.blit(
+            title,
+            title.get_rect(center=(self.app.width // 2, self.app.height // 2 - 40)),
+        )
+        surface.blit(
+            subtitle,
+            subtitle.get_rect(center=(self.app.width // 2, self.app.height // 2 + 20)),
+        )
+        surface.blit(
+            hint, hint.get_rect(center=(self.app.width // 2, self.app.height // 2 + 70))
+        )
 
 
 TILE_SIZE: int = 128  # 4x 32 for higher resolution
@@ -120,9 +129,16 @@ TILE_BOUNDARY = "X"  # impassable, unbreakable level boundary
 
 
 class SideScrollerScene(Scene):
-    def __init__(self, app: "GameApp", world_tiles: Optional[List[str]] = None, player_spawn_px: Optional[Tuple[int, int]] = None) -> None:
+    def __init__(
+        self,
+        app: "GameApp",
+        world_tiles: Optional[List[str]] = None,
+        player_spawn_px: Optional[Tuple[int, int]] = None,
+    ) -> None:
         super().__init__(app)
-        self.world_tiles: List[str] = world_tiles if world_tiles is not None else self._build_world()
+        self.world_tiles: List[str] = (
+            world_tiles if world_tiles is not None else self._build_world()
+        )
         self.world_cols = max(len(row) for row in self.world_tiles)
         self.world_rows = len(self.world_tiles)
         self.world_width_px = self.world_cols * TILE_SIZE
@@ -240,7 +256,9 @@ class SideScrollerScene(Scene):
                 line[col] = value
                 self.world_tiles[row] = "".join(line)
 
-    def _tiles_overlapping_rect(self, rect: pygame.Rect) -> List[Tuple[int, int, str, pygame.Rect]]:
+    def _tiles_overlapping_rect(
+        self, rect: pygame.Rect
+    ) -> List[Tuple[int, int, str, pygame.Rect]]:
         tiles: List[Tuple[int, int, str, pygame.Rect]] = []
         left = rect.left // TILE_SIZE
         right = (rect.right - 1) // TILE_SIZE
@@ -250,7 +268,9 @@ class SideScrollerScene(Scene):
             for tx in range(left, right + 1):
                 t = self._tile_at(tx, ty)
                 if t != TILE_EMPTY:
-                    tile_rect = pygame.Rect(tx * TILE_SIZE, ty * TILE_SIZE, TILE_SIZE, TILE_SIZE)
+                    tile_rect = pygame.Rect(
+                        tx * TILE_SIZE, ty * TILE_SIZE, TILE_SIZE, TILE_SIZE
+                    )
                     tiles.append((tx, ty, t, tile_rect))
         return tiles
 
@@ -274,7 +294,9 @@ class SideScrollerScene(Scene):
         # Ladder check: inside any ladder tile at player center
         player_center_col = (self.player_rect.centerx) // TILE_SIZE
         player_center_row = (self.player_rect.centery) // TILE_SIZE
-        inside_ladder = self._tile_at(player_center_col, player_center_row) == TILE_LADDER
+        inside_ladder = (
+            self._tile_at(player_center_col, player_center_row) == TILE_LADDER
+        )
 
         # Jump / climb
         want_jump = keys[pygame.K_SPACE] or keys[pygame.K_w] or keys[pygame.K_UP]
@@ -296,15 +318,21 @@ class SideScrollerScene(Scene):
                 self.player_velocity_y = -self.player_jump_speed_px_per_sec
                 self.on_ground = False
 
-        prev_rect = self.player_rect.copy()
+        # Removed unused prev_rect to satisfy linter
 
         # Horizontal movement and collisions (solid tiles only)
         self.player_rect.x += int(self.player_velocity_x * delta_seconds)
         for tx, ty, t, tile_rect in self._tiles_overlapping_rect(self.player_rect):
             if t in (TILE_METAL, TILE_BRICK, TILE_BOUNDARY):
-                if self.player_velocity_x > 0 and self.player_rect.right > tile_rect.left:
+                if (
+                    self.player_velocity_x > 0
+                    and self.player_rect.right > tile_rect.left
+                ):
                     self.player_rect.right = tile_rect.left
-                elif self.player_velocity_x < 0 and self.player_rect.left < tile_rect.right:
+                elif (
+                    self.player_velocity_x < 0
+                    and self.player_rect.left < tile_rect.right
+                ):
                     self.player_rect.left = tile_rect.right
 
         # Vertical movement and collisions
@@ -317,22 +345,35 @@ class SideScrollerScene(Scene):
         for tx, ty, t, tile_rect in collisions:
             if t == TILE_BRICK and self.player_velocity_y < 0:
                 # Break brick when hitting from below: previously below its bottom, now intersecting upward
-                if prev_top >= tile_rect.bottom and self.player_rect.top <= tile_rect.bottom:
+                if (
+                    prev_top >= tile_rect.bottom
+                    and self.player_rect.top <= tile_rect.bottom
+                ):
                     self._set_tile(tx, ty, TILE_EMPTY)
                     continue
 
             if t in (TILE_METAL, TILE_BRICK, TILE_BOUNDARY):
-                if self.player_velocity_y > 0 and self.player_rect.bottom > tile_rect.top:
+                if (
+                    self.player_velocity_y > 0
+                    and self.player_rect.bottom > tile_rect.top
+                ):
                     self.player_rect.bottom = tile_rect.top
                     self.player_velocity_y = 0
                     self.on_ground = True
-                elif self.player_velocity_y < 0 and self.player_rect.top < tile_rect.bottom:
+                elif (
+                    self.player_velocity_y < 0
+                    and self.player_rect.top < tile_rect.bottom
+                ):
                     self.player_rect.top = tile_rect.bottom
                     self.player_velocity_y = 0
 
             elif t == TILE_PLATFORM:
                 # One-way: only collide if falling and was above the platform
-                if self.player_velocity_y > 0 and prev_bottom <= tile_rect.top and self.player_rect.bottom >= tile_rect.top:
+                if (
+                    self.player_velocity_y > 0
+                    and prev_bottom <= tile_rect.top
+                    and self.player_rect.bottom >= tile_rect.top
+                ):
                     # Optional: drop-through by holding down
                     if not want_down:
                         self.player_rect.bottom = tile_rect.top
@@ -340,11 +381,15 @@ class SideScrollerScene(Scene):
                         self.on_ground = True
 
         # Constrain to world bounds
-        self.player_rect.clamp_ip(pygame.Rect(0, 0, self.world_width_px, self.world_height_px))
+        self.player_rect.clamp_ip(
+            pygame.Rect(0, 0, self.world_width_px, self.world_height_px)
+        )
 
         # Camera follow
         target_camera_x = self.player_rect.centerx - self.app.width // 2
-        self.camera_x = max(0, min(self.world_width_px - self.app.width, target_camera_x))
+        self.camera_x = max(
+            0, min(self.world_width_px - self.app.width, target_camera_x)
+        )
         self.camera_y = 0
 
     # --- Rendering ---
@@ -391,7 +436,9 @@ class SideScrollerScene(Scene):
 
     def _draw_tiles(self, surface: pygame.Surface) -> None:
         view_left_col = max(0, int(self.camera_x) // TILE_SIZE)
-        view_right_col = min(self.world_cols - 1, (int(self.camera_x) + self.app.width) // TILE_SIZE + 1)
+        view_right_col = min(
+            self.world_cols - 1, (int(self.camera_x) + self.app.width) // TILE_SIZE + 1
+        )
         view_top_row = 0
         view_bottom_row = self.world_rows - 1
 
@@ -401,7 +448,12 @@ class SideScrollerScene(Scene):
                 t = line[tx] if tx < len(line) else TILE_EMPTY
                 if t == TILE_EMPTY:
                     continue
-                rect = pygame.Rect(tx * TILE_SIZE - int(self.camera_x), ty * TILE_SIZE - int(self.camera_y), TILE_SIZE, TILE_SIZE)
+                rect = pygame.Rect(
+                    tx * TILE_SIZE - int(self.camera_x),
+                    ty * TILE_SIZE - int(self.camera_y),
+                    TILE_SIZE,
+                    TILE_SIZE,
+                )
                 self._draw_detailed_tile(surface, rect, t)
 
     def _draw_foreground(self, surface: pygame.Surface) -> None:
@@ -464,7 +516,9 @@ class SideScrollerScene(Scene):
         center_dot_rect = pygame.Rect(center_x - 4, center_y - 4, 8, 8)
         pygame.draw.rect(surface, (255, 0, 255), center_dot_rect)  # Bright magenta
 
-    def _draw_detailed_tile(self, surface: pygame.Surface, rect: pygame.Rect, tile_type: str) -> None:
+    def _draw_detailed_tile(
+        self, surface: pygame.Surface, rect: pygame.Rect, tile_type: str
+    ) -> None:
         """Draw a detailed tile with texture and shading."""
         if tile_type == TILE_METAL:
             # Metal tile with rivets and shading
@@ -497,7 +551,9 @@ class SideScrollerScene(Scene):
 
         elif tile_type == TILE_PLATFORM:
             # Platform with wood grain
-            platform_rect = pygame.Rect(rect.x, rect.y + rect.height - 24, rect.width, 24)
+            platform_rect = pygame.Rect(
+                rect.x, rect.y + rect.height - 24, rect.width, 24
+            )
             pygame.draw.rect(surface, (190, 190, 200), platform_rect)
             # Wood grain lines
             for i in range(0, rect.width, 16):
@@ -525,14 +581,19 @@ class SideScrollerScene(Scene):
                 start_x = max(0, i - rect.height)
                 end_x = min(rect.width, i)
                 if start_x < end_x:
-                    stripe_rect = pygame.Rect(rect.x + start_x, rect.y + i - start_x, end_x - start_x, 4)
+                    stripe_rect = pygame.Rect(
+                        rect.x + start_x, rect.y + i - start_x, end_x - start_x, 4
+                    )
                     pygame.draw.rect(surface, (100, 140, 180), stripe_rect)
+
 
 class WorldScene(Scene):
     def __init__(self, app: "GameApp") -> None:
         super().__init__(app)
         self.font: Optional[pygame.font.Font] = None
-        self.player_rect = pygame.Rect(app.width // 2 - 60, app.height // 2 - 60, 120, 120)  # 4x 30x30
+        self.player_rect = pygame.Rect(
+            app.width // 2 - 60, app.height // 2 - 60, 120, 120
+        )  # 4x 30x30
         self.player_speed_px_per_sec: int = 240
 
     def on_enter(self) -> None:
@@ -544,8 +605,12 @@ class WorldScene(Scene):
 
     def update(self, delta_seconds: float) -> None:
         keys = pygame.key.get_pressed()
-        movement_x = (keys[pygame.K_RIGHT] or keys[pygame.K_d]) - (keys[pygame.K_LEFT] or keys[pygame.K_a])
-        movement_y = (keys[pygame.K_DOWN] or keys[pygame.K_s]) - (keys[pygame.K_UP] or keys[pygame.K_w])
+        movement_x = (keys[pygame.K_RIGHT] or keys[pygame.K_d]) - (
+            keys[pygame.K_LEFT] or keys[pygame.K_a]
+        )
+        movement_y = (keys[pygame.K_DOWN] or keys[pygame.K_s]) - (
+            keys[pygame.K_UP] or keys[pygame.K_w]
+        )
 
         dx = int(movement_x * self.player_speed_px_per_sec * delta_seconds)
         dy = int(movement_y * self.player_speed_px_per_sec * delta_seconds)
@@ -563,11 +628,15 @@ class WorldScene(Scene):
         ]
         for i, line in enumerate(text_lines):
             rendered = self.font.render(line, True, (210, 210, 220))
-            surface.blit(rendered, (64, 64 + i * 96))  # 4x 16, 16 + i * 24 for higher resolution
+            surface.blit(
+                rendered, (64, 64 + i * 96)
+            )  # 4x 16, 16 + i * 24 for higher resolution
 
 
 class GameApp:
-    def __init__(self, config: GameConfig, time_provider: Optional[TimeProvider] = None) -> None:
+    def __init__(
+        self, config: GameConfig, time_provider: Optional[TimeProvider] = None
+    ) -> None:
         self.config = config
         self.width = config.window_width
         self.height = config.window_height
@@ -662,10 +731,10 @@ class GameApp:
 
             # Inject synthetic KEYDOWN/KEYUP events to mirror desired key state
             # Issue KEYUP for keys no longer pressed
-            for key in (pressed_prev - desired_pressed):
+            for key in pressed_prev - desired_pressed:
                 pygame.event.post(pygame.event.Event(pygame.KEYUP, {"key": key}))
             # Issue KEYDOWN for newly pressed keys
-            for key in (desired_pressed - pressed_prev):
+            for key in desired_pressed - pressed_prev:
                 pygame.event.post(pygame.event.Event(pygame.KEYDOWN, {"key": key}))
             pressed_prev = desired_pressed
 
@@ -705,17 +774,19 @@ class GameApp:
         This allows precise control over when frames are rendered for testing.
         """
         if not isinstance(self._time_provider, ControlledTimeProvider):
-            raise RuntimeError("advance_frame() can only be used with ControlledTimeProvider")
+            raise RuntimeError(
+                "advance_frame() can only be used with ControlledTimeProvider"
+            )
 
         # Set up key state if provided
         if keys is not None:
             # Clear any existing key events
             pygame.event.clear()
-            
+
             # Post KEYDOWN events for all desired keys
             for key in keys:
                 pygame.event.post(pygame.event.Event(pygame.KEYDOWN, {"key": key}))
-            
+
             # Monkey-patch get_pressed to reflect our desired state
             class _PressedProxy:
                 def __init__(self, pressed_keys: set[int]) -> None:
@@ -723,7 +794,7 @@ class GameApp:
 
                 def __getitem__(self, key_code: int) -> int:
                     return 1 if key_code in self._pressed_keys else 0
-            
+
             pygame.key.get_pressed = lambda: _PressedProxy(keys)  # type: ignore[assignment,return-value]
 
         # Process events
