@@ -4,6 +4,7 @@ import os
 import os
 from dataclasses import dataclass
 from typing import Optional, List, Tuple, Callable, Any
+from abc import ABC, abstractmethod
 
 import pygame
 
@@ -14,6 +15,49 @@ class GameConfig:
     window_height: int
     window_title: str
     target_fps: int
+
+
+class TimeProvider(ABC):
+    """Abstract base class for time providers."""
+
+    @abstractmethod
+    def get_delta_seconds(self) -> float:
+        """Get the time delta for the current frame."""
+        pass
+
+
+class RealTimeProvider(TimeProvider):
+    """Time provider that uses real system time."""
+
+    def __init__(self, target_fps: int):
+        self._clock = pygame.time.Clock()
+        self._target_fps = target_fps
+
+    def get_delta_seconds(self) -> float:
+        return self._clock.tick(self._target_fps) / 1000.0
+
+
+class ControlledTimeProvider(TimeProvider):
+    """Time provider that allows explicit control of time advancement."""
+
+    def __init__(self, fixed_delta: float):
+        self._fixed_delta = fixed_delta
+        self._current_time = 0.0
+
+    def get_delta_seconds(self) -> float:
+        return self._fixed_delta
+
+    def advance_time(self, delta_seconds: float) -> None:
+        """Explicitly advance time by the given amount."""
+        self._current_time += delta_seconds
+
+    def get_current_time(self) -> float:
+        """Get the current controlled time."""
+        return self._current_time
+
+    def set_delta(self, delta_seconds: float) -> None:
+        """Set the fixed delta time for each frame."""
+        self._fixed_delta = delta_seconds
 
 
 class Scene:
@@ -414,6 +458,12 @@ class SideScrollerScene(Scene):
         belt_rect = pygame.Rect(rect.x + 24, rect.y + 80, 56, 8)
         pygame.draw.rect(surface, (100, 50, 0), belt_rect)  # Brown belt
 
+        # Center mass dot for testing (bright magenta - very distinct color)
+        center_x = rect.x + rect.width // 2
+        center_y = rect.y + rect.height // 2
+        center_dot_rect = pygame.Rect(center_x - 4, center_y - 4, 8, 8)
+        pygame.draw.rect(surface, (255, 0, 255), center_dot_rect)  # Bright magenta
+
     def _draw_detailed_tile(self, surface: pygame.Surface, rect: pygame.Rect, tile_type: str) -> None:
         """Draw a detailed tile with texture and shading."""
         if tile_type == TILE_METAL:
@@ -517,12 +567,15 @@ class WorldScene(Scene):
 
 
 class GameApp:
-    def __init__(self, config: GameConfig) -> None:
+    def __init__(self, config: GameConfig, time_provider: Optional[TimeProvider] = None) -> None:
         self.config = config
         self.width = config.window_width
         self.height = config.window_height
         self._running = True
         self._current_scene: Optional[Scene] = None
+
+        # Time provider - defaults to real time
+        self._time_provider = time_provider or RealTimeProvider(config.target_fps)
 
         # Ensure a minimal SDL audio/video setup in headless mode
         if os.environ.get("SDL_AUDIODRIVER") is None:
@@ -531,7 +584,6 @@ class GameApp:
         pygame.init()
         pygame.display.set_caption(config.window_title)
         self._screen = pygame.display.set_mode((self.width, self.height))
-        self._clock = pygame.time.Clock()
 
         self.switch_scene(MenuScene(self))
 
@@ -547,7 +599,7 @@ class GameApp:
     def run(self, max_frames: Optional[int] = None) -> int:
         frames_rendered = 0
         while self._running:
-            delta_seconds = self._clock.tick(self.config.target_fps) / 1000.0
+            delta_seconds = self._time_provider.get_delta_seconds()
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -582,8 +634,10 @@ class GameApp:
         - keys_for_frame(frame_index) -> Set[int] of pygame.K_* to hold pressed
         - capture_callback(frame_index, surface) -> None to save screenshots
         """
-        # Use fixed timestep for determinism
-        delta_seconds = 1.0 / float(self.config.target_fps)
+        # Use controlled time provider for deterministic testing
+        controlled_time = ControlledTimeProvider(1.0 / float(self.config.target_fps))
+        original_time_provider = self._time_provider
+        self._time_provider = controlled_time
         pressed_prev: set[int] = set()
 
         # Provide a proxy that emulates pygame.key.get_pressed() based on a dynamic set
@@ -631,6 +685,7 @@ class GameApp:
 
             # Update and draw
             if self._current_scene is not None:
+                delta_seconds = self._time_provider.get_delta_seconds()
                 self._current_scene.update(delta_seconds)
                 self._current_scene.draw(self._screen)
 
@@ -639,6 +694,58 @@ class GameApp:
             if capture_callback is not None:
                 capture_callback(frame, self._screen)
 
-        # Restore original get_pressed after loop
+        # Restore original get_pressed and time provider after loop
         pygame.key.get_pressed = original_get_pressed
+        self._time_provider = original_time_provider
         return 0
+
+    def advance_frame(self, keys: Optional[set[int]] = None) -> None:
+        """
+        Advance the game by exactly one frame with controlled time.
+        This allows precise control over when frames are rendered for testing.
+        """
+        if not isinstance(self._time_provider, ControlledTimeProvider):
+            raise RuntimeError("advance_frame() can only be used with ControlledTimeProvider")
+
+        # Set up key state if provided
+        if keys is not None:
+            # Clear any existing key events
+            pygame.event.clear()
+            
+            # Post KEYDOWN events for all desired keys
+            for key in keys:
+                pygame.event.post(pygame.event.Event(pygame.KEYDOWN, {"key": key}))
+            
+            # Monkey-patch get_pressed to reflect our desired state
+            class _PressedProxy:
+                def __init__(self, pressed_keys: set[int]) -> None:
+                    self._pressed_keys = pressed_keys
+
+                def __getitem__(self, key_code: int) -> int:
+                    return 1 if key_code in self._pressed_keys else 0
+            
+            pygame.key.get_pressed = lambda: _PressedProxy(keys)  # type: ignore[assignment,return-value]
+
+        # Process events
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                self._running = False
+            elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                self._running = False
+            elif self._current_scene is not None:
+                self._current_scene.handle_event(event)
+
+        # Update and draw
+        if self._current_scene is not None:
+            delta_seconds = self._time_provider.get_delta_seconds()
+            self._time_provider.advance_time(delta_seconds)
+            self._current_scene.update(delta_seconds)
+            self._current_scene.draw(self._screen)
+
+        pygame.display.flip()
+
+    def get_current_time(self) -> float:
+        """Get the current time from the time provider."""
+        if isinstance(self._time_provider, ControlledTimeProvider):
+            return self._time_provider.get_current_time()
+        return 0.0  # Real time providers don't track time
