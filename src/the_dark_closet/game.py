@@ -66,7 +66,7 @@ class MenuScene(Scene):
         surface.blit(hint, hint.get_rect(center=(self.app.width // 2, self.app.height // 2 + 70)))
 
 
-TILE_SIZE: int = 32
+TILE_SIZE: int = 128  # 4x 32 for higher resolution
 TILE_EMPTY = " "
 TILE_METAL = "#"
 TILE_BRICK = "B"
@@ -90,7 +90,7 @@ class SideScrollerScene(Scene):
             spawn_y = self.world_height_px - 5 * TILE_SIZE
         else:
             spawn_x, spawn_y = player_spawn_px
-        self.player_rect = pygame.Rect(spawn_x, spawn_y, 26, 30)
+        self.player_rect = pygame.Rect(spawn_x, spawn_y, 104, 120)  # 4x 26x30
         self.player_velocity_x: float = 0.0
         self.player_velocity_y: float = 0.0
         self.player_speed_px_per_sec: float = 220.0
@@ -107,7 +107,7 @@ class SideScrollerScene(Scene):
         self.hud_font: Optional[pygame.font.Font] = None
 
     def on_enter(self) -> None:
-        self.hud_font = pygame.font.Font(None, 24)
+        self.hud_font = pygame.font.Font(None, 96)  # 4x 24 for higher resolution
 
     # --- World helpers ---
     def _build_world(self) -> List[str]:
@@ -316,7 +316,7 @@ class SideScrollerScene(Scene):
 
         # Player
         pr = self.player_rect.move(-int(self.camera_x), -int(self.camera_y))
-        pygame.draw.rect(surface, (220, 80, 80), pr)
+        self._draw_detailed_player(surface, pr)
 
         # Foreground accents (slightly faster than camera for depth)
         self._draw_foreground(surface)
@@ -325,7 +325,7 @@ class SideScrollerScene(Scene):
         if self.hud_font:
             msg = "Arrows/WASD to move, Space/Up to jump, Esc to quit"
             text = self.hud_font.render(msg, True, (210, 210, 220))
-            surface.blit(text, (12, 12))
+            surface.blit(text, (48, 48))  # 4x 12, 12 for higher resolution
 
     def _draw_parallax(self, surface: pygame.Surface) -> None:
         width = surface.get_width()
@@ -358,17 +358,7 @@ class SideScrollerScene(Scene):
                 if t == TILE_EMPTY:
                     continue
                 rect = pygame.Rect(tx * TILE_SIZE - int(self.camera_x), ty * TILE_SIZE - int(self.camera_y), TILE_SIZE, TILE_SIZE)
-                if t == TILE_METAL:
-                    pygame.draw.rect(surface, (100, 105, 115), rect)
-                elif t == TILE_BRICK:
-                    pygame.draw.rect(surface, (145, 100, 70), rect)
-                elif t == TILE_PLATFORM:
-                    platform_rect = pygame.Rect(rect.x, rect.y + TILE_SIZE - 6, TILE_SIZE, 6)
-                    pygame.draw.rect(surface, (190, 190, 200), platform_rect)
-                elif t == TILE_LADDER:
-                    pygame.draw.rect(surface, (210, 180, 80), rect)
-                elif t == TILE_BOUNDARY:
-                    pygame.draw.rect(surface, (80, 120, 160), rect)
+                self._draw_detailed_tile(surface, rect, t)
 
     def _draw_foreground(self, surface: pygame.Surface) -> None:
         factor_fore = 1.2
@@ -379,15 +369,124 @@ class SideScrollerScene(Scene):
             rect = pygame.Rect(x, height - 2 * TILE_SIZE, TILE_SIZE, 2 * TILE_SIZE)
             pygame.draw.rect(surface, (12, 14, 18), rect)
 
+    def _draw_detailed_player(self, surface: pygame.Surface, rect: pygame.Rect) -> None:
+        """Draw a detailed player sprite with multiple colors and features."""
+        # Main body (darker red)
+        pygame.draw.rect(surface, (180, 60, 60), rect)
+
+        # Head (lighter skin tone)
+        head_rect = pygame.Rect(rect.x + 20, rect.y + 8, 64, 48)
+        pygame.draw.rect(surface, (255, 220, 180), head_rect)
+
+        # Eyes
+        left_eye = pygame.Rect(rect.x + 32, rect.y + 20, 8, 8)
+        right_eye = pygame.Rect(rect.x + 64, rect.y + 20, 8, 8)
+        pygame.draw.rect(surface, (0, 0, 0), left_eye)
+        pygame.draw.rect(surface, (0, 0, 0), right_eye)
+
+        # Hair
+        hair_rect = pygame.Rect(rect.x + 16, rect.y + 4, 72, 16)
+        pygame.draw.rect(surface, (80, 40, 20), hair_rect)
+
+        # Arms
+        left_arm = pygame.Rect(rect.x + 4, rect.y + 56, 16, 40)
+        right_arm = pygame.Rect(rect.x + 84, rect.y + 56, 16, 40)
+        pygame.draw.rect(surface, (255, 220, 180), left_arm)
+        pygame.draw.rect(surface, (255, 220, 180), right_arm)
+
+        # Legs
+        left_leg = pygame.Rect(rect.x + 24, rect.y + 88, 20, 32)
+        right_leg = pygame.Rect(rect.x + 60, rect.y + 88, 20, 32)
+        pygame.draw.rect(surface, (40, 40, 120), left_leg)  # Blue pants
+        pygame.draw.rect(surface, (40, 40, 120), right_leg)
+
+        # Feet
+        left_foot = pygame.Rect(rect.x + 20, rect.y + 112, 24, 8)
+        right_foot = pygame.Rect(rect.x + 60, rect.y + 112, 24, 8)
+        pygame.draw.rect(surface, (60, 30, 10), left_foot)  # Brown shoes
+        pygame.draw.rect(surface, (60, 30, 10), right_foot)
+
+        # Shirt details
+        shirt_rect = pygame.Rect(rect.x + 20, rect.y + 56, 64, 32)
+        pygame.draw.rect(surface, (200, 200, 200), shirt_rect)  # White shirt
+
+        # Belt
+        belt_rect = pygame.Rect(rect.x + 24, rect.y + 80, 56, 8)
+        pygame.draw.rect(surface, (100, 50, 0), belt_rect)  # Brown belt
+
+    def _draw_detailed_tile(self, surface: pygame.Surface, rect: pygame.Rect, tile_type: str) -> None:
+        """Draw a detailed tile with texture and shading."""
+        if tile_type == TILE_METAL:
+            # Metal tile with rivets and shading
+            pygame.draw.rect(surface, (90, 95, 105), rect)
+            # Rivets
+            for i in range(0, rect.width, 32):
+                for j in range(0, rect.height, 32):
+                    rivet_rect = pygame.Rect(rect.x + i + 8, rect.y + j + 8, 8, 8)
+                    pygame.draw.rect(surface, (120, 125, 135), rivet_rect)
+            # Highlight
+            highlight_rect = pygame.Rect(rect.x, rect.y, rect.width, 4)
+            pygame.draw.rect(surface, (130, 135, 145), highlight_rect)
+
+        elif tile_type == TILE_BRICK:
+            # Brick tile with mortar lines
+            pygame.draw.rect(surface, (135, 90, 60), rect)
+            # Mortar lines
+            for i in range(0, rect.width, 64):
+                mortar_rect = pygame.Rect(rect.x + i, rect.y, 2, rect.height)
+                pygame.draw.rect(surface, (200, 200, 200), mortar_rect)
+            for j in range(0, rect.height, 32):
+                mortar_rect = pygame.Rect(rect.x, rect.y + j, rect.width, 2)
+                pygame.draw.rect(surface, (200, 200, 200), mortar_rect)
+            # Brick texture
+            for i in range(0, rect.width, 32):
+                for j in range(0, rect.height, 16):
+                    if (i // 32 + j // 16) % 2 == 0:
+                        brick_rect = pygame.Rect(rect.x + i + 2, rect.y + j + 2, 28, 12)
+                        pygame.draw.rect(surface, (155, 110, 80), brick_rect)
+
+        elif tile_type == TILE_PLATFORM:
+            # Platform with wood grain
+            platform_rect = pygame.Rect(rect.x, rect.y + rect.height - 24, rect.width, 24)
+            pygame.draw.rect(surface, (190, 190, 200), platform_rect)
+            # Wood grain lines
+            for i in range(0, rect.width, 16):
+                grain_rect = pygame.Rect(rect.x + i, rect.y + rect.height - 20, 1, 16)
+                pygame.draw.rect(surface, (170, 170, 180), grain_rect)
+
+        elif tile_type == TILE_LADDER:
+            # Ladder with rungs
+            pygame.draw.rect(surface, (200, 170, 70), rect)
+            # Vertical rails
+            left_rail = pygame.Rect(rect.x + 8, rect.y, 8, rect.height)
+            right_rail = pygame.Rect(rect.x + rect.width - 16, rect.y, 8, rect.height)
+            pygame.draw.rect(surface, (180, 150, 50), left_rail)
+            pygame.draw.rect(surface, (180, 150, 50), right_rail)
+            # Rungs
+            for j in range(16, rect.height, 32):
+                rung_rect = pygame.Rect(rect.x + 8, rect.y + j, rect.width - 16, 8)
+                pygame.draw.rect(surface, (180, 150, 50), rung_rect)
+
+        elif tile_type == TILE_BOUNDARY:
+            # Boundary with warning pattern
+            pygame.draw.rect(surface, (70, 110, 150), rect)
+            # Diagonal stripes
+            for i in range(0, rect.width + rect.height, 16):
+                start_x = max(0, i - rect.height)
+                end_x = min(rect.width, i)
+                if start_x < end_x:
+                    stripe_rect = pygame.Rect(rect.x + start_x, rect.y + i - start_x, end_x - start_x, 4)
+                    pygame.draw.rect(surface, (100, 140, 180), stripe_rect)
+
 class WorldScene(Scene):
     def __init__(self, app: "GameApp") -> None:
         super().__init__(app)
         self.font: Optional[pygame.font.Font] = None
-        self.player_rect = pygame.Rect(app.width // 2 - 15, app.height // 2 - 15, 30, 30)
+        self.player_rect = pygame.Rect(app.width // 2 - 60, app.height // 2 - 60, 120, 120)  # 4x 30x30
         self.player_speed_px_per_sec: int = 240
 
     def on_enter(self) -> None:
-        self.font = pygame.font.Font(None, 28)
+        self.font = pygame.font.Font(None, 112)  # 4x 28 for higher resolution
 
     def handle_event(self, event: pygame.event.Event) -> None:
         if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
@@ -414,7 +513,7 @@ class WorldScene(Scene):
         ]
         for i, line in enumerate(text_lines):
             rendered = self.font.render(line, True, (210, 210, 220))
-            surface.blit(rendered, (16, 16 + i * 24))
+            surface.blit(rendered, (64, 64 + i * 96))  # 4x 16, 16 + i * 24 for higher resolution
 
 
 class GameApp:
