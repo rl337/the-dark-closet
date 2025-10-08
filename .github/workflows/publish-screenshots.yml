@@ -25,21 +25,19 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
-          cache: 'poetry'
+          python-version: "3.11"
 
       - name: Install Poetry
-        uses: abatilo/actions-poetry@v3
+        uses: snok/install-poetry@v1
         with:
-          poetry-version: '1.8.3'
+          version: latest
+          virtualenvs-create: false
+          virtualenvs-in-project: false
 
-      - name: Ensure Poetry is in PATH
-        run: echo "$HOME/.local/bin" >> $GITHUB_PATH
-
-      - name: Install dependencies (with dev)
+      - name: Install dependencies
         run: |
-          poetry --version
-          poetry install --with dev --no-interaction --no-ansi
+          poetry install --no-interaction --no-root
+          poetry install --no-interaction
 
       - name: Run mypy
         env:

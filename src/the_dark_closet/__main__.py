@@ -1,5 +1,4 @@
 import os
-import sys
 
 # Hide pygame's support prompt to keep CLI output clean
 os.environ.setdefault("PYGAME_HIDE_SUPPORT_PROMPT", "1")
@@ -13,8 +12,8 @@ from .game import GameApp, GameConfig
 
 def main() -> int:
     config = GameConfig(
-        window_width=1280,
-        window_height=720,
+        window_width=5120,  # 4x 1280
+        window_height=2880,  # 4x 720
         window_title="The Dark Closet",
         target_fps=60,
     )

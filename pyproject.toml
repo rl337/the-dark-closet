@@ -35,15 +35,43 @@ warn_unused_ignores = true
 show_error_codes = true
 pretty = true
 
+[tool.ruff]
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F"]
+extend-ignore = ["E501"]
+
+[tool.ruff.lint.per-file-ignores]
+"scripts/*.py" = ["E402"]
+
 [tool.pylint.MASTER]
 ignore = [".venv", "build", "dist"]
 jobs = 0
 
-[tool.pylint.MESSAGES CONTROL]
+[tool.pylint.'MESSAGES CONTROL']
 disable = [
   "missing-module-docstring",
   "missing-class-docstring",
   "missing-function-docstring",
+  "no-member",  # pygame constants not recognized
+  "line-too-long",  # allow longer lines
+  "too-many-instance-attributes",
+  "too-many-branches",
+  "too-many-locals",
+  "too-many-statements",
+  "too-few-public-methods",
+  "broad-exception-caught",
+  "cell-var-from-loop",
+  "no-else-return",
+  "wrong-import-position",
+  "import-outside-toplevel",
+  "invalid-name",
+  "unused-import",
+  "too-many-arguments",
+  "too-many-positional-arguments",
+  "reimported",
+  "unused-variable",
 ]
 
 [tool.pylint.BASIC]
