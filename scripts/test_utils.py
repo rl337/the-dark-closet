@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import os
 from pathlib import Path
-from typing import Tuple, Optional, List
+from typing import Tuple, Optional, List, Sequence
 import pygame
 
 # Ensure we can import from src layout
@@ -117,7 +117,7 @@ def run_action_with_assertions(
     name: str,
     world: List[str],
     spawn_px: Tuple[int, int],
-    action_sequence: List[Tuple[str, Optional[set[int]], int, Tuple[int, int]]],
+    action_sequence: Sequence[Tuple[str, Optional[set[int]], int, Tuple[int, int]]],
     out_dir: Path,
 ) -> bool:
     """
