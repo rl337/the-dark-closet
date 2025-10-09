@@ -51,6 +51,15 @@ jobs:
         run: |
           poetry run pylint src/the_dark_closet scripts
 
+      - name: Run pytest test suite
+        env:
+          SDL_VIDEODRIVER: dummy
+          SDL_AUDIODRIVER: dummy
+          PYTHONPATH: src
+        run: |
+          # Run all tests with pytest (assets generated automatically)
+          poetry run python scripts/run_pytest_tests.py
+
       - name: Generate screenshots site (docs/)
         env:
           SDL_VIDEODRIVER: dummy
@@ -63,6 +72,13 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           path: docs
+
+      - name: Upload test reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-reports
+          path: reports/
 
   deploy:
     needs: build
