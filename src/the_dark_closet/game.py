@@ -527,7 +527,7 @@ class SideScrollerScene(Scene):
     def _load_character_assets(self) -> Dict[str, pygame.Surface]:
         """Load procedurally generated character assets."""
         assets = {}
-        asset_dir = Path("generated_assets")
+        asset_dir = Path("build/generated_assets")
         
         if not asset_dir.exists():
             print("Warning: Generated assets not found. Using fallback drawing.")

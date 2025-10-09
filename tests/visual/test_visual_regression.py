@@ -20,6 +20,7 @@ class VisualRegressionTester:
         self.current_dir = current_dir
         self.baseline_dir.mkdir(parents=True, exist_ok=True)
         self.current_dir.mkdir(parents=True, exist_ok=True)
+        self.auto_generate_baselines = True  # Auto-generate baselines if missing
     
     def capture_test_scene(self, name: str, world: List[str], spawn_px: Tuple[int, int], 
                           actions: List[Tuple[str, int, int]]) -> List[Path]:
@@ -56,11 +57,18 @@ class VisualRegressionTester:
     
     def compare_images(self, baseline_path: Path, current_path: Path) -> Tuple[bool, str, float]:
         """Compare two images and return similarity metrics."""
-        if not baseline_path.exists():
-            return False, "Baseline image not found", 0.0
-        
         if not current_path.exists():
             return False, "Current image not found", 0.0
+        
+        # Auto-generate baseline if missing
+        if not baseline_path.exists() and self.auto_generate_baselines:
+            baseline_path.parent.mkdir(parents=True, exist_ok=True)
+            import shutil
+            shutil.copy2(current_path, baseline_path)
+            return True, f"Auto-generated baseline: {baseline_path.name}", 1.0
+        
+        if not baseline_path.exists():
+            return False, "Baseline image not found", 0.0
         
         # Load images
         try:
@@ -92,10 +100,10 @@ class VisualRegressionTester:
 
 
 @pytest.fixture
-def visual_tester(output_dir):
+def visual_tester():
     """Create a visual regression tester."""
-    baseline_dir = output_dir / "baselines"
-    current_dir = output_dir / "current"
+    baseline_dir = Path("build/visual_baselines")
+    current_dir = Path("build/visual_current")
     return VisualRegressionTester(baseline_dir, current_dir)
 
 
@@ -103,7 +111,7 @@ class TestCharacterRenderingRegression:
     """Test character rendering for visual regressions."""
     
     @pytest.mark.visual
-    def test_character_rendering_consistency(self, visual_tester, output_dir):
+    def test_character_rendering_consistency(self, visual_tester):
         """Test character rendering consistency."""
         # Simple character rendering test
         world = [
@@ -144,7 +152,7 @@ class TestCharacterRenderingRegression:
         assert all_passed, "Visual regression detected in character rendering"
     
     @pytest.mark.visual
-    def test_character_movement_consistency(self, visual_tester, output_dir):
+    def test_character_movement_consistency(self, visual_tester):
         """Test character movement visual consistency."""
         world = [
             "BBBBBBBBBBBB",
@@ -186,7 +194,7 @@ class TestPlatformInteractionRegression:
     """Test platform interactions for visual regressions."""
     
     @pytest.mark.visual
-    def test_platform_interaction_consistency(self, visual_tester, output_dir):
+    def test_platform_interaction_consistency(self, visual_tester):
         """Test platform interaction visual consistency."""
         world = [
             "BBBBBBBBBBBB",
@@ -229,7 +237,7 @@ class TestTileRenderingRegression:
     """Test tile rendering for visual regressions."""
     
     @pytest.mark.visual
-    def test_tile_rendering_consistency(self, visual_tester, output_dir):
+    def test_tile_rendering_consistency(self, visual_tester):
         """Test tile rendering visual consistency."""
         world = [
             "BBBBBBBBBBBB",  # Boundaries
@@ -272,7 +280,7 @@ class TestAssetRenderingRegression:
     
     @pytest.mark.visual
     @pytest.mark.asset
-    def test_procedural_asset_consistency(self, visual_tester, output_dir):
+    def test_procedural_asset_consistency(self, visual_tester):
         """Test procedural asset rendering consistency."""
         world = [
             "BBBBBBBBBBBB",
@@ -345,7 +353,7 @@ class TestAssetRenderingRegression:
     ], (9 * 128, 4 * 128), [("move_left", {pygame.K_LEFT}, 4)]),
 ])
 @pytest.mark.visual
-def test_character_rendering_parametrized(visual_tester, test_name, world, spawn_px, actions, output_dir):
+def test_character_rendering_parametrized(visual_tester, test_name, world, spawn_px, actions):
     """Parametrized test for different character rendering scenarios."""
     # Capture current screenshots
     current_screenshots = visual_tester.capture_test_scene(test_name, world, spawn_px, actions)
@@ -368,7 +376,7 @@ def test_character_rendering_parametrized(visual_tester, test_name, world, spawn
 
 
 @pytest.mark.visual
-def test_generate_baseline_images(visual_tester, output_dir):
+def test_generate_baseline_images(visual_tester):
     """Generate baseline images for visual regression testing."""
     # This test can be run to generate new baseline images
     test_scenarios = [

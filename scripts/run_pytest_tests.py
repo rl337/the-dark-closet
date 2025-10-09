@@ -48,9 +48,9 @@ def main():
     project_root = script_dir.parent
     os.chdir(project_root)
     
-    # Create reports directory
-    reports_dir = Path("reports")
-    reports_dir.mkdir(exist_ok=True)
+    # Create build directory
+    build_dir = Path("build")
+    build_dir.mkdir(exist_ok=True)
     
     # Test results
     results = []
@@ -58,7 +58,7 @@ def main():
     # 1. Generate procedural assets first
     print("Generating procedural assets...")
     from the_dark_closet.assets import generate_character_assets
-    generate_character_assets(Path("generated_assets"))
+    generate_character_assets(Path("build/generated_assets"))
     print("✓ Assets generated")
     
     # 2. Run unit tests

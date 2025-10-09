@@ -125,8 +125,9 @@ def test_scene(test_game_app, simple_room) -> SideScrollerScene:
 @pytest.fixture
 def temp_assets_dir() -> Generator[Path, None, None]:
     """Temporary directory for generated assets."""
-    with tempfile.TemporaryDirectory() as temp_dir:
-        yield Path(temp_dir)
+    build_dir = Path("build/generated_assets")
+    build_dir.mkdir(parents=True, exist_ok=True)
+    yield build_dir
 
 
 @pytest.fixture
@@ -138,8 +139,9 @@ def generated_assets(temp_assets_dir) -> dict:
 @pytest.fixture
 def output_dir() -> Generator[Path, None, None]:
     """Temporary directory for test outputs."""
-    with tempfile.TemporaryDirectory() as temp_dir:
-        yield Path(temp_dir)
+    build_dir = Path("build/test_outputs")
+    build_dir.mkdir(parents=True, exist_ok=True)
+    yield build_dir
 
 
 @pytest.fixture(autouse=True)
