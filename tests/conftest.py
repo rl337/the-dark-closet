@@ -192,7 +192,7 @@ def assert_center_mass_at(surface: pygame.Surface, expected_x: int, expected_y: 
     if pos is None:
         return False
     actual_x, actual_y = pos
-    return (abs(actual_x - expected_x) <= tolerance and 
+    return (abs(actual_x - expected_x) <= tolerance and
             abs(actual_y - expected_y) <= tolerance)
 
 
