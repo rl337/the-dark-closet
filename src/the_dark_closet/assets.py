@@ -61,7 +61,7 @@ class PinocchioAssetGenerator:
                                 shadow_color: Optional[Tuple[int, int, int]] = None) -> None:
         """Draw a circle with subtle shading."""
         if shadow_color is None:
-            shadow_color = tuple(max(0, c - 30) for c in color)
+            shadow_color = tuple(max(0, c - 30) for c in color)  # type: ignore
         
         # Main circle
         pygame.draw.circle(surface, color, center, radius)
@@ -75,6 +75,7 @@ class PinocchioAssetGenerator:
         # Shadow
         shadow_center = (center[0] + radius // 4, center[1] + radius // 4)
         shadow_radius = radius // 2
+        assert shadow_color is not None  # We set it above if it was None
         pygame.draw.circle(surface, shadow_color, shadow_center, shadow_radius)
     
     def draw_ellipse_with_shading(self, surface: pygame.Surface, rect: pygame.Rect, 
@@ -82,7 +83,7 @@ class PinocchioAssetGenerator:
                                  shadow_color: Optional[Tuple[int, int, int]] = None) -> None:
         """Draw an ellipse with subtle shading."""
         if shadow_color is None:
-            shadow_color = tuple(max(0, c - 30) for c in color)
+            shadow_color = tuple(max(0, c - 30) for c in color)  # type: ignore
         
         # Main ellipse
         pygame.draw.ellipse(surface, color, rect)
