@@ -49,6 +49,16 @@ jobs:
           poetry run pytest tests/unit/test_sprite_layout.py -v
           echo "✅ Sprite layout validation PASSED - build can continue"
 
+      - name: Run JSON level placement validation (MANDATORY)
+        env:
+          SDL_VIDEODRIVER: dummy
+          SDL_AUDIODRIVER: dummy
+          PYTHONPATH: src
+        run: |
+          echo "🔍 Running CRITICAL JSON level placement validation tests..."
+          poetry run pytest tests/unit/test_json_level_placement.py -v
+          echo "✅ JSON level placement validation PASSED - build can continue"
+
       - name: Run pytest test suite
         env:
           SDL_VIDEODRIVER: dummy
