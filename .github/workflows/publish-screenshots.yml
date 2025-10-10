@@ -754,6 +754,43 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - name: Deploy to GitHub Pages
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download Pages artifact
+        uses: actions/download-pages-artifact@v4
+        with:
+          path: docs
+
+      - name: Setup Google Cloud CLI
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          service_account_key: ${{ secrets.GCP_SA_KEY }}
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+
+      - name: Deploy to Google Cloud Storage
         id: deployment
-        uses: actions/deploy-pages@v4
+        run: |
+          # Get the service account key file
+          SA_KEY_FILE=$(find . -name "rl337*.json" | head -1)
+          if [ -z "$SA_KEY_FILE" ]; then
+            echo "Service account key file not found!"
+            exit 1
+          fi
+
+          # Authenticate with the service account
+          gcloud auth activate-service-account --key-file="$SA_KEY_FILE"
+
+          # Set the project
+          gcloud config set project ${{ secrets.GCP_PROJECT_ID }}
+
+          # Sync files to Google Cloud Storage bucket
+          gsutil -m rsync -r -d docs/ gs://${{ secrets.GCP_BUCKET_NAME }}/
+
+          # Make files publicly readable
+          gsutil -m acl ch -r -u AllUsers:R gs://${{ secrets.GCP_BUCKET_NAME }}/
+
+          # Set the bucket website configuration
+          gsutil web set -m index.html -e 404.html gs://${{ secrets.GCP_BUCKET_NAME }}
+
+          echo "page_url=https://${{ secrets.GCP_BUCKET_NAME }}.storage.googleapis.com" >> $GITHUB_OUTPUT
