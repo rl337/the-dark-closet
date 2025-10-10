@@ -23,7 +23,7 @@ class TimeProvider(ABC):
     @abstractmethod
     def get_delta_seconds(self) -> float:
         """Get the time delta for the current frame."""
-        pass
+        raise NotImplementedError
 
 
 class RealTimeProvider(TimeProvider):
@@ -151,6 +151,9 @@ class SideScrollerScene(Scene):
             spawn_y = self.world_height_px - 5 * TILE_SIZE
         else:
             spawn_x, spawn_y = player_spawn_px
+
+        # Character assets (lazy loaded)
+        self._character_assets: Optional[Dict[str, pygame.Surface]] = None
         self.player_rect = pygame.Rect(spawn_x, spawn_y, 104, 120)  # 4x 26x30
         self.player_velocity_x: float = 0.0
         self.player_velocity_y: float = 0.0
@@ -407,7 +410,7 @@ class SideScrollerScene(Scene):
         # Player
         pr = self.player_rect.move(-int(self.camera_x), -int(self.camera_y))
         self._draw_procedural_player(surface, pr)
-        
+
         # Foreground accents (slightly faster than camera for depth)
         self._draw_foreground(surface)
 
@@ -416,7 +419,7 @@ class SideScrollerScene(Scene):
             msg = "Arrows/WASD to move, Space/Up to jump, Esc to quit"
             text = self.hud_font.render(msg, True, (210, 210, 220))
             surface.blit(text, (48, 48))  # 4x 12, 12 for higher resolution
-        
+
         # Draw center mass dot after all other rendering (so it's not overwritten)
         pr = self.player_rect.move(-int(self.camera_x), -int(self.camera_y))
         center_x = pr.x + pr.width // 2
@@ -528,11 +531,11 @@ class SideScrollerScene(Scene):
         """Load procedurally generated character assets."""
         assets = {}
         asset_dir = Path("build/generated_assets")
-        
+
         if not asset_dir.exists():
             print("Warning: Generated assets not found. Using fallback drawing.")
             return {}
-        
+
         # Load body parts
         body_parts = ["head", "torso", "left_arm", "right_arm", "left_leg", "right_leg"]
         for part in body_parts:
@@ -542,11 +545,11 @@ class SideScrollerScene(Scene):
                     assets[part] = pygame.image.load(str(asset_path)).convert_alpha()
                 except pygame.error as e:
                     print(f"Warning: Could not load {part}: {e}")
-        
+
         # Load facial features
         face_parts = {
             "eyes_open": "face/eyes/eyes_open.png",
-            "eyes_closed": "face/eyes/eyes_closed.png", 
+            "eyes_closed": "face/eyes/eyes_closed.png",
             "mouth_neutral": "face/mouths/mouth_neutral.png",
             "mouth_open": "face/mouths/mouth_open.png"
         }
@@ -557,7 +560,7 @@ class SideScrollerScene(Scene):
                     assets[part] = pygame.image.load(str(asset_path)).convert_alpha()
                 except pygame.error as e:
                     print(f"Warning: Could not load {part}: {e}")
-        
+
         # Load gear
         gear_parts = ["hat"]
         for part in gear_parts:
@@ -567,61 +570,61 @@ class SideScrollerScene(Scene):
                     assets[part] = pygame.image.load(str(asset_path)).convert_alpha()
                 except pygame.error as e:
                     print(f"Warning: Could not load {part}: {e}")
-        
+
         return assets
 
     def _draw_procedural_player(self, surface: pygame.Surface, rect: pygame.Rect) -> None:
         """Draw player using procedurally generated assets."""
         # Load assets if not already loaded
-        if not hasattr(self, '_character_assets'):
+        if self._character_assets is None:
             self._character_assets = self._load_character_assets()
-        
+
         assets = self._character_assets
-        
+
         # If no assets loaded, fall back to detailed drawing
         if not assets:
             self._draw_detailed_player(surface, rect)
             return
-        
+
         # Calculate scaling factor (our rect is 104x120, assets are 256x256)
         scale_x = rect.width / 256.0
         scale_y = rect.height / 256.0
-        
+
         # Draw body parts in order (back to front)
         parts_order = ["left_leg", "right_leg", "torso", "left_arm", "right_arm", "head"]
-        
+
         for part in parts_order:
             if part in assets:
                 # Scale the asset to fit our rect
                 scaled_asset = pygame.transform.scale(assets[part], (int(256 * scale_x), int(256 * scale_y)))
-                
+
                 # Center the asset in our rect
                 asset_rect = scaled_asset.get_rect()
                 asset_rect.center = rect.center
-                
+
                 # Blit the asset
                 surface.blit(scaled_asset, asset_rect)
-        
+
         # Draw facial features
         if "eyes_open" in assets:
             scaled_eyes = pygame.transform.scale(assets["eyes_open"], (int(256 * scale_x), int(256 * scale_y)))
             eyes_rect = scaled_eyes.get_rect()
             eyes_rect.center = rect.center
             surface.blit(scaled_eyes, eyes_rect)
-        
+
         if "mouth_neutral" in assets:
             scaled_mouth = pygame.transform.scale(assets["mouth_neutral"], (int(256 * scale_x), int(256 * scale_y)))
             mouth_rect = scaled_mouth.get_rect()
             mouth_rect.center = rect.center
             surface.blit(scaled_mouth, mouth_rect)
-        
+
         # Draw gear
         if "hat" in assets:
             scaled_hat = pygame.transform.scale(assets["hat"], (int(256 * scale_x), int(256 * scale_y)))
             hat_rect = scaled_hat.get_rect()
             hat_rect.center = rect.center
             surface.blit(scaled_hat, hat_rect)
-        
+
         # Center mass dot will be drawn after all other rendering
 
     def _draw_detailed_tile(

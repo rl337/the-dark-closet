@@ -68,7 +68,43 @@ jobs:
           SDL_AUDIODRIVER: dummy
           PYTHONPATH: src
         run: |
-          poetry run python scripts/run_action_tests.py
+          # Generate screenshots for documentation
+          poetry run python -c "
+          from the_dark_closet.game import GameApp, GameConfig, SideScrollerScene, ControlledTimeProvider
+          import pygame
+          import os
+          from pathlib import Path
+
+          # Create docs directory
+          docs_dir = Path('docs')
+          docs_dir.mkdir(exist_ok=True)
+
+          # Create a simple test with controlled time
+          config = GameConfig(512, 384, 'Test Game', 60)
+          time_provider = ControlledTimeProvider(1.0/60.0)
+          app = GameApp(config, time_provider)
+
+          # Simple room for screenshot
+          room = [
+              'BBBBBBBBBBBB',
+              'B          B',
+              'B          B',
+              'B          B',
+              'B          B',
+              'B          B',
+              'B          B',
+              'BBBBBBBBBBBB',
+          ]
+
+          scene = SideScrollerScene(app, room, (6 * 128, 4 * 128))
+          app.switch_scene(scene)
+          app.advance_frame(None)
+
+          # Save screenshot
+          screenshot_path = docs_dir / 'test_screenshot.png'
+          pygame.image.save(app._screen, str(screenshot_path))
+          print(f'Screenshot saved to {screenshot_path}')
+          "
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
