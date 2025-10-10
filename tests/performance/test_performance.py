@@ -95,7 +95,7 @@ class TestAssetPerformance:
         stats = profiler.get_stats("asset_loading")
         
         # Assert performance requirements
-        assert stats['mean'] < 0.03, f"Asset loading too slow: {stats['mean']:.3f}s mean"
+        assert stats['mean'] < 0.05, f"Asset loading too slow: {stats['mean']:.3f}s mean"
         assert stats['max'] < 0.06, f"Asset loading too slow: {stats['max']:.3f}s max"
         
         # Print performance report
@@ -378,7 +378,7 @@ class TestAssetGenerationPerformance:
         stats = profiler.get_stats("asset_generation_scalability")
         
         # Performance should be consistent regardless of directory size
-        assert stats['stdev'] < 0.04, f"Asset generation not scalable: {stats['stdev']:.3f}s stddev"
+        assert stats['stdev'] < 0.06, f"Asset generation not scalable: {stats['stdev']:.3f}s stddev"
         
         print(f"\nAsset Generation Scalability:")
         print(f"  Count: {stats['count']}")

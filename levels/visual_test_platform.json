@@ -1,0 +1,187 @@
+{
+    "metadata": {
+        "name": "Platform Visual Test Room",
+        "width": 12,
+        "height": 8
+    },
+    "layers": {
+        "tiles": {
+            "parallax_factor": 1.0,
+            "objects": [
+                {
+                    "id": "brick_0_7",
+                    "type": "brick",
+                    "x": 0,
+                    "y": 896,
+                    "width": 128,
+                    "height": 128,
+                    "color": [
+                        135,
+                        90,
+                        60
+                    ]
+                },
+                {
+                    "id": "brick_1_7",
+                    "type": "brick",
+                    "x": 128,
+                    "y": 896,
+                    "width": 128,
+                    "height": 128,
+                    "color": [
+                        135,
+                        90,
+                        60
+                    ]
+                },
+                {
+                    "id": "brick_2_7",
+                    "type": "brick",
+                    "x": 256,
+                    "y": 896,
+                    "width": 128,
+                    "height": 128,
+                    "color": [
+                        135,
+                        90,
+                        60
+                    ]
+                },
+                {
+                    "id": "brick_3_7",
+                    "type": "brick",
+                    "x": 384,
+                    "y": 896,
+                    "width": 128,
+                    "height": 128,
+                    "color": [
+                        135,
+                        90,
+                        60
+                    ]
+                },
+                {
+                    "id": "brick_4_7",
+                    "type": "brick",
+                    "x": 512,
+                    "y": 896,
+                    "width": 128,
+                    "height": 128,
+                    "color": [
+                        135,
+                        90,
+                        60
+                    ]
+                },
+                {
+                    "id": "brick_5_7",
+                    "type": "brick",
+                    "x": 640,
+                    "y": 896,
+                    "width": 128,
+                    "height": 128,
+                    "color": [
+                        135,
+                        90,
+                        60
+                    ]
+                },
+                {
+                    "id": "brick_6_7",
+                    "type": "brick",
+                    "x": 768,
+                    "y": 896,
+                    "width": 128,
+                    "height": 128,
+                    "color": [
+                        135,
+                        90,
+                        60
+                    ]
+                },
+                {
+                    "id": "brick_7_7",
+                    "type": "brick",
+                    "x": 896,
+                    "y": 896,
+                    "width": 128,
+                    "height": 128,
+                    "color": [
+                        135,
+                        90,
+                        60
+                    ]
+                },
+                {
+                    "id": "brick_8_7",
+                    "type": "brick",
+                    "x": 1024,
+                    "y": 896,
+                    "width": 128,
+                    "height": 128,
+                    "color": [
+                        135,
+                        90,
+                        60
+                    ]
+                },
+                {
+                    "id": "brick_9_7",
+                    "type": "brick",
+                    "x": 1152,
+                    "y": 896,
+                    "width": 128,
+                    "height": 128,
+                    "color": [
+                        135,
+                        90,
+                        60
+                    ]
+                },
+                {
+                    "id": "brick_10_7",
+                    "type": "brick",
+                    "x": 1280,
+                    "y": 896,
+                    "width": 128,
+                    "height": 128,
+                    "color": [
+                        135,
+                        90,
+                        60
+                    ]
+                },
+                {
+                    "id": "brick_11_7",
+                    "type": "brick",
+                    "x": 1408,
+                    "y": 896,
+                    "width": 128,
+                    "height": 128,
+                    "color": [
+                        135,
+                        90,
+                        60
+                    ]
+                },
+                {
+                    "id": "platform_4_2",
+                    "type": "platform",
+                    "x": 512,
+                    "y": 256,
+                    "width": 512,
+                    "height": 32,
+                    "color": [
+                        190,
+                        190,
+                        200
+                    ]
+                }
+            ]
+        }
+    },
+    "player": {
+        "spawn_x": 768,
+        "spawn_y": 256
+    }
+}

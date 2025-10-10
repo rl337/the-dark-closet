@@ -158,6 +158,10 @@ class LevelRenderer:
         
         if obj.type == "brick":
             self._render_brick(surface, rect)
+        elif obj.type == "platform":
+            self._render_platform(surface, rect)
+        elif obj.type == "ladder":
+            self._render_ladder(surface, rect)
         elif obj.type == "mountain":
             self._render_mountain(surface, rect, obj.color)
         elif obj.type == "hill":
@@ -198,6 +202,32 @@ class LevelRenderer:
         """Render a hill."""
         hill_color = color or (40, 46, 60)
         pygame.draw.rect(surface, hill_color, rect)
+    
+    def _render_platform(self, surface: pygame.Surface, rect: pygame.Rect) -> None:
+        """Render a platform tile using the same logic as the game."""
+        # Platform with wood grain (exact copy from game code)
+        platform_rect = pygame.Rect(
+            rect.x, rect.y + rect.height - 24, rect.width, 24
+        )
+        pygame.draw.rect(surface, (190, 190, 200), platform_rect)
+        # Wood grain lines
+        for i in range(0, rect.width, 16):
+            grain_rect = pygame.Rect(rect.x + i, rect.y + rect.height - 20, 1, 16)
+            pygame.draw.rect(surface, (170, 170, 180), grain_rect)
+    
+    def _render_ladder(self, surface: pygame.Surface, rect: pygame.Rect) -> None:
+        """Render a ladder tile using the same logic as the game."""
+        # Ladder with rungs (exact copy from game code)
+        pygame.draw.rect(surface, (200, 170, 70), rect)
+        # Vertical rails
+        left_rail = pygame.Rect(rect.x + 8, rect.y, 8, rect.height)
+        right_rail = pygame.Rect(rect.x + rect.width - 16, rect.y, 8, rect.height)
+        pygame.draw.rect(surface, (180, 150, 50), left_rail)
+        pygame.draw.rect(surface, (180, 150, 50), right_rail)
+        # Rungs
+        for j in range(16, rect.height, 32):
+            rung_rect = pygame.Rect(rect.x + 8, rect.y + j, rect.width - 16, 8)
+            pygame.draw.rect(surface, (180, 150, 50), rung_rect)
     
     def _render_foreground_accent(self, surface: pygame.Surface, rect: pygame.Rect, color: Optional[Tuple[int, int, int]]) -> None:
         """Render a foreground accent object."""

@@ -22,10 +22,10 @@ class VisualRegressionTester:
         self.current_dir.mkdir(parents=True, exist_ok=True)
         self.auto_generate_baselines = True  # Auto-generate baselines if missing
     
-    def capture_test_scene(self, name: str, world: List[str], spawn_px: Tuple[int, int], 
-                          actions: List[Tuple[str, int, int]]) -> List[Path]:
-        """Capture screenshots for a test scene."""
-        from the_dark_closet.game import GameApp, GameConfig, SideScrollerScene, ControlledTimeProvider
+    def capture_test_scene(self, name: str, level_path: Path, actions: List[Tuple[str, int, int]]) -> List[Path]:
+        """Capture screenshots for a test scene using JSON levels."""
+        from the_dark_closet.game import GameApp, GameConfig, ControlledTimeProvider
+        from the_dark_closet.json_scene import JSONScene
         
         # Create test game
         config = GameConfig(
@@ -37,7 +37,7 @@ class VisualRegressionTester:
         time_provider = ControlledTimeProvider(1.0 / 60.0)
         app = GameApp(config, time_provider)
         
-        scene = SideScrollerScene(app, world, spawn_px)
+        scene = JSONScene(app, level_path)
         app.switch_scene(scene)
         app.advance_frame(None)
         
@@ -113,19 +113,7 @@ class TestCharacterRenderingRegression:
     @pytest.mark.visual
     def test_character_rendering_consistency(self, visual_tester):
         """Test character rendering consistency."""
-        # Simple character rendering test
-        world = [
-            "BBBBBBBBBBBB",
-            "B          B",
-            "B          B", 
-            "B          B",
-            "B          B",
-            "B          B",
-            "B          B",
-            "BBBBBBBBBBBB",
-        ]
-        
-        spawn_px = (6 * 128, 4 * 128)
+        level_path = Path("levels/visual_test_simple.json")
         actions = [
             ("idle", None, 4),
             ("move_right", {pygame.K_RIGHT}, 4),
@@ -133,7 +121,7 @@ class TestCharacterRenderingRegression:
         ]
         
         # Capture current screenshots
-        current_screenshots = visual_tester.capture_test_scene("character_rendering", world, spawn_px, actions)
+        current_screenshots = visual_tester.capture_test_scene("character_rendering", level_path, actions)
         
         # Compare with baselines
         all_passed = True
@@ -154,24 +142,13 @@ class TestCharacterRenderingRegression:
     @pytest.mark.visual
     def test_character_movement_consistency(self, visual_tester):
         """Test character movement visual consistency."""
-        world = [
-            "BBBBBBBBBBBB",
-            "B          B",
-            "B          B", 
-            "B          B",
-            "B          B",
-            "B          B",
-            "B          B",
-            "BBBBBBBBBBBB",
-        ]
-        
-        spawn_px = (3 * 128, 4 * 128)
+        level_path = Path("levels/visual_test_simple.json")
         actions = [
             ("move_sequence", {pygame.K_RIGHT}, 8),
         ]
         
         # Capture current screenshots
-        current_screenshots = visual_tester.capture_test_scene("character_movement", world, spawn_px, actions)
+        current_screenshots = visual_tester.capture_test_scene("character_movement", level_path, actions)
         
         # Compare with baselines
         all_passed = True
@@ -196,25 +173,14 @@ class TestPlatformInteractionRegression:
     @pytest.mark.visual
     def test_platform_interaction_consistency(self, visual_tester):
         """Test platform interaction visual consistency."""
-        world = [
-            "BBBBBBBBBBBB",
-            "B          B",
-            "B    PP    B",  # Platform
-            "B          B",
-            "B          B",
-            "B          B",
-            "B          B",
-            "BBBBBBBBBBBB",
-        ]
-        
-        spawn_px = (6 * 128, 2 * 128)  # Above platform
+        level_path = Path("levels/visual_test_platform.json")
         actions = [
             ("fall_to_platform", None, 8),
             ("jump_from_platform", {pygame.K_SPACE}, 8),
         ]
         
         # Capture current screenshots
-        current_screenshots = visual_tester.capture_test_scene("platform_interaction", world, spawn_px, actions)
+        current_screenshots = visual_tester.capture_test_scene("platform_interaction", level_path, actions)
         
         # Compare with baselines
         all_passed = True
@@ -239,24 +205,13 @@ class TestTileRenderingRegression:
     @pytest.mark.visual
     def test_tile_rendering_consistency(self, visual_tester):
         """Test tile rendering visual consistency."""
-        world = [
-            "BBBBBBBBBBBB",  # Boundaries
-            "B          B",
-            "B   BBBB   B",  # Bricks
-            "B   HHHH   B",  # Ladders
-            "B   PPPP   B",  # Platforms
-            "B          B",
-            "B          B",
-            "BBBBBBBBBBBB",
-        ]
-        
-        spawn_px = (6 * 128, 4 * 128)
+        level_path = Path("levels/visual_test_simple.json")
         actions = [
             ("observe_tiles", None, 8),
         ]
         
         # Capture current screenshots
-        current_screenshots = visual_tester.capture_test_scene("tile_rendering", world, spawn_px, actions)
+        current_screenshots = visual_tester.capture_test_scene("tile_rendering", level_path, actions)
         
         # Compare with baselines
         all_passed = True
@@ -282,24 +237,13 @@ class TestAssetRenderingRegression:
     @pytest.mark.asset
     def test_procedural_asset_consistency(self, visual_tester):
         """Test procedural asset rendering consistency."""
-        world = [
-            "BBBBBBBBBBBB",
-            "B          B",
-            "B          B", 
-            "B          B",
-            "B          B",
-            "B          B",
-            "B          B",
-            "BBBBBBBBBBBB",
-        ]
-        
-        spawn_px = (6 * 128, 4 * 128)
+        level_path = Path("levels/visual_test_simple.json")
         actions = [
             ("asset_rendering", None, 8),
         ]
         
         # Capture current screenshots
-        current_screenshots = visual_tester.capture_test_scene("procedural_assets", world, spawn_px, actions)
+        current_screenshots = visual_tester.capture_test_scene("procedural_assets", level_path, actions)
         
         # Compare with baselines
         all_passed = True
@@ -318,45 +262,16 @@ class TestAssetRenderingRegression:
         assert all_passed, "Visual regression detected in procedural asset rendering"
 
 
-@pytest.mark.parametrize("test_name,world,spawn_px,actions", [
-    ("character_idle", [
-        "BBBBBBBBBBBB",
-        "B          B",
-        "B          B", 
-        "B          B",
-        "B          B",
-        "B          B",
-        "B          B",
-        "BBBBBBBBBBBB",
-    ], (6 * 128, 4 * 128), [("idle", None, 4)]),
-    
-    ("character_move_right", [
-        "BBBBBBBBBBBB",
-        "B          B",
-        "B          B", 
-        "B          B",
-        "B          B",
-        "B          B",
-        "B          B",
-        "BBBBBBBBBBBB",
-    ], (3 * 128, 4 * 128), [("move_right", {pygame.K_RIGHT}, 4)]),
-    
-    ("character_move_left", [
-        "BBBBBBBBBBBB",
-        "B          B",
-        "B          B", 
-        "B          B",
-        "B          B",
-        "B          B",
-        "B          B",
-        "BBBBBBBBBBBB",
-    ], (9 * 128, 4 * 128), [("move_left", {pygame.K_LEFT}, 4)]),
+@pytest.mark.parametrize("test_name,level_path,actions", [
+    ("character_idle", "levels/visual_test_simple.json", [("idle", None, 4)]),
+    ("character_move_right", "levels/visual_test_simple.json", [("move_right", {pygame.K_RIGHT}, 4)]),
+    ("character_move_left", "levels/visual_test_simple.json", [("move_left", {pygame.K_LEFT}, 4)]),
 ])
 @pytest.mark.visual
-def test_character_rendering_parametrized(visual_tester, test_name, world, spawn_px, actions):
+def test_character_rendering_parametrized(visual_tester, test_name, level_path, actions):
     """Parametrized test for different character rendering scenarios."""
     # Capture current screenshots
-    current_screenshots = visual_tester.capture_test_scene(test_name, world, spawn_px, actions)
+    current_screenshots = visual_tester.capture_test_scene(test_name, Path(level_path), actions)
     
     # Compare with baselines
     all_passed = True
@@ -380,52 +295,25 @@ def test_generate_baseline_images(visual_tester):
     """Generate baseline images for visual regression testing."""
     # This test can be run to generate new baseline images
     test_scenarios = [
-        ("character_rendering", [
-            "BBBBBBBBBBBB",
-            "B          B",
-            "B          B", 
-            "B          B",
-            "B          B",
-            "B          B",
-            "B          B",
-            "BBBBBBBBBBBB",
-        ], (6 * 128, 4 * 128), [
+        ("character_rendering", "levels/visual_test_simple.json", [
             ("idle", None, 4),
             ("move_right", {pygame.K_RIGHT}, 4),
             ("move_left", {pygame.K_LEFT}, 4),
         ]),
         
-        ("platform_interaction", [
-            "BBBBBBBBBBBB",
-            "B          B",
-            "B    PP    B",
-            "B          B",
-            "B          B",
-            "B          B",
-            "B          B",
-            "BBBBBBBBBBBB",
-        ], (6 * 128, 2 * 128), [
+        ("platform_interaction", "levels/visual_test_platform.json", [
             ("fall_to_platform", None, 8),
             ("jump_from_platform", {pygame.K_SPACE}, 8),
         ]),
         
-        ("tile_rendering", [
-            "BBBBBBBBBBBB",
-            "B          B",
-            "B   BBBB   B",
-            "B   HHHH   B",
-            "B   PPPP   B",
-            "B          B",
-            "B          B",
-            "BBBBBBBBBBBB",
-        ], (6 * 128, 4 * 128), [
+        ("tile_rendering", "levels/visual_test_simple.json", [
             ("observe_tiles", None, 8),
         ]),
     ]
     
-    for test_name, world, spawn_px, actions in test_scenarios:
+    for test_name, level_path, actions in test_scenarios:
         # Capture screenshots
-        screenshots = visual_tester.capture_test_scene(test_name, world, spawn_px, actions)
+        screenshots = visual_tester.capture_test_scene(test_name, Path(level_path), actions)
         
         # Copy to baseline directory
         for screenshot_path in screenshots:

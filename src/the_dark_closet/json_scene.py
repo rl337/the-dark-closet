@@ -106,18 +106,21 @@ class JSONScene(Scene):
         for brick in brick_objects:
             brick_rect = brick.get_rect()
             
-            # Check if player is standing on brick
+            # Check if player is standing on brick (only for ground-level bricks)
             if (self.player_rect.colliderect(brick_rect) and 
                 player_bottom <= brick_rect.top + 10 and 
-                self.player_velocity_y >= 0):
+                self.player_velocity_y >= 0 and
+                brick_rect.y >= self.level_height - 256):  # Only ground-level bricks
                 self.player_rect.bottom = brick_rect.top
                 self.player_velocity_y = 0
                 self.on_ground = True
                 break
         
-        # Keep player within level bounds
+        # Gravity is now handled in update method
+        
+        # Keep player within level bounds (but allow movement)
         self.player_rect.x = max(0, min(self.player_rect.x, self.level_width - self.player_rect.width))
-        self.player_rect.y = max(0, min(self.player_rect.y, self.level_height - self.player_rect.height))
+        # Don't constrain Y position to allow jumping
     
     def _update_camera(self) -> None:
         """Update camera position to follow player."""

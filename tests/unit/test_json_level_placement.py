@@ -75,6 +75,10 @@ class JSONLevelValidator:
         # Validate based on object type
         if object_type == "brick":
             return self._validate_brick_region(region_array, object_id)
+        elif object_type == "platform":
+            return self._validate_platform_region(region_array, object_id)
+        elif object_type == "ladder":
+            return self._validate_ladder_region(region_array, object_id)
         elif object_type == "mountain":
             return self._validate_mountain_region(region_array, object_id)
         elif object_type == "hill":
@@ -105,6 +109,48 @@ class JSONLevelValidator:
                 return True
         
         self.errors.append(f"{object_id}: Region does not contain expected brick colors")
+        return False
+    
+    def _validate_platform_region(self, region_array: np.ndarray, object_id: str) -> bool:
+        """Validate that a region contains platform colors and patterns."""
+        # Look for characteristic platform colors
+        platform_colors = [
+            [190, 190, 200],  # Platform base color
+            [170, 170, 180],  # Wood grain color
+        ]
+        
+        # Check if any of the platform colors appear in the region
+        for color in platform_colors:
+            color_diff = np.abs(region_array.astype(int) - np.array(color))
+            max_diff = np.max(color_diff, axis=2)
+            matching_pixels = np.sum(max_diff < 30)  # 30 pixel tolerance
+            
+            # If we find a reasonable number of matching pixels, this looks like a platform
+            if matching_pixels > (region_array.shape[0] * region_array.shape[1]) * 0.1:  # At least 10% of pixels
+                return True
+        
+        self.errors.append(f"{object_id}: Region does not contain expected platform colors")
+        return False
+    
+    def _validate_ladder_region(self, region_array: np.ndarray, object_id: str) -> bool:
+        """Validate that a region contains ladder colors and patterns."""
+        # Look for characteristic ladder colors
+        ladder_colors = [
+            [200, 170, 70],   # Ladder base color
+            [180, 150, 50],   # Ladder rail/rung color
+        ]
+        
+        # Check if any of the ladder colors appear in the region
+        for color in ladder_colors:
+            color_diff = np.abs(region_array.astype(int) - np.array(color))
+            max_diff = np.max(color_diff, axis=2)
+            matching_pixels = np.sum(max_diff < 30)  # 30 pixel tolerance
+            
+            # If we find a reasonable number of matching pixels, this looks like a ladder
+            if matching_pixels > (region_array.shape[0] * region_array.shape[1]) * 0.1:  # At least 10% of pixels
+                return True
+        
+        self.errors.append(f"{object_id}: Region does not contain expected ladder colors")
         return False
     
     def _validate_mountain_region(self, region_array: np.ndarray, object_id: str) -> bool:
