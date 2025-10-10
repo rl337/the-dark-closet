@@ -39,6 +39,16 @@ jobs:
           poetry install --no-interaction --no-root
           poetry install --no-interaction
 
+      - name: Run sprite layout validation (MANDATORY)
+        env:
+          SDL_VIDEODRIVER: dummy
+          SDL_AUDIODRIVER: dummy
+          PYTHONPATH: src
+        run: |
+          echo "🔍 Running CRITICAL sprite layout validation tests..."
+          poetry run pytest tests/unit/test_sprite_layout.py -v
+          echo "✅ Sprite layout validation PASSED - build can continue"
+
       - name: Run pytest test suite
         env:
           SDL_VIDEODRIVER: dummy
