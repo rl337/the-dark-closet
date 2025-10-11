@@ -95,18 +95,36 @@ run_mypy() {
 # Function to run all tests
 run_tests() {
     print_status "Running all tests..."
-    poetry run pytest tests/ \
-        --verbose \
-        --tb=short \
-        --strict-markers \
-        --disable-warnings \
-        --html=build/reports/pytest_report.html \
-        --self-contained-html \
-        --cov=src \
-        --cov-report=html:build/reports/coverage \
-        --cov-report=term-missing \
-        --cov-report=xml:build/reports/coverage.xml \
-        --junitxml=build/reports/junit.xml
+    # Skip performance tests in CI environments as they can be flaky due to timing
+    if [ -n "$CI" ] || [ -n "$GITHUB_ACTIONS" ]; then
+        print_status "Skipping performance tests in CI environment"
+        poetry run pytest tests/ \
+            --verbose \
+            --tb=short \
+            --strict-markers \
+            --disable-warnings \
+            --html=build/reports/pytest_report.html \
+            --self-contained-html \
+            --cov=src \
+            --cov-report=html:build/reports/coverage \
+            --cov-report=term-missing \
+            --cov-report=xml:build/reports/coverage.xml \
+            --junitxml=build/reports/junit.xml \
+            -m "not performance"
+    else
+        poetry run pytest tests/ \
+            --verbose \
+            --tb=short \
+            --strict-markers \
+            --disable-warnings \
+            --html=build/reports/pytest_report.html \
+            --self-contained-html \
+            --cov=src \
+            --cov-report=html:build/reports/coverage \
+            --cov-report=term-missing \
+            --cov-report=xml:build/reports/coverage.xml \
+            --junitxml=build/reports/junit.xml
+    fi
     print_success "All tests passed"
 }
 
