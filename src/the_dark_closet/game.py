@@ -1,3 +1,4 @@
+# pylint: disable=attribute-defined-outside-init
 from __future__ import annotations
 
 import os
@@ -7,6 +8,14 @@ from abc import ABC, abstractmethod
 from pathlib import Path
 
 import pygame
+from .rendering_utils import (
+    render_brick_tile,
+    render_platform_tile,
+    render_ladder_tile,
+    render_hud,
+    render_center_mass_dot,
+    PlayerMixin,
+)
 
 
 @dataclass(frozen=True)
@@ -129,7 +138,7 @@ TILE_LADDER = "H"
 TILE_BOUNDARY = "X"  # impassable, unbreakable level boundary
 
 
-class SideScrollerScene(Scene):
+class SideScrollerScene(Scene, PlayerMixin):
     def __init__(
         self,
         app: "GameApp",
@@ -154,21 +163,9 @@ class SideScrollerScene(Scene):
 
         # Character assets (lazy loaded)
         self._character_assets: Optional[Dict[str, pygame.Surface]] = None
-        self.player_rect = pygame.Rect(spawn_x, spawn_y, 104, 120)  # 4x 26x30
-        self.player_velocity_x: float = 0.0
-        self.player_velocity_y: float = 0.0
-        self.player_speed_px_per_sec: float = 220.0
-        self.player_jump_speed_px_per_sec: float = 420.0
-        self.gravity_px_per_sec2: float = 1200.0
-        self.on_ground: bool = False
-        self.on_ladder: bool = False
 
-        # Camera
-        self.camera_x: float = 0.0
-        self.camera_y: float = 0.0
-
-        # Fonts
-        self.hud_font: Optional[pygame.font.Font] = None
+        # Initialize player state using shared configuration
+        self._init_player_state(spawn_x, spawn_y)
 
     def on_enter(self) -> None:
         self.hud_font = pygame.font.Font(None, 96)  # 4x 24 for higher resolution
@@ -415,17 +412,10 @@ class SideScrollerScene(Scene):
         self._draw_foreground(surface)
 
         # HUD
-        if self.hud_font:
-            msg = "Arrows/WASD to move, Space/Up to jump, Esc to quit"
-            text = self.hud_font.render(msg, True, (210, 210, 220))
-            surface.blit(text, (48, 48))  # 4x 12, 12 for higher resolution
+        render_hud(surface, self.hud_font)
 
         # Draw center mass dot after all other rendering (so it's not overwritten)
-        pr = self.player_rect.move(-int(self.camera_x), -int(self.camera_y))
-        center_x = pr.x + pr.width // 2
-        center_y = pr.y + pr.height // 2
-        center_dot_rect = pygame.Rect(center_x - 4, center_y - 4, 8, 8)
-        pygame.draw.rect(surface, (255, 0, 255), center_dot_rect)  # Bright magenta
+        render_center_mass_dot(surface, self.player_rect, self.camera_x, self.camera_y)
 
     def _draw_parallax(self, surface: pygame.Surface) -> None:
         width = surface.get_width()
@@ -551,7 +541,7 @@ class SideScrollerScene(Scene):
             "eyes_open": "face/eyes/eyes_open.png",
             "eyes_closed": "face/eyes/eyes_closed.png",
             "mouth_neutral": "face/mouths/mouth_neutral.png",
-            "mouth_open": "face/mouths/mouth_open.png"
+            "mouth_open": "face/mouths/mouth_open.png",
         }
         for part, rel_path in face_parts.items():
             asset_path = asset_dir / rel_path
@@ -573,7 +563,9 @@ class SideScrollerScene(Scene):
 
         return assets
 
-    def _draw_procedural_player(self, surface: pygame.Surface, rect: pygame.Rect) -> None:
+    def _draw_procedural_player(
+        self, surface: pygame.Surface, rect: pygame.Rect
+    ) -> None:
         """Draw player using procedurally generated assets."""
         # Load assets if not already loaded
         if self._character_assets is None:
@@ -591,12 +583,21 @@ class SideScrollerScene(Scene):
         scale_y = rect.height / 256.0
 
         # Draw body parts in order (back to front)
-        parts_order = ["left_leg", "right_leg", "torso", "left_arm", "right_arm", "head"]
+        parts_order = [
+            "left_leg",
+            "right_leg",
+            "torso",
+            "left_arm",
+            "right_arm",
+            "head",
+        ]
 
         for part in parts_order:
             if part in assets:
                 # Scale the asset to fit our rect
-                scaled_asset = pygame.transform.scale(assets[part], (int(256 * scale_x), int(256 * scale_y)))
+                scaled_asset = pygame.transform.scale(
+                    assets[part], (int(256 * scale_x), int(256 * scale_y))
+                )
 
                 # Center the asset in our rect
                 asset_rect = scaled_asset.get_rect()
@@ -607,20 +608,26 @@ class SideScrollerScene(Scene):
 
         # Draw facial features
         if "eyes_open" in assets:
-            scaled_eyes = pygame.transform.scale(assets["eyes_open"], (int(256 * scale_x), int(256 * scale_y)))
+            scaled_eyes = pygame.transform.scale(
+                assets["eyes_open"], (int(256 * scale_x), int(256 * scale_y))
+            )
             eyes_rect = scaled_eyes.get_rect()
             eyes_rect.center = rect.center
             surface.blit(scaled_eyes, eyes_rect)
 
         if "mouth_neutral" in assets:
-            scaled_mouth = pygame.transform.scale(assets["mouth_neutral"], (int(256 * scale_x), int(256 * scale_y)))
+            scaled_mouth = pygame.transform.scale(
+                assets["mouth_neutral"], (int(256 * scale_x), int(256 * scale_y))
+            )
             mouth_rect = scaled_mouth.get_rect()
             mouth_rect.center = rect.center
             surface.blit(scaled_mouth, mouth_rect)
 
         # Draw gear
         if "hat" in assets:
-            scaled_hat = pygame.transform.scale(assets["hat"], (int(256 * scale_x), int(256 * scale_y)))
+            scaled_hat = pygame.transform.scale(
+                assets["hat"], (int(256 * scale_x), int(256 * scale_y))
+            )
             hat_rect = scaled_hat.get_rect()
             hat_rect.center = rect.center
             surface.blit(scaled_hat, hat_rect)
@@ -644,45 +651,13 @@ class SideScrollerScene(Scene):
             pygame.draw.rect(surface, (130, 135, 145), highlight_rect)
 
         elif tile_type == TILE_BRICK:
-            # Brick tile with mortar lines
-            pygame.draw.rect(surface, (135, 90, 60), rect)
-            # Mortar lines
-            for i in range(0, rect.width, 64):
-                mortar_rect = pygame.Rect(rect.x + i, rect.y, 2, rect.height)
-                pygame.draw.rect(surface, (200, 200, 200), mortar_rect)
-            for j in range(0, rect.height, 32):
-                mortar_rect = pygame.Rect(rect.x, rect.y + j, rect.width, 2)
-                pygame.draw.rect(surface, (200, 200, 200), mortar_rect)
-            # Brick texture
-            for i in range(0, rect.width, 32):
-                for j in range(0, rect.height, 16):
-                    if (i // 32 + j // 16) % 2 == 0:
-                        brick_rect = pygame.Rect(rect.x + i + 2, rect.y + j + 2, 28, 12)
-                        pygame.draw.rect(surface, (155, 110, 80), brick_rect)
+            render_brick_tile(surface, rect)
 
         elif tile_type == TILE_PLATFORM:
-            # Platform with wood grain
-            platform_rect = pygame.Rect(
-                rect.x, rect.y + rect.height - 24, rect.width, 24
-            )
-            pygame.draw.rect(surface, (190, 190, 200), platform_rect)
-            # Wood grain lines
-            for i in range(0, rect.width, 16):
-                grain_rect = pygame.Rect(rect.x + i, rect.y + rect.height - 20, 1, 16)
-                pygame.draw.rect(surface, (170, 170, 180), grain_rect)
+            render_platform_tile(surface, rect)
 
         elif tile_type == TILE_LADDER:
-            # Ladder with rungs
-            pygame.draw.rect(surface, (200, 170, 70), rect)
-            # Vertical rails
-            left_rail = pygame.Rect(rect.x + 8, rect.y, 8, rect.height)
-            right_rail = pygame.Rect(rect.x + rect.width - 16, rect.y, 8, rect.height)
-            pygame.draw.rect(surface, (180, 150, 50), left_rail)
-            pygame.draw.rect(surface, (180, 150, 50), right_rail)
-            # Rungs
-            for j in range(16, rect.height, 32):
-                rung_rect = pygame.Rect(rect.x + 8, rect.y + j, rect.width - 16, 8)
-                pygame.draw.rect(surface, (180, 150, 50), rung_rect)
+            render_ladder_tile(surface, rect)
 
         elif tile_type == TILE_BOUNDARY:
             # Boundary with warning pattern

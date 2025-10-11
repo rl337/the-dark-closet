@@ -7,9 +7,9 @@ from __future__ import annotations
 import pytest
 import pygame
 from pathlib import Path
-from typing import Dict, List, Tuple
+from typing import List, Tuple
 
-from ..conftest import find_center_mass_position, save_surface
+from ..conftest import save_surface
 
 
 class VisualRegressionTester:
@@ -22,7 +22,9 @@ class VisualRegressionTester:
         self.current_dir.mkdir(parents=True, exist_ok=True)
         self.auto_generate_baselines = True  # Auto-generate baselines if missing
 
-    def capture_test_scene(self, name: str, level_path: Path, actions: List[Tuple[str, int, int]]) -> List[Path]:
+    def capture_test_scene(
+        self, name: str, level_path: Path, actions: List[Tuple[str, int, int]]
+    ) -> List[Path]:
         """Capture screenshots for a test scene using JSON levels."""
         from the_dark_closet.game import GameApp, GameConfig, ControlledTimeProvider
         from the_dark_closet.json_scene import JSONScene
@@ -49,13 +51,17 @@ class VisualRegressionTester:
                 frame_count += 1
                 app.advance_frame(keys)
 
-                screenshot_path = self.current_dir / f"{name}_{description}_{frame:02d}.png"
+                screenshot_path = (
+                    self.current_dir / f"{name}_{description}_{frame:02d}.png"
+                )
                 save_surface(app._screen, screenshot_path)
                 screenshots.append(screenshot_path)
 
         return screenshots
 
-    def compare_images(self, baseline_path: Path, current_path: Path) -> Tuple[bool, str, float]:
+    def compare_images(
+        self, baseline_path: Path, current_path: Path
+    ) -> Tuple[bool, str, float]:
         """Compare two images and return similarity metrics."""
         if not current_path.exists():
             return False, "Current image not found", 0.0
@@ -64,6 +70,7 @@ class VisualRegressionTester:
         if not baseline_path.exists() and self.auto_generate_baselines:
             baseline_path.parent.mkdir(parents=True, exist_ok=True)
             import shutil
+
             shutil.copy2(current_path, baseline_path)
             return True, f"Auto-generated baseline: {baseline_path.name}", 1.0
 
@@ -79,7 +86,11 @@ class VisualRegressionTester:
 
         # Check dimensions
         if baseline.get_size() != current.get_size():
-            return False, f"Size mismatch: {baseline.get_size()} vs {current.get_size()}", 0.0
+            return (
+                False,
+                f"Size mismatch: {baseline.get_size()} vs {current.get_size()}",
+                0.0,
+            )
 
         # Calculate pixel differences
         width, height = baseline.get_size()
@@ -96,7 +107,11 @@ class VisualRegressionTester:
         similarity = 1.0 - (different_pixels / total_pixels)
         is_similar = similarity >= 0.95  # 95% similarity threshold
 
-        return is_similar, f"Similarity: {similarity:.3f} ({different_pixels}/{total_pixels} different pixels)", similarity
+        return (
+            is_similar,
+            f"Similarity: {similarity:.3f} ({different_pixels}/{total_pixels} different pixels)",
+            similarity,
+        )
 
 
 @pytest.fixture
@@ -121,20 +136,25 @@ class TestCharacterRenderingRegression:
         ]
 
         # Capture current screenshots
-        current_screenshots = visual_tester.capture_test_scene("character_rendering", level_path, actions)
+        current_screenshots = visual_tester.capture_test_scene(
+            "character_rendering", level_path, actions
+        )
 
         # Compare with baselines
         all_passed = True
         for screenshot_path in current_screenshots:
             baseline_path = visual_tester.baseline_dir / screenshot_path.name
 
-            is_similar, message, similarity = visual_tester.compare_images(baseline_path, screenshot_path)
+            is_similar, message, similarity = visual_tester.compare_images(
+                baseline_path, screenshot_path
+            )
 
             if not is_similar:
                 all_passed = False
                 # Copy current image to baseline for easy comparison
                 baseline_path.parent.mkdir(parents=True, exist_ok=True)
                 import shutil
+
                 shutil.copy2(screenshot_path, baseline_path)
                 print(f"Updated baseline for {screenshot_path.name}: {message}")
 
@@ -155,20 +175,25 @@ class TestCharacterRenderingRegression:
         ]
 
         # Capture current screenshots
-        current_screenshots = visual_tester.capture_test_scene("character_movement", level_path, actions)
+        current_screenshots = visual_tester.capture_test_scene(
+            "character_movement", level_path, actions
+        )
 
         # Compare with baselines
         all_passed = True
         for screenshot_path in current_screenshots:
             baseline_path = visual_tester.baseline_dir / screenshot_path.name
 
-            is_similar, message, similarity = visual_tester.compare_images(baseline_path, screenshot_path)
+            is_similar, message, similarity = visual_tester.compare_images(
+                baseline_path, screenshot_path
+            )
 
             if not is_similar:
                 all_passed = False
                 # Copy current image to baseline for easy comparison
                 baseline_path.parent.mkdir(parents=True, exist_ok=True)
                 import shutil
+
                 shutil.copy2(screenshot_path, baseline_path)
                 print(f"Updated baseline for {screenshot_path.name}: {message}")
 
@@ -194,20 +219,25 @@ class TestPlatformInteractionRegression:
         ]
 
         # Capture current screenshots
-        current_screenshots = visual_tester.capture_test_scene("platform_interaction", level_path, actions)
+        current_screenshots = visual_tester.capture_test_scene(
+            "platform_interaction", level_path, actions
+        )
 
         # Compare with baselines
         all_passed = True
         for screenshot_path in current_screenshots:
             baseline_path = visual_tester.baseline_dir / screenshot_path.name
 
-            is_similar, message, similarity = visual_tester.compare_images(baseline_path, screenshot_path)
+            is_similar, message, similarity = visual_tester.compare_images(
+                baseline_path, screenshot_path
+            )
 
             if not is_similar:
                 all_passed = False
                 # Copy current image to baseline for easy comparison
                 baseline_path.parent.mkdir(parents=True, exist_ok=True)
                 import shutil
+
                 shutil.copy2(screenshot_path, baseline_path)
                 print(f"Updated baseline for {screenshot_path.name}: {message}")
 
@@ -232,20 +262,25 @@ class TestTileRenderingRegression:
         ]
 
         # Capture current screenshots
-        current_screenshots = visual_tester.capture_test_scene("tile_rendering", level_path, actions)
+        current_screenshots = visual_tester.capture_test_scene(
+            "tile_rendering", level_path, actions
+        )
 
         # Compare with baselines
         all_passed = True
         for screenshot_path in current_screenshots:
             baseline_path = visual_tester.baseline_dir / screenshot_path.name
 
-            is_similar, message, similarity = visual_tester.compare_images(baseline_path, screenshot_path)
+            is_similar, message, similarity = visual_tester.compare_images(
+                baseline_path, screenshot_path
+            )
 
             if not is_similar:
                 all_passed = False
                 # Copy current image to baseline for easy comparison
                 baseline_path.parent.mkdir(parents=True, exist_ok=True)
                 import shutil
+
                 shutil.copy2(screenshot_path, baseline_path)
                 print(f"Updated baseline for {screenshot_path.name}: {message}")
 
@@ -271,20 +306,25 @@ class TestAssetRenderingRegression:
         ]
 
         # Capture current screenshots
-        current_screenshots = visual_tester.capture_test_scene("procedural_assets", level_path, actions)
+        current_screenshots = visual_tester.capture_test_scene(
+            "procedural_assets", level_path, actions
+        )
 
         # Compare with baselines
         all_passed = True
         for screenshot_path in current_screenshots:
             baseline_path = visual_tester.baseline_dir / screenshot_path.name
 
-            is_similar, message, similarity = visual_tester.compare_images(baseline_path, screenshot_path)
+            is_similar, message, similarity = visual_tester.compare_images(
+                baseline_path, screenshot_path
+            )
 
             if not is_similar:
                 all_passed = False
                 # Copy current image to baseline for easy comparison
                 baseline_path.parent.mkdir(parents=True, exist_ok=True)
                 import shutil
+
                 shutil.copy2(screenshot_path, baseline_path)
                 print(f"Updated baseline for {screenshot_path.name}: {message}")
 
@@ -297,29 +337,47 @@ class TestAssetRenderingRegression:
         assert all_passed, "Visual regression detected in procedural asset rendering"
 
 
-@pytest.mark.parametrize("test_name,level_path,actions", [
-    ("character_idle", "levels/visual_test_simple.json", [("idle", None, 4)]),
-    ("character_move_right", "levels/visual_test_simple.json", [("move_right", {pygame.K_RIGHT}, 4)]),
-    ("character_move_left", "levels/visual_test_simple.json", [("move_left", {pygame.K_LEFT}, 4)]),
-])
+@pytest.mark.parametrize(
+    "test_name,level_path,actions",
+    [
+        ("character_idle", "levels/visual_test_simple.json", [("idle", None, 4)]),
+        (
+            "character_move_right",
+            "levels/visual_test_simple.json",
+            [("move_right", {pygame.K_RIGHT}, 4)],
+        ),
+        (
+            "character_move_left",
+            "levels/visual_test_simple.json",
+            [("move_left", {pygame.K_LEFT}, 4)],
+        ),
+    ],
+)
 @pytest.mark.visual
-def test_character_rendering_parametrized(visual_tester, test_name, level_path, actions):
+def test_character_rendering_parametrized(
+    visual_tester, test_name, level_path, actions
+):
     """Parametrized test for different character rendering scenarios."""
     # Capture current screenshots
-    current_screenshots = visual_tester.capture_test_scene(test_name, Path(level_path), actions)
+    current_screenshots = visual_tester.capture_test_scene(
+        test_name, Path(level_path), actions
+    )
 
     # Compare with baselines
     all_passed = True
     for screenshot_path in current_screenshots:
         baseline_path = visual_tester.baseline_dir / screenshot_path.name
 
-        is_similar, message, similarity = visual_tester.compare_images(baseline_path, screenshot_path)
+        is_similar, message, similarity = visual_tester.compare_images(
+            baseline_path, screenshot_path
+        )
 
         if not is_similar:
             all_passed = False
             # Copy current image to baseline for easy comparison
             baseline_path.parent.mkdir(parents=True, exist_ok=True)
             import shutil
+
             shutil.copy2(screenshot_path, baseline_path)
             print(f"Updated baseline for {screenshot_path.name}: {message}")
 
@@ -337,31 +395,44 @@ def test_generate_baseline_images(visual_tester):
     """Generate baseline images for visual regression testing."""
     # This test can be run to generate new baseline images
     test_scenarios = [
-        ("character_rendering", "levels/visual_test_simple.json", [
-            ("idle", None, 4),
-            ("move_right", {pygame.K_RIGHT}, 4),
-            ("move_left", {pygame.K_LEFT}, 4),
-        ]),
-
-        ("platform_interaction", "levels/visual_test_platform.json", [
-            ("fall_to_platform", None, 8),
-            ("jump_from_platform", {pygame.K_SPACE}, 8),
-        ]),
-
-        ("tile_rendering", "levels/visual_test_simple.json", [
-            ("observe_tiles", None, 8),
-        ]),
+        (
+            "character_rendering",
+            "levels/visual_test_simple.json",
+            [
+                ("idle", None, 4),
+                ("move_right", {pygame.K_RIGHT}, 4),
+                ("move_left", {pygame.K_LEFT}, 4),
+            ],
+        ),
+        (
+            "platform_interaction",
+            "levels/visual_test_platform.json",
+            [
+                ("fall_to_platform", None, 8),
+                ("jump_from_platform", {pygame.K_SPACE}, 8),
+            ],
+        ),
+        (
+            "tile_rendering",
+            "levels/visual_test_simple.json",
+            [
+                ("observe_tiles", None, 8),
+            ],
+        ),
     ]
 
     for test_name, level_path, actions in test_scenarios:
         # Capture screenshots
-        screenshots = visual_tester.capture_test_scene(test_name, Path(level_path), actions)
+        screenshots = visual_tester.capture_test_scene(
+            test_name, Path(level_path), actions
+        )
 
         # Copy to baseline directory
         for screenshot_path in screenshots:
             baseline_path = visual_tester.baseline_dir / screenshot_path.name
             baseline_path.parent.mkdir(parents=True, exist_ok=True)
             import shutil
+
             shutil.copy2(screenshot_path, baseline_path)
 
     # This test always passes - it's just for generating baselines

@@ -23,11 +23,22 @@ class TestAssetGeneration:
 
         # Check that all expected assets were generated
         expected_assets = [
-            "head", "torso", "left_arm", "right_arm", "left_leg", "right_leg",
-            "eyes_open", "eyes_closed", "mouth_neutral", "mouth_open", "hat"
+            "head",
+            "torso",
+            "left_arm",
+            "right_arm",
+            "left_leg",
+            "right_leg",
+            "eyes_open",
+            "eyes_closed",
+            "mouth_neutral",
+            "mouth_open",
+            "hat",
         ]
 
-        assert len(assets) == len(expected_assets), f"Expected {len(expected_assets)} assets, got {len(assets)}"
+        assert len(assets) == len(
+            expected_assets
+        ), f"Expected {len(expected_assets)} assets, got {len(assets)}"
 
         for asset_name in expected_assets:
             assert asset_name in assets, f"Asset '{asset_name}' not generated"
@@ -42,12 +53,16 @@ class TestAssetGeneration:
 
         for asset_name, asset_path in assets.items():
             asset_path = Path(asset_path)
-            if asset_path.suffix == '.png':
+            if asset_path.suffix == ".png":
                 # Try to load the image
                 try:
                     surface = pygame.image.load(str(asset_path))
-                    assert surface.get_width() > 0, f"Asset '{asset_name}' has zero width"
-                    assert surface.get_height() > 0, f"Asset '{asset_name}' has zero height"
+                    assert (
+                        surface.get_width() > 0
+                    ), f"Asset '{asset_name}' has zero width"
+                    assert (
+                        surface.get_height() > 0
+                    ), f"Asset '{asset_name}' has zero height"
                 except pygame.error as e:
                     pytest.fail(f"Asset '{asset_name}' is not a valid image: {e}")
 
@@ -63,8 +78,17 @@ class TestAssetGeneration:
 
         # Check that expected character parts are present
         expected_parts = [
-            "head", "torso", "left_arm", "right_arm", "left_leg", "right_leg",
-            "eyes_open", "eyes_closed", "mouth_neutral", "mouth_open", "hat"
+            "head",
+            "torso",
+            "left_arm",
+            "right_arm",
+            "left_leg",
+            "right_leg",
+            "eyes_open",
+            "eyes_closed",
+            "mouth_neutral",
+            "mouth_open",
+            "hat",
         ]
 
         for part in expected_parts:
@@ -73,7 +97,9 @@ class TestAssetGeneration:
         # Check that all asset files exist
         for part, file_path in assets.items():
             asset_path = Path(file_path)
-            assert asset_path.exists(), f"Asset file for '{part}' does not exist: {file_path}"
+            assert (
+                asset_path.exists()
+            ), f"Asset file for '{part}' does not exist: {file_path}"
 
     @pytest.mark.unit
     @pytest.mark.asset
@@ -86,7 +112,9 @@ class TestAssetGeneration:
         end_time = time.perf_counter()
 
         generation_time = end_time - start_time
-        assert generation_time < 1.0, f"Asset generation took too long: {generation_time:.3f}s"
+        assert (
+            generation_time < 1.0
+        ), f"Asset generation took too long: {generation_time:.3f}s"
 
     @pytest.mark.unit
     @pytest.mark.asset
@@ -102,10 +130,12 @@ class TestAssetGeneration:
         # Check that files have same size (rough check for determinism)
         for asset_name in assets1:
             asset_path1 = Path(assets1[asset_name])
-            if asset_path1.suffix == '.png':
+            if asset_path1.suffix == ".png":
                 size1 = asset_path1.stat().st_size
                 size2 = Path(assets2[asset_name]).stat().st_size
-                assert size1 == size2, f"Asset '{asset_name}' sizes differ: {size1} vs {size2}"
+                assert (
+                    size1 == size2
+                ), f"Asset '{asset_name}' sizes differ: {size1} vs {size2}"
 
 
 class TestAssetLoading:
@@ -123,7 +153,9 @@ class TestAssetLoading:
 
         # Check that loaded assets are pygame surfaces
         for name, surface in loaded_assets.items():
-            assert isinstance(surface, pygame.Surface), f"Asset '{name}' is not a pygame.Surface"
+            assert isinstance(
+                surface, pygame.Surface
+            ), f"Asset '{name}' is not a pygame.Surface"
             assert surface.get_width() > 0, f"Asset '{name}' has zero width"
             assert surface.get_height() > 0, f"Asset '{name}' has zero height"
 
@@ -203,7 +235,9 @@ class TestCharacterRendering:
             save_surface(test_game_app._screen, screenshot_path)
 
         # Character should be visible in all frames (may fall due to gravity)
-        assert all(pos is not None for pos in positions), "Character not visible in all frames"
+        assert all(
+            pos is not None for pos in positions
+        ), "Character not visible in all frames"
 
         # Character should be falling (Y position should increase due to gravity)
         y_positions = [pos[1] for pos in positions if pos is not None]
@@ -216,7 +250,9 @@ class TestCharacterRendering:
         # Check that character doesn't move too far (reasonable bounds)
         if len(y_positions) > 1:
             y_range = max(y_positions) - min(y_positions)
-            assert y_range < 100, f"Character moved too far vertically: {y_range} pixels"
+            assert (
+                y_range < 100
+            ), f"Character moved too far vertically: {y_range} pixels"
 
     @pytest.mark.unit
     @pytest.mark.rendering
@@ -250,13 +286,27 @@ class TestCharacterRendering:
 
         # Check that character moved in world coordinates
         final_world_x = scene.player_rect.x
-        assert final_world_x > initial_world_x, f"Character did not move (initial: {initial_world_x}, final: {final_world_x})"
+        assert (
+            final_world_x > initial_world_x
+        ), f"Character did not move (initial: {initial_world_x}, final: {final_world_x})"
 
 
-@pytest.mark.parametrize("asset_name", [
-    "head", "torso", "left_arm", "right_arm", "left_leg", "right_leg",
-    "eyes_open", "eyes_closed", "mouth_neutral", "mouth_open", "hat"
-])
+@pytest.mark.parametrize(
+    "asset_name",
+    [
+        "head",
+        "torso",
+        "left_arm",
+        "right_arm",
+        "left_leg",
+        "right_leg",
+        "eyes_open",
+        "eyes_closed",
+        "mouth_neutral",
+        "mouth_open",
+        "hat",
+    ],
+)
 @pytest.mark.unit
 @pytest.mark.asset
 def test_individual_asset_generation(temp_assets_dir, asset_name):
@@ -278,7 +328,6 @@ def test_individual_asset_generation(temp_assets_dir, asset_name):
 def test_asset_generation_with_custom_output_dir():
     """Test asset generation with custom output directory."""
     import tempfile
-    import shutil
 
     with tempfile.TemporaryDirectory() as temp_dir:
         custom_dir = Path(temp_dir) / "custom_assets"
@@ -287,5 +336,7 @@ def test_asset_generation_with_custom_output_dir():
         # Check that assets were created in the custom directory
         for asset_name, asset_path in assets.items():
             asset_path = Path(asset_path)
-            assert custom_dir in asset_path.parents, f"Asset '{asset_name}' not in custom directory"
+            assert (
+                custom_dir in asset_path.parents
+            ), f"Asset '{asset_name}' not in custom directory"
             assert asset_path.exists(), f"Asset file '{asset_path}' does not exist"

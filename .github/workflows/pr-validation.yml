@@ -1,0 +1,90 @@
+name: PR Validation
+
+on:
+    pull_request:
+        branches: [main, develop]
+    push:
+        branches: [main, develop]
+
+jobs:
+    validate:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+
+            - name: Set up Python
+              uses: actions/setup-python@v5
+              with:
+                  python-version: "3.11"
+
+            - name: Install Poetry
+              uses: snok/install-poetry@v1
+              with:
+                  version: 1.8.3
+                  virtualenvs-create: true
+                  virtualenvs-in-project: true
+
+            - name: Load cached venv
+              id: cached-poetry-dependencies
+              uses: actions/cache@v4
+              with:
+                  path: .venv
+                  key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}
+
+            - name: Install dependencies
+              if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+              run: poetry install --only=main,dev
+
+            - name: Install dependencies (cached)
+              if: steps.cached-poetry-dependencies.outputs.cache-hit == 'true'
+              run: poetry install --only=main,dev --no-dev
+
+            - name: Make run_checks.sh executable
+              run: chmod +x run_checks.sh
+
+            - name: Run project structure validation
+              run: poetry run ./run_checks.sh --structure
+
+            - name: Run formatting checks
+              run: poetry run ./run_checks.sh --format
+
+            - name: Run linting checks
+              run: poetry run ./run_checks.sh --lint
+
+            - name: Run security checks
+              run: poetry run ./run_checks.sh --security
+
+            - name: Run unit tests
+              run: poetry run ./run_checks.sh --unit
+
+            - name: Run integration tests
+              run: poetry run ./run_checks.sh --integration
+
+            - name: Run visual tests
+              run: poetry run ./run_checks.sh --visual
+
+            - name: Run performance tests
+              run: poetry run ./run_checks.sh --performance
+
+            - name: Run coverage check
+              run: poetry run ./run_checks.sh --coverage
+
+            - name: Upload test results
+              uses: actions/upload-artifact@v4
+              if: always()
+              with:
+                  name: test-results
+                  path: |
+                      build/reports/
+                      build/test_outputs/
+
+            # - name: Upload coverage reports
+            #   uses: codecov/codecov-action@v4
+            #   if: always()
+            #   with:
+            #       file: build/reports/coverage.xml
+            #       flags: unittests
+            #       name: codecov-umbrella
+            #       fail_ci_if_error: false
