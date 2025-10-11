@@ -4,7 +4,6 @@ Test specifically for HUD rendering issues.
 
 from __future__ import annotations
 
-import pytest
 import pygame
 from pathlib import Path
 import numpy as np
@@ -79,12 +78,12 @@ def test_hud_text_detection():
     regular_has_hud, regular_contrast, regular_ratio = detect_hud_text(regular_surface)
     clean_has_hud, clean_contrast, clean_ratio = detect_hud_text(clean_surface)
 
-    print(f"Regular rendering:")
+    print("Regular rendering:")
     print(f"  Has HUD text: {regular_has_hud}")
     print(f"  Contrast: {regular_contrast:.2f}")
     print(f"  Text ratio: {regular_ratio:.2f}")
 
-    print(f"Clean rendering:")
+    print("Clean rendering:")
     print(f"  Has HUD text: {clean_has_hud}")
     print(f"  Contrast: {clean_contrast:.2f}")
     print(f"  Text ratio: {clean_ratio:.2f}")

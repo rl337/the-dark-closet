@@ -135,7 +135,6 @@ class CharacterRenderingTester:
         for x in range(width):
             column = surface_array[:, x, :]
             # Check if this column has consistent color (potential vertical line)
-            column_mean = np.mean(column, axis=0)
             column_std = np.std(column, axis=0)
 
             # If standard deviation is low, it's a consistent vertical line
@@ -361,7 +360,7 @@ class TestCharacterRenderingIssues:
                 # Check if HUD text is too prominent by looking at the top-left area
                 # This is a basic check - in a real implementation, we'd be more sophisticated
                 print(
-                    f"  HUD text detected - this is expected but should not dominate the image"
+                    "  HUD text detected - this is expected but should not dominate the image"
                 )
 
             print()

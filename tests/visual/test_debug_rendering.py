@@ -4,7 +4,6 @@ Debug rendering test to understand what's being rendered.
 
 from __future__ import annotations
 
-import pytest
 import pygame
 from pathlib import Path
 

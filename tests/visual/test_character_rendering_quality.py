@@ -4,7 +4,6 @@ Test for character rendering quality and proper visual composition.
 
 from __future__ import annotations
 
-import pytest
 import pygame
 import numpy as np
 from pathlib import Path
