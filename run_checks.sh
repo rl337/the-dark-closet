@@ -171,11 +171,30 @@ run_unit_tests() {
 # Function to run integration tests
 run_integration_tests() {
     print_status "Running integration tests..."
+    # Check if there are any test files in the integration directory
+    if ! find tests/integration -name 'test_*.py' -o -name '*_test.py' | grep -q .; then
+        print_status "No integration tests found, skipping..."
+        return 0
+    fi
+    
+    set +e  # Temporarily disable exit on error
     poetry run pytest tests/integration/ \
         --verbose \
         --tb=short \
         --strict-markers \
         --disable-warnings
+    integration_exit_code=$?
+    set -e  # Re-enable exit on error
+    
+    # Pytest exit code 5 means "no tests were collected" - this is OK
+    if [ $integration_exit_code -eq 5 ]; then
+        print_status "No integration tests found, skipping..."
+        return 0
+    elif [ $integration_exit_code -ne 0 ]; then
+        print_error "Integration tests failed with exit code $integration_exit_code"
+        exit $integration_exit_code
+    fi
+    
     print_success "Integration tests passed"
 }
 
