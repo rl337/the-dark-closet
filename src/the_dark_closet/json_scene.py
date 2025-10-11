@@ -197,10 +197,10 @@ class JSONScene(Scene, PlayerMixin):
             from .assets import generate_character_assets
 
             # Use a consistent assets directory for this scene instance
-            if not hasattr(self, '_assets_dir'):
+            if not hasattr(self, "_assets_dir"):
                 self._assets_dir = Path("build/generated_assets")
                 self._assets_dir.mkdir(parents=True, exist_ok=True)
-                
+
                 # Generate assets only once
                 asset_paths = generate_character_assets(self._assets_dir)
                 self._asset_paths = asset_paths

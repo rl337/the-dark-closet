@@ -912,6 +912,7 @@ class GameApp:
         if self._current_scene is not None:
             # Check if the scene is a JSONScene and supports show_hud parameter
             from .json_scene import JSONScene
+
             if isinstance(self._current_scene, JSONScene):
                 self._current_scene.draw(surface, show_hud=False)
             else:

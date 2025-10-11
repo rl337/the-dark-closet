@@ -53,26 +53,26 @@ def test_hud_text_detection():
     def detect_hud_text(surface):
         """Detect if HUD text is present in the image."""
         array = pygame.surfarray.array3d(surface)
-        
+
         # Look at the top-left area where HUD text appears
         hud_region = array[:100, :400]  # Top-left area
-        
+
         # Convert to grayscale
         gray_region = np.mean(hud_region, axis=2)
-        
+
         # Look for high contrast areas (text typically has high contrast)
         contrast = np.std(gray_region)
-        
+
         # Look for horizontal text patterns
         horizontal_edges = np.sum(np.abs(np.diff(gray_region, axis=1)))
         vertical_edges = np.sum(np.abs(np.diff(gray_region, axis=0)))
-        
+
         # Text typically has more horizontal than vertical edges
         text_ratio = horizontal_edges / (vertical_edges + 1)
-        
+
         # If contrast is high and text ratio is high, likely HUD text
         has_hud_text = contrast > 40 and text_ratio > 2.0
-        
+
         return has_hud_text, contrast, text_ratio
 
     # Analyze both images
@@ -83,7 +83,7 @@ def test_hud_text_detection():
     print(f"  Has HUD text: {regular_has_hud}")
     print(f"  Contrast: {regular_contrast:.2f}")
     print(f"  Text ratio: {regular_ratio:.2f}")
-    
+
     print(f"Clean rendering:")
     print(f"  Has HUD text: {clean_has_hud}")
     print(f"  Contrast: {clean_contrast:.2f}")
@@ -91,10 +91,14 @@ def test_hud_text_detection():
 
     # The regular version should have HUD text, clean should not
     assert regular_has_hud, "Regular rendering should have HUD text"
-    assert not clean_has_hud, f"Clean rendering should not have HUD text (contrast: {clean_contrast:.2f}, ratio: {clean_ratio:.2f})"
+    assert (
+        not clean_has_hud
+    ), f"Clean rendering should not have HUD text (contrast: {clean_contrast:.2f}, ratio: {clean_ratio:.2f})"
 
     # The clean version should have lower contrast in the HUD area
-    assert clean_contrast < regular_contrast, f"Clean rendering should have lower contrast than regular (clean: {clean_contrast:.2f}, regular: {regular_contrast:.2f})"
+    assert (
+        clean_contrast < regular_contrast
+    ), f"Clean rendering should have lower contrast than regular (clean: {clean_contrast:.2f}, regular: {regular_contrast:.2f})"
 
 
 def test_character_rendering_consistency():
@@ -128,7 +132,7 @@ def test_character_rendering_consistency():
 
     # Compare frames for consistency
     frame_arrays = [pygame.surfarray.array3d(frame) for frame in frames]
-    
+
     # All frames should be identical (no randomness)
     for i in range(1, len(frame_arrays)):
         different_pixels = 0
@@ -136,8 +140,10 @@ def test_character_rendering_consistency():
             for x in range(frame_arrays[0].shape[1]):
                 if not (frame_arrays[0][y, x] == frame_arrays[i][y, x]).all():
                     different_pixels += 1
-        
+
         print(f"Different pixels between frame 0 and frame {i}: {different_pixels}")
-        
+
         # Should be identical (or very close due to floating point precision)
-        assert different_pixels < 100, f"Frame {i} differs from frame 0 by {different_pixels} pixels - rendering is not consistent"
+        assert (
+            different_pixels < 100
+        ), f"Frame {i} differs from frame 0 by {different_pixels} pixels - rendering is not consistent"

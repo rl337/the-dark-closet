@@ -43,36 +43,38 @@ def test_direct_hud_check():
     # Look for HUD text color (210, 210, 220) directly
     array = pygame.surfarray.array3d(surface)
     hud_color = np.array([210, 210, 220])
-    
+
     # Count pixels that match the HUD text color
     hud_pixels = 0
     hud_locations = []
-    
+
     for y in range(array.shape[0]):
         for x in range(array.shape[1]):
             pixel = array[y, x]
             if np.allclose(pixel, hud_color, atol=10):  # Allow some tolerance
                 hud_pixels += 1
                 hud_locations.append((x, y))
-    
+
     print(f"HUD text pixels found: {hud_pixels}")
     print(f"HUD locations (first 10): {hud_locations[:10]}")
-    
+
     # Check the top-left area specifically
     top_left_region = array[:150, :500]
     top_left_hud_pixels = 0
-    
+
     for y in range(top_left_region.shape[0]):
         for x in range(top_left_region.shape[1]):
             pixel = top_left_region[y, x]
             if np.allclose(pixel, hud_color, atol=10):
                 top_left_hud_pixels += 1
-    
+
     print(f"HUD pixels in top-left region: {top_left_hud_pixels}")
-    
+
     # Should have HUD text pixels
     assert hud_pixels > 100, f"Expected HUD text pixels, but found only {hud_pixels}"
-    assert top_left_hud_pixels > 50, f"Expected HUD text in top-left region, but found only {top_left_hud_pixels}"
+    assert (
+        top_left_hud_pixels > 50
+    ), f"Expected HUD text in top-left region, but found only {top_left_hud_pixels}"
 
 
 def test_hud_vs_no_hud_difference():
@@ -111,14 +113,16 @@ def test_hud_vs_no_hud_difference():
     # Compare the two surfaces
     hud_array = pygame.surfarray.array3d(hud_surface)
     no_hud_array = pygame.surfarray.array3d(no_hud_surface)
-    
+
     different_pixels = 0
     for y in range(hud_array.shape[0]):
         for x in range(hud_array.shape[1]):
             if not np.array_equal(hud_array[y, x], no_hud_array[y, x]):
                 different_pixels += 1
-    
+
     print(f"Different pixels between HUD and no-HUD: {different_pixels}")
-    
+
     # Should have some differences (HUD text)
-    assert different_pixels > 100, f"Expected differences between HUD and no-HUD rendering, but found only {different_pixels} pixels"
+    assert (
+        different_pixels > 100
+    ), f"Expected differences between HUD and no-HUD rendering, but found only {different_pixels} pixels"

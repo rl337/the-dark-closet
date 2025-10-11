@@ -44,18 +44,20 @@ def test_debug_rendering():
     # Compare the two
     print("Regular rendering saved to build/debug_regular.png")
     print("Clean rendering saved to build/debug_clean.png")
-    
+
     # Check if they're different
     regular_array = pygame.surfarray.array3d(regular_surface)
     clean_array = pygame.surfarray.array3d(clean_surface)
-    
+
     different_pixels = 0
     for y in range(regular_array.shape[0]):
         for x in range(regular_array.shape[1]):
             if not (regular_array[y, x] == clean_array[y, x]).all():
                 different_pixels += 1
-    
+
     print(f"Different pixels between regular and clean: {different_pixels}")
-    
+
     # The clean version should have fewer different pixels (no HUD text)
-    assert different_pixels < 1000, f"Too many different pixels: {different_pixels} - HUD might not be disabled properly"
+    assert (
+        different_pixels < 1000
+    ), f"Too many different pixels: {different_pixels} - HUD might not be disabled properly"
