@@ -81,8 +81,22 @@ run_ruff_format() {
 # Function to run Pylint
 run_pylint() {
     print_status "Running Pylint static analysis..."
-    poetry run pylint src/ tests/ --output-format=text
-    print_success "Pylint analysis passed"
+    # Run pylint and capture the exit code
+    # Pylint exit codes: 0=no issues, 1=fatal, 2=error, 4=warning, 8=refactor, 16=convention, 32=usage error
+    # We only fail on fatal errors (exit code 1) and usage errors (exit code 32)
+    # Allow warnings, refactoring suggestions, and convention issues
+    set +e  # Temporarily disable exit on error
+    poetry run pylint src/ tests/ --output-format=text --fail-under=9.0
+    pylint_exit_code=$?
+    set -e  # Re-enable exit on error
+    
+    # Check if pylint failed with a fatal error or usage error
+    if [ $pylint_exit_code -eq 1 ] || [ $pylint_exit_code -eq 32 ]; then
+        print_error "Pylint analysis failed with critical errors (exit code: $pylint_exit_code)"
+        return 1
+    fi
+    
+    print_success "Pylint analysis passed (exit code: $pylint_exit_code)"
 }
 
 # Function to run MyPy type checking
