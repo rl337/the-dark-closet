@@ -10,11 +10,11 @@ import pygame
 from pathlib import Path
 from PIL import Image
 import numpy as np
-from typing import Dict, Tuple, List, Set
+from typing import List
 
 from the_dark_closet.game import GameApp, GameConfig, ControlledTimeProvider
 from the_dark_closet.json_scene import JSONScene
-from the_dark_closet.level_loader import LevelData, LevelObject
+from the_dark_closet.level_loader import LevelData
 
 
 class JSONLevelValidator:
@@ -32,7 +32,7 @@ class JSONLevelValidator:
         expected_width: int,
         expected_height: int,
         object_type: str,
-        object_id: str
+        object_id: str,
     ) -> bool:
         """
         Validate that an object appears at the expected position in the screenshot.
@@ -52,9 +52,12 @@ class JSONLevelValidator:
         screenshot_width, screenshot_height = screenshot.size
 
         # Check bounds
-        if (expected_x < 0 or expected_y < 0 or
-            expected_x + expected_width > screenshot_width or
-            expected_y + expected_height > screenshot_height):
+        if (
+            expected_x < 0
+            or expected_y < 0
+            or expected_x + expected_width > screenshot_width
+            or expected_y + expected_height > screenshot_height
+        ):
             self.errors.append(
                 f"{object_id}: Object bounds exceed screenshot "
                 f"(expected: {expected_x},{expected_y}, size: {expected_width}x{expected_height}, "
@@ -63,11 +66,14 @@ class JSONLevelValidator:
             return False
 
         # Extract the region where the object should be
-        object_region = screenshot.crop((
-            expected_x, expected_y,
-            expected_x + expected_width,
-            expected_y + expected_height
-        ))
+        object_region = screenshot.crop(
+            (
+                expected_x,
+                expected_y,
+                expected_x + expected_width,
+                expected_y + expected_height,
+            )
+        )
 
         # Convert to numpy array for analysis
         region_array = np.array(object_region)
@@ -93,8 +99,8 @@ class JSONLevelValidator:
         """Validate that a region contains brick colors and patterns."""
         # Look for characteristic brick colors
         brick_colors = [
-            [135, 90, 60],    # Base brick color
-            [155, 110, 80],   # Brick texture color
+            [135, 90, 60],  # Base brick color
+            [155, 110, 80],  # Brick texture color
             [200, 200, 200],  # Mortar color
         ]
 
@@ -105,13 +111,19 @@ class JSONLevelValidator:
             matching_pixels = np.sum(max_diff < 30)  # 30 pixel tolerance
 
             # If we find a reasonable number of matching pixels, this looks like a brick
-            if matching_pixels > (region_array.shape[0] * region_array.shape[1]) * 0.1:  # At least 10% of pixels
+            if (
+                matching_pixels > (region_array.shape[0] * region_array.shape[1]) * 0.1
+            ):  # At least 10% of pixels
                 return True
 
-        self.errors.append(f"{object_id}: Region does not contain expected brick colors")
+        self.errors.append(
+            f"{object_id}: Region does not contain expected brick colors"
+        )
         return False
 
-    def _validate_platform_region(self, region_array: np.ndarray, object_id: str) -> bool:
+    def _validate_platform_region(
+        self, region_array: np.ndarray, object_id: str
+    ) -> bool:
         """Validate that a region contains platform colors and patterns."""
         # Look for characteristic platform colors
         platform_colors = [
@@ -126,18 +138,22 @@ class JSONLevelValidator:
             matching_pixels = np.sum(max_diff < 30)  # 30 pixel tolerance
 
             # If we find a reasonable number of matching pixels, this looks like a platform
-            if matching_pixels > (region_array.shape[0] * region_array.shape[1]) * 0.1:  # At least 10% of pixels
+            if (
+                matching_pixels > (region_array.shape[0] * region_array.shape[1]) * 0.1
+            ):  # At least 10% of pixels
                 return True
 
-        self.errors.append(f"{object_id}: Region does not contain expected platform colors")
+        self.errors.append(
+            f"{object_id}: Region does not contain expected platform colors"
+        )
         return False
 
     def _validate_ladder_region(self, region_array: np.ndarray, object_id: str) -> bool:
         """Validate that a region contains ladder colors and patterns."""
         # Look for characteristic ladder colors
         ladder_colors = [
-            [200, 170, 70],   # Ladder base color
-            [180, 150, 50],   # Ladder rail/rung color
+            [200, 170, 70],  # Ladder base color
+            [180, 150, 50],  # Ladder rail/rung color
         ]
 
         # Check if any of the ladder colors appear in the region
@@ -147,13 +163,19 @@ class JSONLevelValidator:
             matching_pixels = np.sum(max_diff < 30)  # 30 pixel tolerance
 
             # If we find a reasonable number of matching pixels, this looks like a ladder
-            if matching_pixels > (region_array.shape[0] * region_array.shape[1]) * 0.1:  # At least 10% of pixels
+            if (
+                matching_pixels > (region_array.shape[0] * region_array.shape[1]) * 0.1
+            ):  # At least 10% of pixels
                 return True
 
-        self.errors.append(f"{object_id}: Region does not contain expected ladder colors")
+        self.errors.append(
+            f"{object_id}: Region does not contain expected ladder colors"
+        )
         return False
 
-    def _validate_mountain_region(self, region_array: np.ndarray, object_id: str) -> bool:
+    def _validate_mountain_region(
+        self, region_array: np.ndarray, object_id: str
+    ) -> bool:
         """Validate that a region contains mountain colors."""
         # Look for mountain color
         mountain_color = [30, 34, 46]
@@ -161,10 +183,14 @@ class JSONLevelValidator:
         max_diff = np.max(color_diff, axis=2)
         matching_pixels = np.sum(max_diff < 30)
 
-        if matching_pixels > (region_array.shape[0] * region_array.shape[1]) * 0.8:  # At least 80% of pixels
+        if (
+            matching_pixels > (region_array.shape[0] * region_array.shape[1]) * 0.8
+        ):  # At least 80% of pixels
             return True
 
-        self.errors.append(f"{object_id}: Region does not contain expected mountain colors")
+        self.errors.append(
+            f"{object_id}: Region does not contain expected mountain colors"
+        )
         return False
 
     def _validate_hill_region(self, region_array: np.ndarray, object_id: str) -> bool:
@@ -175,13 +201,17 @@ class JSONLevelValidator:
         max_diff = np.max(color_diff, axis=2)
         matching_pixels = np.sum(max_diff < 30)
 
-        if matching_pixels > (region_array.shape[0] * region_array.shape[1]) * 0.8:  # At least 80% of pixels
+        if (
+            matching_pixels > (region_array.shape[0] * region_array.shape[1]) * 0.8
+        ):  # At least 80% of pixels
             return True
 
         self.errors.append(f"{object_id}: Region does not contain expected hill colors")
         return False
 
-    def _validate_foreground_region(self, region_array: np.ndarray, object_id: str) -> bool:
+    def _validate_foreground_region(
+        self, region_array: np.ndarray, object_id: str
+    ) -> bool:
         """Validate that a region contains foreground accent colors."""
         # Look for foreground accent color
         accent_color = [12, 14, 18]
@@ -189,13 +219,19 @@ class JSONLevelValidator:
         max_diff = np.max(color_diff, axis=2)
         matching_pixels = np.sum(max_diff < 30)
 
-        if matching_pixels > (region_array.shape[0] * region_array.shape[1]) * 0.8:  # At least 80% of pixels
+        if (
+            matching_pixels > (region_array.shape[0] * region_array.shape[1]) * 0.8
+        ):  # At least 80% of pixels
             return True
 
-        self.errors.append(f"{object_id}: Region does not contain expected foreground accent colors")
+        self.errors.append(
+            f"{object_id}: Region does not contain expected foreground accent colors"
+        )
         return False
 
-    def _validate_generic_region(self, region_array: np.ndarray, object_id: str) -> bool:
+    def _validate_generic_region(
+        self, region_array: np.ndarray, object_id: str
+    ) -> bool:
         """Generic validation for unknown object types."""
         # Check if region is not just sky color
         sky_color = [18, 22, 30]
@@ -203,13 +239,23 @@ class JSONLevelValidator:
         max_diff = np.max(color_diff, axis=2)
         non_sky_pixels = np.sum(max_diff > 10)
 
-        if non_sky_pixels > (region_array.shape[0] * region_array.shape[1]) * 0.1:  # At least 10% non-sky pixels
+        if (
+            non_sky_pixels > (region_array.shape[0] * region_array.shape[1]) * 0.1
+        ):  # At least 10% non-sky pixels
             return True
 
-        self.errors.append(f"{object_id}: Region appears to be empty or sky-colored only")
+        self.errors.append(
+            f"{object_id}: Region appears to be empty or sky-colored only"
+        )
         return False
 
-    def validate_level_objects(self, screenshot: Image.Image, level_data: LevelData, camera_x: float = 0, camera_y: float = 0) -> bool:
+    def validate_level_objects(
+        self,
+        screenshot: Image.Image,
+        level_data: LevelData,
+        camera_x: float = 0,
+        camera_y: float = 0,
+    ) -> bool:
         """
         Validate that all objects in the level are positioned correctly.
 
@@ -233,8 +279,12 @@ class JSONLevelValidator:
                 expected_y = obj.y - int(camera_y * parallax_factor)
 
                 # Only validate objects that should be visible (at least partially on screen)
-                if (expected_x < screenshot.width and expected_x + obj.width > 0 and
-                    expected_y < screenshot.height and expected_y + obj.height > 0):
+                if (
+                    expected_x < screenshot.width
+                    and expected_x + obj.width > 0
+                    and expected_y < screenshot.height
+                    and expected_y + obj.height > 0
+                ):
 
                     # Clamp coordinates to screenshot bounds for validation
                     clamped_x = max(0, expected_x)
@@ -243,8 +293,13 @@ class JSONLevelValidator:
                     clamped_height = min(obj.height, screenshot.height - clamped_y)
 
                     if not self.validate_object_position(
-                        screenshot, clamped_x, clamped_y, clamped_width, clamped_height,
-                        obj.type, f"{layer_name}_{obj.id}"
+                        screenshot,
+                        clamped_x,
+                        clamped_y,
+                        clamped_width,
+                        clamped_height,
+                        obj.type,
+                        f"{layer_name}_{obj.id}",
                     ):
                         success = False
 
@@ -255,7 +310,10 @@ class JSONLevelValidator:
         if not self.errors:
             return "All JSON level object positions validated successfully!"
 
-        return f"Found {len(self.errors)} JSON level object positioning errors:\n" + "\n".join(self.errors)
+        return (
+            f"Found {len(self.errors)} JSON level object positioning errors:\n"
+            + "\n".join(self.errors)
+        )
 
 
 @pytest.fixture
@@ -273,15 +331,17 @@ def test_level_path():
 @pytest.fixture
 def test_game_app():
     """Create a test game app with controlled time."""
-    config = GameConfig(512, 384, 'JSON Level Test', 60)
-    time_provider = ControlledTimeProvider(1.0/60.0)
+    config = GameConfig(512, 384, "JSON Level Test", 60)
+    time_provider = ControlledTimeProvider(1.0 / 60.0)
     return GameApp(config, time_provider)
 
 
 class TestJSONLevelPlacement:
     """Test suite for JSON level object placement validation."""
 
-    def test_brick_objects_positioning(self, json_level_validator, test_game_app, test_level_path, output_dir):
+    def test_brick_objects_positioning(
+        self, json_level_validator, test_game_app, test_level_path, output_dir
+    ):
         """Test that brick objects are positioned exactly where specified in JSON."""
         # Create JSON scene
         scene = JSONScene(test_game_app, test_level_path)
@@ -289,7 +349,7 @@ class TestJSONLevelPlacement:
         test_game_app.advance_frame(None)
 
         # Take screenshot
-        screenshot_path = output_dir / 'json_level_test.png'
+        screenshot_path = output_dir / "json_level_test.png"
         pygame.image.save(test_game_app._screen, str(screenshot_path))
 
         # Load screenshot with PIL
@@ -305,8 +365,12 @@ class TestJSONLevelPlacement:
             expected_y = brick.y - int(scene.camera_y)
 
             # Only validate bricks that should be visible
-            if (expected_x < screenshot.width and expected_x + brick.width > 0 and
-                expected_y < screenshot.height and expected_y + brick.height > 0):
+            if (
+                expected_x < screenshot.width
+                and expected_x + brick.width > 0
+                and expected_y < screenshot.height
+                and expected_y + brick.height > 0
+            ):
 
                 # Clamp coordinates to screenshot bounds
                 clamped_x = max(0, expected_x)
@@ -315,24 +379,37 @@ class TestJSONLevelPlacement:
                 clamped_height = min(brick.height, screenshot.height - clamped_y)
 
                 if not json_level_validator.validate_object_position(
-                    screenshot, clamped_x, clamped_y, clamped_width, clamped_height,
-                    brick.type, f"brick_{brick.id}"
+                    screenshot,
+                    clamped_x,
+                    clamped_y,
+                    clamped_width,
+                    clamped_height,
+                    brick.type,
+                    f"brick_{brick.id}",
                 ):
                     success = False
 
         # Generate detailed error report if validation failed
         if not success:
             error_report = json_level_validator.get_error_summary()
-            print(f"JSON level brick object positioning validation failed:\n{error_report}")
+            print(
+                f"JSON level brick object positioning validation failed:\n{error_report}"
+            )
 
             # Save debug image with object overlay
-            debug_path = output_dir / 'json_level_debug.png'
-            self._save_debug_image(screenshot, scene.level_data, scene.camera_x, scene.camera_y, debug_path)
+            debug_path = output_dir / "json_level_debug.png"
+            self._save_debug_image(
+                screenshot, scene.level_data, scene.camera_x, scene.camera_y, debug_path
+            )
             print(f"Debug image saved to: {debug_path}")
 
-        assert success, f"JSON level brick object positioning validation failed. {json_level_validator.get_error_summary()}"
+        assert (
+            success
+        ), f"JSON level brick object positioning validation failed. {json_level_validator.get_error_summary()}"
 
-    def test_camera_offset_object_positioning(self, json_level_validator, test_game_app, test_level_path, output_dir):
+    def test_camera_offset_object_positioning(
+        self, json_level_validator, test_game_app, test_level_path, output_dir
+    ):
         """Test object positioning with camera offset."""
         # Create JSON scene
         scene = JSONScene(test_game_app, test_level_path)
@@ -345,7 +422,7 @@ class TestJSONLevelPlacement:
         test_game_app.advance_frame(None)
 
         # Take screenshot
-        screenshot_path = output_dir / 'json_level_offset_test.png'
+        screenshot_path = output_dir / "json_level_offset_test.png"
         pygame.image.save(test_game_app._screen, str(screenshot_path))
 
         # Load screenshot with PIL
@@ -361,8 +438,12 @@ class TestJSONLevelPlacement:
             expected_y = brick.y - int(scene.camera_y)
 
             # Only validate bricks that should be visible
-            if (expected_x < screenshot.width and expected_x + brick.width > 0 and
-                expected_y < screenshot.height and expected_y + brick.height > 0):
+            if (
+                expected_x < screenshot.width
+                and expected_x + brick.width > 0
+                and expected_y < screenshot.height
+                and expected_y + brick.height > 0
+            ):
 
                 # Clamp coordinates to screenshot bounds
                 clamped_x = max(0, expected_x)
@@ -371,23 +452,36 @@ class TestJSONLevelPlacement:
                 clamped_height = min(brick.height, screenshot.height - clamped_y)
 
                 if not json_level_validator.validate_object_position(
-                    screenshot, clamped_x, clamped_y, clamped_width, clamped_height,
-                    brick.type, f"brick_{brick.id}_offset"
+                    screenshot,
+                    clamped_x,
+                    clamped_y,
+                    clamped_width,
+                    clamped_height,
+                    brick.type,
+                    f"brick_{brick.id}_offset",
                 ):
                     success = False
 
         if not success:
             error_report = json_level_validator.get_error_summary()
-            print(f"JSON level brick object positioning with camera offset failed:\n{error_report}")
+            print(
+                f"JSON level brick object positioning with camera offset failed:\n{error_report}"
+            )
 
             # Save debug image
-            debug_path = output_dir / 'json_level_offset_debug.png'
-            self._save_debug_image(screenshot, scene.level_data, scene.camera_x, scene.camera_y, debug_path)
+            debug_path = output_dir / "json_level_offset_debug.png"
+            self._save_debug_image(
+                screenshot, scene.level_data, scene.camera_x, scene.camera_y, debug_path
+            )
             print(f"Debug image saved to: {debug_path}")
 
-        assert success, f"JSON level brick object positioning with camera offset failed. {json_level_validator.get_error_summary()}"
+        assert (
+            success
+        ), f"JSON level brick object positioning with camera offset failed. {json_level_validator.get_error_summary()}"
 
-    def test_parallax_layers_positioning(self, json_level_validator, test_game_app, test_level_path, output_dir):
+    def test_parallax_layers_positioning(
+        self, json_level_validator, test_game_app, test_level_path, output_dir
+    ):
         """Test that parallax layers are positioned correctly."""
         # Create JSON scene
         scene = JSONScene(test_game_app, test_level_path)
@@ -400,7 +494,7 @@ class TestJSONLevelPlacement:
         test_game_app.advance_frame(None)
 
         # Take screenshot
-        screenshot_path = output_dir / 'json_level_parallax_test.png'
+        screenshot_path = output_dir / "json_level_parallax_test.png"
         pygame.image.save(test_game_app._screen, str(screenshot_path))
 
         # Load screenshot with PIL
@@ -416,8 +510,12 @@ class TestJSONLevelPlacement:
             expected_y = brick.y - int(scene.camera_y)
 
             # Only validate bricks that should be visible
-            if (expected_x < screenshot.width and expected_x + brick.width > 0 and
-                expected_y < screenshot.height and expected_y + brick.height > 0):
+            if (
+                expected_x < screenshot.width
+                and expected_x + brick.width > 0
+                and expected_y < screenshot.height
+                and expected_y + brick.height > 0
+            ):
 
                 # Clamp coordinates to screenshot bounds
                 clamped_x = max(0, expected_x)
@@ -426,21 +524,32 @@ class TestJSONLevelPlacement:
                 clamped_height = min(brick.height, screenshot.height - clamped_y)
 
                 if not json_level_validator.validate_object_position(
-                    screenshot, clamped_x, clamped_y, clamped_width, clamped_height,
-                    brick.type, f"brick_{brick.id}_parallax"
+                    screenshot,
+                    clamped_x,
+                    clamped_y,
+                    clamped_width,
+                    clamped_height,
+                    brick.type,
+                    f"brick_{brick.id}_parallax",
                 ):
                     success = False
 
         if not success:
             error_report = json_level_validator.get_error_summary()
-            print(f"JSON level brick object positioning with parallax failed:\n{error_report}")
+            print(
+                f"JSON level brick object positioning with parallax failed:\n{error_report}"
+            )
 
             # Save debug image
-            debug_path = output_dir / 'json_level_parallax_debug.png'
-            self._save_debug_image(screenshot, scene.level_data, scene.camera_x, scene.camera_y, debug_path)
+            debug_path = output_dir / "json_level_parallax_debug.png"
+            self._save_debug_image(
+                screenshot, scene.level_data, scene.camera_x, scene.camera_y, debug_path
+            )
             print(f"Debug image saved to: {debug_path}")
 
-        assert success, f"JSON level brick object positioning with parallax failed. {json_level_validator.get_error_summary()}"
+        assert (
+            success
+        ), f"JSON level brick object positioning with parallax failed. {json_level_validator.get_error_summary()}"
 
     def test_json_level_loading(self, test_level_path):
         """Test that JSON level files load correctly."""
@@ -493,14 +602,21 @@ class TestJSONLevelPlacement:
         assert len(hill_objects) == 2
         assert all(obj.type == "hill" for obj in hill_objects)
 
-    def _save_debug_image(self, screenshot: Image.Image, level_data: LevelData,
-                         camera_x: float, camera_y: float, debug_path: Path) -> None:
+    def _save_debug_image(
+        self,
+        screenshot: Image.Image,
+        level_data: LevelData,
+        camera_x: float,
+        camera_y: float,
+        debug_path: Path,
+    ) -> None:
         """Save a debug image with object overlay showing expected positions."""
         # Create a copy of the screenshot
         debug_img = screenshot.copy()
 
         # Draw object boundaries
         from PIL import ImageDraw
+
         draw = ImageDraw.Draw(debug_img)
 
         # Draw expected object boundaries
@@ -511,20 +627,30 @@ class TestJSONLevelPlacement:
                 expected_y = obj.y - int(camera_y * parallax_factor)
 
                 # Only draw if object should be visible
-                if (expected_x + obj.width > 0 and expected_x < screenshot.width and
-                    expected_y + obj.height > 0 and expected_y < screenshot.height):
+                if (
+                    expected_x + obj.width > 0
+                    and expected_x < screenshot.width
+                    and expected_y + obj.height > 0
+                    and expected_y < screenshot.height
+                ):
 
                     # Draw object boundary
                     draw.rectangle(
-                        [expected_x, expected_y, expected_x + obj.width - 1, expected_y + obj.height - 1],
-                        outline=(255, 0, 0), width=2
+                        [
+                            expected_x,
+                            expected_y,
+                            expected_x + obj.width - 1,
+                            expected_y + obj.height - 1,
+                        ],
+                        outline=(255, 0, 0),
+                        width=2,
                     )
 
                     # Draw object info
                     draw.text(
                         (expected_x + 5, expected_y + 5),
                         f"{obj.type}\n{obj.id}",
-                        fill=(255, 0, 0)
+                        fill=(255, 0, 0),
                     )
 
         debug_img.save(debug_path)

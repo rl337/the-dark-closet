@@ -8,7 +8,6 @@ import os
 import sys
 from pathlib import Path
 from typing import Generator, Tuple, List
-import tempfile
 import shutil
 
 import pytest
@@ -18,8 +17,13 @@ import pygame
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from the_dark_closet.game import GameApp, GameConfig, SideScrollerScene, ControlledTimeProvider
-from the_dark_closet.assets import generate_character_assets
+from the_dark_closet.game import (  # noqa: E402
+    GameApp,
+    GameConfig,
+    SideScrollerScene,
+    ControlledTimeProvider,
+)
+from the_dark_closet.assets import generate_character_assets  # noqa: E402
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -186,14 +190,18 @@ def find_center_mass_position(surface: pygame.Surface) -> Tuple[int, int] | None
     return None
 
 
-def assert_center_mass_at(surface: pygame.Surface, expected_x: int, expected_y: int, tolerance: int = 2) -> bool:
+def assert_center_mass_at(
+    surface: pygame.Surface, expected_x: int, expected_y: int, tolerance: int = 2
+) -> bool:
     """Assert that the center mass dot is at the expected position."""
     pos = find_center_mass_position(surface)
     if pos is None:
         return False
     actual_x, actual_y = pos
-    return (abs(actual_x - expected_x) <= tolerance and
-            abs(actual_y - expected_y) <= tolerance)
+    return (
+        abs(actual_x - expected_x) <= tolerance
+        and abs(actual_y - expected_y) <= tolerance
+    )
 
 
 def save_surface(surface: pygame.Surface, out_path: Path) -> None:

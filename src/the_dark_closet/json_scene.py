@@ -1,3 +1,4 @@
+# pylint: disable=attribute-defined-outside-init
 """
 JSON-based scene implementation.
 
@@ -5,14 +6,15 @@ This scene uses level JSON files to define object placement and rendering.
 """
 
 from pathlib import Path
-from typing import Optional, Dict, Any
+from typing import Optional, Dict
 import pygame
 
 from .game import Scene, GameApp, TILE_SIZE
 from .level_loader import LevelData, LevelRenderer
+from .rendering_utils import render_hud, render_center_mass_dot, PlayerMixin
 
 
-class JSONScene(Scene):
+class JSONScene(Scene, PlayerMixin):
     """A scene that loads object placement from JSON level files."""
 
     def __init__(
@@ -35,21 +37,9 @@ class JSONScene(Scene):
 
         # Character assets (lazy loaded)
         self._character_assets: Optional[Dict[str, pygame.Surface]] = None
-        self.player_rect = pygame.Rect(spawn_x, spawn_y, 104, 120)  # 4x 26x30
-        self.player_velocity_x: float = 0.0
-        self.player_velocity_y: float = 0.0
-        self.player_speed_px_per_sec: float = 220.0
-        self.player_jump_speed_px_per_sec: float = 420.0
-        self.gravity_px_per_sec2: float = 1200.0
-        self.on_ground: bool = False
-        self.on_ladder: bool = False
 
-        # Camera
-        self.camera_x: float = 0.0
-        self.camera_y: float = 0.0
-
-        # Fonts
-        self.hud_font: Optional[pygame.font.Font] = None
+        # Initialize player state using shared configuration
+        self._init_player_state(spawn_x, spawn_y)
 
         # Level dimensions
         self.level_width = self.level_data.metadata.get("width", 12) * TILE_SIZE
@@ -76,7 +66,9 @@ class JSONScene(Scene):
         self.player_velocity_x = movement_x * self.player_speed_px_per_sec
 
         # Jumping
-        if (keys[pygame.K_SPACE] or keys[pygame.K_UP] or keys[pygame.K_w]) and self.on_ground:
+        if (
+            keys[pygame.K_SPACE] or keys[pygame.K_UP] or keys[pygame.K_w]
+        ) and self.on_ground:
             self.player_velocity_y = -self.player_jump_speed_px_per_sec
             self.on_ground = False
 
@@ -107,10 +99,12 @@ class JSONScene(Scene):
             brick_rect = brick.get_rect()
 
             # Check if player is standing on brick (only for ground-level bricks)
-            if (self.player_rect.colliderect(brick_rect) and
-                player_bottom <= brick_rect.top + 10 and
-                self.player_velocity_y >= 0 and
-                brick_rect.y >= self.level_height - 256):  # Only ground-level bricks
+            if (
+                self.player_rect.colliderect(brick_rect)
+                and player_bottom <= brick_rect.top + 10
+                and self.player_velocity_y >= 0
+                and brick_rect.y >= self.level_height - 256
+            ):  # Only ground-level bricks
                 self.player_rect.bottom = brick_rect.top
                 self.player_velocity_y = 0
                 self.on_ground = True
@@ -119,7 +113,9 @@ class JSONScene(Scene):
         # Gravity is now handled in update method
 
         # Keep player within level bounds (but allow movement)
-        self.player_rect.x = max(0, min(self.player_rect.x, self.level_width - self.player_rect.width))
+        self.player_rect.x = max(
+            0, min(self.player_rect.x, self.level_width - self.player_rect.width)
+        )
         # Don't constrain Y position to allow jumping
 
     def _update_camera(self) -> None:
@@ -130,7 +126,9 @@ class JSONScene(Scene):
 
         # Keep camera within level bounds
         self.camera_x = max(0, min(target_camera_x, self.level_width - self.app.width))
-        self.camera_y = max(0, min(target_camera_y, self.level_height - self.app.height))
+        self.camera_y = max(
+            0, min(target_camera_y, self.level_height - self.app.height)
+        )
 
     def draw(self, surface: pygame.Surface) -> None:
         """Draw the scene."""
@@ -140,26 +138,23 @@ class JSONScene(Scene):
         # Render layers in order
         layer_order = ["background", "midground", "tiles", "foreground"]
         for layer_name in layer_order:
-            self.level_renderer.render_layer(surface, layer_name, self.camera_x, self.camera_y)
+            self.level_renderer.render_layer(
+                surface, layer_name, self.camera_x, self.camera_y
+            )
 
         # Player
         pr = self.player_rect.move(-int(self.camera_x), -int(self.camera_y))
         self._draw_procedural_player(surface, pr)
 
         # HUD
-        if self.hud_font:
-            msg = "Arrows/WASD to move, Space/Up to jump, Esc to quit"
-            text = self.hud_font.render(msg, True, (210, 210, 220))
-            surface.blit(text, (48, 48))  # 4x 12, 12 for higher resolution
+        render_hud(surface, self.hud_font)
 
         # Draw center mass dot after all other rendering (so it's not overwritten)
-        pr = self.player_rect.move(-int(self.camera_x), -int(self.camera_y))
-        center_x = pr.x + pr.width // 2
-        center_y = pr.y + pr.height // 2
-        center_dot_rect = pygame.Rect(center_x - 4, center_y - 4, 8, 8)
-        pygame.draw.rect(surface, (255, 0, 255), center_dot_rect)  # Bright magenta
+        render_center_mass_dot(surface, self.player_rect, self.camera_x, self.camera_y)
 
-    def _draw_procedural_player(self, surface: pygame.Surface, rect: pygame.Rect) -> None:
+    def _draw_procedural_player(
+        self, surface: pygame.Surface, rect: pygame.Rect
+    ) -> None:
         """Draw player using procedurally generated assets."""
         # Load assets if not already loaded
         if self._character_assets is None:

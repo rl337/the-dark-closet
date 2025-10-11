@@ -38,10 +38,14 @@ class TestJSONMovement:
 
         # Check that character moved in world coordinates
         final_world_x = scene.player_rect.x
-        assert final_world_x > initial_world_x, f"Character did not move right (initial: {initial_world_x}, final: {final_world_x})"
+        assert (
+            final_world_x > initial_world_x
+        ), f"Character did not move right (initial: {initial_world_x}, final: {final_world_x})"
 
         # Check that character is still visible (camera following)
-        assert assert_center_mass_at(test_game_app._screen, 252, 192), "Character not visible after movement"
+        assert assert_center_mass_at(
+            test_game_app._screen, 252, 192
+        ), "Character not visible after movement"
 
     @pytest.mark.unit
     def test_move_left(self, test_game_app, output_dir):
@@ -64,10 +68,14 @@ class TestJSONMovement:
 
         # Check that character moved in world coordinates
         final_world_x = scene.player_rect.x
-        assert final_world_x < initial_world_x, f"Character did not move left (initial: {initial_world_x}, final: {final_world_x})"
+        assert (
+            final_world_x < initial_world_x
+        ), f"Character did not move left (initial: {initial_world_x}, final: {final_world_x})"
 
         # Check that character is still visible (camera following)
-        assert assert_center_mass_at(test_game_app._screen, 252, 192), "Character not visible after movement"
+        assert assert_center_mass_at(
+            test_game_app._screen, 252, 192
+        ), "Character not visible after movement"
 
     @pytest.mark.unit
     def test_combined_movement(self, test_game_app, output_dir):
@@ -93,10 +101,14 @@ class TestJSONMovement:
 
         # Check that character is back near starting position
         final_world_x = scene.player_rect.x
-        assert abs(final_world_x - initial_world_x) < 10, f"Character not back near start (initial: {initial_world_x}, final: {final_world_x})"
+        assert (
+            abs(final_world_x - initial_world_x) < 10
+        ), f"Character not back near start (initial: {initial_world_x}, final: {final_world_x})"
 
         # Check that character is still visible
-        assert assert_center_mass_at(test_game_app._screen, 252, 192), "Character not visible after movement"
+        assert assert_center_mass_at(
+            test_game_app._screen, 252, 192
+        ), "Character not visible after movement"
 
 
 class TestJSONJumping:
@@ -123,10 +135,14 @@ class TestJSONJumping:
 
         # Check that character jumped (moved up in world coordinates)
         final_world_y = scene.player_rect.y
-        assert final_world_y < initial_world_y, f"Character did not jump (initial: {initial_world_y}, final: {final_world_y})"
+        assert (
+            final_world_y < initial_world_y
+        ), f"Character did not jump (initial: {initial_world_y}, final: {final_world_y})"
 
         # Check that character is still visible (position changes during jump due to camera following)
-        assert assert_center_mass_at(test_game_app._screen, 252, 188), "Character not visible after jump"
+        assert assert_center_mass_at(
+            test_game_app._screen, 252, 188
+        ), "Character not visible after jump"
 
     @pytest.mark.unit
     def test_continue_falling(self, test_game_app, output_dir):
@@ -146,7 +162,9 @@ class TestJSONJumping:
             test_game_app.advance_frame(None)
 
         # Verify character is actually falling (positive velocity)
-        assert scene.player_velocity_y > 0, f"Character not falling yet (velocity: {scene.player_velocity_y})"
+        assert (
+            scene.player_velocity_y > 0
+        ), f"Character not falling yet (velocity: {scene.player_velocity_y})"
 
         initial_world_y = scene.player_rect.y
 
@@ -160,10 +178,14 @@ class TestJSONJumping:
 
         # Check that character fell (moved down in world coordinates)
         final_world_y = scene.player_rect.y
-        assert final_world_y > initial_world_y, f"Character did not fall (initial: {initial_world_y}, final: {final_world_y})"
+        assert (
+            final_world_y > initial_world_y
+        ), f"Character did not fall (initial: {initial_world_y}, final: {final_world_y})"
 
         # Check that character is still visible
-        assert assert_center_mass_at(test_game_app._screen, 252, 188), "Character not visible after falling"
+        assert assert_center_mass_at(
+            test_game_app._screen, 252, 188
+        ), "Character not visible after falling"
 
 
 class TestJSONBrickBreaking:
@@ -190,10 +212,14 @@ class TestJSONBrickBreaking:
 
         # Check that character moved towards brick
         final_world_x = scene.player_rect.x
-        assert final_world_x > initial_world_x, f"Character did not move towards brick (initial: {initial_world_x}, final: {final_world_x})"
+        assert (
+            final_world_x > initial_world_x
+        ), f"Character did not move towards brick (initial: {initial_world_x}, final: {final_world_x})"
 
         # Check that character is still visible
-        assert assert_center_mass_at(test_game_app._screen, 252, 192), "Character not visible after approaching brick"
+        assert assert_center_mass_at(
+            test_game_app._screen, 252, 192
+        ), "Character not visible after approaching brick"
 
     @pytest.mark.unit
     def test_break_brick(self, test_game_app, output_dir):
@@ -221,11 +247,17 @@ class TestJSONBrickBreaking:
         # Check that character moved and jumped
         final_world_x = scene.player_rect.x
         final_world_y = scene.player_rect.y
-        assert final_world_x > initial_world_x, f"Character did not move towards brick (initial: {initial_world_x}, final: {final_world_x})"
-        assert final_world_y < initial_world_y, f"Character did not jump (initial: {initial_world_y}, final: {final_world_y})"
+        assert (
+            final_world_x > initial_world_x
+        ), f"Character did not move towards brick (initial: {initial_world_x}, final: {final_world_x})"
+        assert (
+            final_world_y < initial_world_y
+        ), f"Character did not jump (initial: {initial_world_y}, final: {final_world_y})"
 
         # Check that character is still visible (position changes during jump due to camera following)
-        assert assert_center_mass_at(test_game_app._screen, 252, 188), "Character not visible after breaking brick"
+        assert assert_center_mass_at(
+            test_game_app._screen, 252, 188
+        ), "Character not visible after breaking brick"
 
 
 class TestJSONCharacterRendering:
@@ -265,17 +297,24 @@ class TestJSONCharacterRendering:
         final_world_x = scene.player_rect.x
 
         # Character should have moved in world coordinates
-        assert final_world_x > initial_world_x, f"Character did not move (initial: {initial_world_x}, final: {final_world_x})"
+        assert (
+            final_world_x > initial_world_x
+        ), f"Character did not move (initial: {initial_world_x}, final: {final_world_x})"
 
         # Character should still be visible (camera follows)
-        assert assert_center_mass_at(test_game_app._screen, 252, 192), "Character not visible after movement"
+        assert assert_center_mass_at(
+            test_game_app._screen, 252, 192
+        ), "Character not visible after movement"
 
 
-@pytest.mark.parametrize("keys,expected_movement", [
-    ({pygame.K_RIGHT}, "right"),
-    ({pygame.K_LEFT}, "left"),
-    ({pygame.K_SPACE}, "jump"),
-])
+@pytest.mark.parametrize(
+    "keys,expected_movement",
+    [
+        ({pygame.K_RIGHT}, "right"),
+        ({pygame.K_LEFT}, "left"),
+        ({pygame.K_SPACE}, "jump"),
+    ],
+)
 def test_movement_parametrized(test_game_app, keys, expected_movement, output_dir):
     """Parametrized movement test using JSON level."""
     level_path = Path("levels/test_simple_room.json")
@@ -300,14 +339,24 @@ def test_movement_parametrized(test_game_app, keys, expected_movement, output_di
     final_world_y = scene.player_rect.y
 
     if expected_movement == "right":
-        assert final_world_x > initial_world_x, f"Character did not move right (initial: {initial_world_x}, final: {final_world_x})"
+        assert (
+            final_world_x > initial_world_x
+        ), f"Character did not move right (initial: {initial_world_x}, final: {final_world_x})"
     elif expected_movement == "left":
-        assert final_world_x < initial_world_x, f"Character did not move left (initial: {initial_world_x}, final: {final_world_x})"
+        assert (
+            final_world_x < initial_world_x
+        ), f"Character did not move left (initial: {initial_world_x}, final: {final_world_x})"
     elif expected_movement == "jump":
-        assert final_world_y < initial_world_y, f"Character did not jump (initial: {initial_world_y}, final: {final_world_y})"
+        assert (
+            final_world_y < initial_world_y
+        ), f"Character did not jump (initial: {initial_world_y}, final: {final_world_y})"
 
     # Check that character is still visible (position changes during jump due to camera following)
     if expected_movement == "jump":
-        assert assert_center_mass_at(test_game_app._screen, 252, 188), f"Character not visible after {expected_movement}"
+        assert assert_center_mass_at(
+            test_game_app._screen, 252, 188
+        ), f"Character not visible after {expected_movement}"
     else:
-        assert assert_center_mass_at(test_game_app._screen, 252, 192), f"Character not visible after {expected_movement}"
+        assert assert_center_mass_at(
+            test_game_app._screen, 252, 192
+        ), f"Character not visible after {expected_movement}"

@@ -8,11 +8,9 @@ import pytest
 import pygame
 import time
 import statistics
-from pathlib import Path
 from typing import Dict, List
 
 from the_dark_closet.assets import generate_character_assets
-from ..conftest import find_center_mass_position, save_surface
 
 
 class PerformanceProfiler:
@@ -42,13 +40,13 @@ class PerformanceProfiler:
 
         values = self.measurements[name]
         return {
-            'count': len(values),
-            'total': sum(values),
-            'mean': statistics.mean(values),
-            'median': statistics.median(values),
-            'min': min(values),
-            'max': max(values),
-            'stdev': statistics.stdev(values) if len(values) > 1 else 0.0
+            "count": len(values),
+            "total": sum(values),
+            "mean": statistics.mean(values),
+            "median": statistics.median(values),
+            "min": min(values),
+            "max": max(values),
+            "stdev": statistics.stdev(values) if len(values) > 1 else 0.0,
         }
 
 
@@ -67,16 +65,22 @@ class TestAssetPerformance:
         """Test asset generation performance."""
         # Test asset generation multiple times
         for i in range(10):
-            profiler.measure("asset_generation", generate_character_assets, temp_assets_dir / f"assets_{i}")
+            profiler.measure(
+                "asset_generation",
+                generate_character_assets,
+                temp_assets_dir / f"assets_{i}",
+            )
 
         stats = profiler.get_stats("asset_generation")
 
         # Assert performance requirements
-        assert stats['mean'] < 0.2, f"Asset generation too slow: {stats['mean']:.3f}s mean"
-        assert stats['max'] < 0.4, f"Asset generation too slow: {stats['max']:.3f}s max"
+        assert (
+            stats["mean"] < 0.2
+        ), f"Asset generation too slow: {stats['mean']:.3f}s mean"
+        assert stats["max"] < 0.4, f"Asset generation too slow: {stats['max']:.3f}s max"
 
         # Print performance report
-        print(f"\nAsset Generation Performance:")
+        print("\nAsset Generation Performance:")
         print(f"  Count: {stats['count']}")
         print(f"  Mean:  {stats['mean']:.4f}s")
         print(f"  Max:   {stats['max']:.4f}s")
@@ -95,11 +99,13 @@ class TestAssetPerformance:
         stats = profiler.get_stats("asset_loading")
 
         # Assert performance requirements
-        assert stats['mean'] < 0.05, f"Asset loading too slow: {stats['mean']:.3f}s mean"
-        assert stats['max'] < 0.06, f"Asset loading too slow: {stats['max']:.3f}s max"
+        assert (
+            stats["mean"] < 0.05
+        ), f"Asset loading too slow: {stats['mean']:.3f}s mean"
+        assert stats["max"] < 0.06, f"Asset loading too slow: {stats['max']:.3f}s max"
 
         # Print performance report
-        print(f"\nAsset Loading Performance:")
+        print("\nAsset Loading Performance:")
         print(f"  Count: {stats['count']}")
         print(f"  Mean:  {stats['mean']:.4f}s")
         print(f"  Max:   {stats['max']:.4f}s")
@@ -115,14 +121,19 @@ class TestAssetPerformance:
         # Test different scaling operations
         for scale in [0.5, 1.0, 2.0, 4.0]:
             for i in range(20):
+
                 def scale_asset():
                     if assets:
                         # Get first asset
                         asset_path = list(assets.values())[0]
                         surface = pygame.image.load(str(asset_path))
-                        scaled = pygame.transform.scale(surface,
-                            (int(surface.get_width() * scale),
-                             int(surface.get_height() * scale)))
+                        scaled = pygame.transform.scale(
+                            surface,
+                            (
+                                int(surface.get_width() * scale),
+                                int(surface.get_height() * scale),
+                            ),
+                        )
                         return scaled
                     return None
 
@@ -131,7 +142,9 @@ class TestAssetPerformance:
         # Check performance for each scale
         for scale in [0.5, 1.0, 2.0, 4.0]:
             stats = profiler.get_stats(f"scaling_{scale}x")
-            assert stats['mean'] < 0.02, f"Asset scaling {scale}x too slow: {stats['mean']:.3f}s mean"
+            assert (
+                stats["mean"] < 0.02
+            ), f"Asset scaling {scale}x too slow: {stats['mean']:.3f}s mean"
 
             print(f"\nAsset Scaling {scale}x Performance:")
             print(f"  Count: {stats['count']}")
@@ -150,6 +163,7 @@ class TestRenderingPerformance:
 
         # Test frame rendering multiple times
         for i in range(100):
+
             def render_frame():
                 app.advance_frame(None)
 
@@ -158,11 +172,15 @@ class TestRenderingPerformance:
         stats = profiler.get_stats("frame_rendering")
 
         # Assert performance requirements
-        assert stats['mean'] < 0.01, f"Frame rendering too slow: {stats['mean']:.3f}s mean"
-        assert stats['max'] < 0.2, f"Frame rendering too slow: {stats['max']:.3f}s max"  # Relaxed threshold
+        assert (
+            stats["mean"] < 0.01
+        ), f"Frame rendering too slow: {stats['mean']:.3f}s mean"
+        assert (
+            stats["max"] < 0.2
+        ), f"Frame rendering too slow: {stats['max']:.3f}s max"  # Relaxed threshold
 
         # Print performance report
-        print(f"\nFrame Rendering Performance:")
+        print("\nFrame Rendering Performance:")
         print(f"  Count: {stats['count']}")
         print(f"  Mean:  {stats['mean']:.4f}s")
         print(f"  Max:   {stats['max']:.4f}s")
@@ -176,6 +194,7 @@ class TestRenderingPerformance:
 
         # Test rendering with movement
         for i in range(50):
+
             def render_with_movement():
                 app.advance_frame({pygame.K_RIGHT})
 
@@ -184,10 +203,12 @@ class TestRenderingPerformance:
         stats = profiler.get_stats("rendering_with_movement")
 
         # Assert performance requirements
-        assert stats['mean'] < 0.01, f"Movement rendering too slow: {stats['mean']:.3f}s mean"
+        assert (
+            stats["mean"] < 0.01
+        ), f"Movement rendering too slow: {stats['mean']:.3f}s mean"
 
         # Print performance report
-        print(f"\nMovement Rendering Performance:")
+        print("\nMovement Rendering Performance:")
         print(f"  Count: {stats['count']}")
         print(f"  Mean:  {stats['mean']:.4f}s")
         print(f"  Max:   {stats['max']:.4f}s")
@@ -200,6 +221,7 @@ class TestRenderingPerformance:
 
         # Test rendering with jumping
         for i in range(50):
+
             def render_with_jump():
                 app.advance_frame({pygame.K_SPACE})
 
@@ -208,10 +230,12 @@ class TestRenderingPerformance:
         stats = profiler.get_stats("rendering_with_jump")
 
         # Assert performance requirements
-        assert stats['mean'] < 0.01, f"Jump rendering too slow: {stats['mean']:.3f}s mean"
+        assert (
+            stats["mean"] < 0.01
+        ), f"Jump rendering too slow: {stats['mean']:.3f}s mean"
 
         # Print performance report
-        print(f"\nJump Rendering Performance:")
+        print("\nJump Rendering Performance:")
         print(f"  Count: {stats['count']}")
         print(f"  Mean:  {stats['mean']:.4f}s")
         print(f"  Max:   {stats['max']:.4f}s")
@@ -328,7 +352,7 @@ class TestFrameRatePerformance:
         max_fps = max(fps_values)
         fps_stddev = statistics.stdev(fps_values)
 
-        print(f"\nFrame Rate Performance:")
+        print("\nFrame Rate Performance:")
         print(f"Frames rendered: {len(frame_times)}")
         print(f"Average FPS: {avg_fps:.2f}")
         print(f"Min FPS: {min_fps:.2f}")
@@ -355,14 +379,20 @@ class TestAssetGenerationPerformance:
         """Test that asset generation is consistent in performance."""
         # Generate assets multiple times
         for i in range(20):
-            profiler.measure("asset_generation_consistency", generate_character_assets, temp_assets_dir / f"consistency_{i}")
+            profiler.measure(
+                "asset_generation_consistency",
+                generate_character_assets,
+                temp_assets_dir / f"consistency_{i}",
+            )
 
         stats = profiler.get_stats("asset_generation_consistency")
 
         # Check consistency (low standard deviation)
-        assert stats['stdev'] < 0.06, f"Asset generation too inconsistent: {stats['stdev']:.3f}s stddev"
+        assert (
+            stats["stdev"] < 0.06
+        ), f"Asset generation too inconsistent: {stats['stdev']:.3f}s stddev"
 
-        print(f"\nAsset Generation Consistency:")
+        print("\nAsset Generation Consistency:")
         print(f"  Count: {stats['count']}")
         print(f"  Mean:  {stats['mean']:.4f}s")
         print(f"  StDev: {stats['stdev']:.4f}s")
@@ -373,53 +403,74 @@ class TestAssetGenerationPerformance:
         """Test asset generation scalability."""
         # Test with different output directory sizes
         for i in range(5):
-            profiler.measure("asset_generation_scalability", generate_character_assets, temp_assets_dir / f"scalability_{i}")
+            profiler.measure(
+                "asset_generation_scalability",
+                generate_character_assets,
+                temp_assets_dir / f"scalability_{i}",
+            )
 
         stats = profiler.get_stats("asset_generation_scalability")
 
         # Performance should be consistent regardless of directory size
-        assert stats['stdev'] < 0.06, f"Asset generation not scalable: {stats['stdev']:.3f}s stddev"
+        assert (
+            stats["stdev"] < 0.06
+        ), f"Asset generation not scalable: {stats['stdev']:.3f}s stddev"
 
-        print(f"\nAsset Generation Scalability:")
+        print("\nAsset Generation Scalability:")
         print(f"  Count: {stats['count']}")
         print(f"  Mean:  {stats['mean']:.4f}s")
         print(f"  StDev: {stats['stdev']:.4f}s")
 
 
-@pytest.mark.parametrize("test_type,expected_max_time", [
-    ("asset_generation", 0.2),
-    ("asset_loading", 0.04),
-    ("frame_rendering", 0.01),
-    ("movement_rendering", 0.01),
-    ("jump_rendering", 0.01),
-])
+@pytest.mark.parametrize(
+    "test_type,expected_max_time",
+    [
+        ("asset_generation", 0.2),
+        ("asset_loading", 0.04),
+        ("frame_rendering", 0.01),
+        ("movement_rendering", 0.01),
+        ("jump_rendering", 0.01),
+    ],
+)
 @pytest.mark.performance
-def test_performance_benchmarks(profiler, test_scene, temp_assets_dir, test_type, expected_max_time):
+def test_performance_benchmarks(
+    profiler, test_scene, temp_assets_dir, test_type, expected_max_time
+):
     """Parametrized performance benchmarks."""
     if test_type == "asset_generation":
         for i in range(10):
-            profiler.measure(test_type, generate_character_assets, temp_assets_dir / f"benchmark_{i}")
+            profiler.measure(
+                test_type, generate_character_assets, temp_assets_dir / f"benchmark_{i}"
+            )
     elif test_type == "asset_loading":
         for i in range(10):
             profiler.measure(test_type, test_scene._load_character_assets)
     elif test_type == "frame_rendering":
         for i in range(50):
+
             def render_frame():
                 test_scene.app.advance_frame(None)
+
             profiler.measure(test_type, render_frame)
     elif test_type == "movement_rendering":
         for i in range(50):
+
             def render_movement():
                 test_scene.app.advance_frame({pygame.K_RIGHT})
+
             profiler.measure(test_type, render_movement)
     elif test_type == "jump_rendering":
         for i in range(50):
+
             def render_jump():
                 test_scene.app.advance_frame({pygame.K_SPACE})
+
             profiler.measure(test_type, render_jump)
 
     stats = profiler.get_stats(test_type)
-    assert stats['mean'] < expected_max_time, f"{test_type} too slow: {stats['mean']:.3f}s > {expected_max_time}s"
+    assert (
+        stats["mean"] < expected_max_time
+    ), f"{test_type} too slow: {stats['mean']:.3f}s > {expected_max_time}s"
 
     print(f"\n{test_type} Benchmark:")
     print(f"  Mean:  {stats['mean']:.4f}s")
