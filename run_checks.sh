@@ -131,13 +131,26 @@ run_tests() {
 # Function to run unit tests only
 run_unit_tests() {
     print_status "Running unit tests..."
-    poetry run pytest tests/unit/ \
-        --verbose \
-        --tb=short \
-        --strict-markers \
-        --disable-warnings \
-        --cov=src \
-        --cov-report=term-missing
+    # Skip performance tests in CI environments as they can be flaky due to timing
+    if [ -n "$CI" ] || [ -n "$GITHUB_ACTIONS" ]; then
+        print_status "Skipping performance tests in CI environment"
+        poetry run pytest tests/unit/ \
+            --verbose \
+            --tb=short \
+            --strict-markers \
+            --disable-warnings \
+            --cov=src \
+            --cov-report=term-missing \
+            -m "not performance"
+    else
+        poetry run pytest tests/unit/ \
+            --verbose \
+            --tb=short \
+            --strict-markers \
+            --disable-warnings \
+            --cov=src \
+            --cov-report=term-missing
+    fi
     print_success "Unit tests passed"
 }
 
@@ -155,11 +168,22 @@ run_integration_tests() {
 # Function to run visual tests
 run_visual_tests() {
     print_status "Running visual regression tests..."
-    poetry run pytest tests/visual/ \
-        --verbose \
-        --tb=short \
-        --strict-markers \
-        --disable-warnings
+    # Skip performance tests in CI environments as they can be flaky due to timing
+    if [ -n "$CI" ] || [ -n "$GITHUB_ACTIONS" ]; then
+        print_status "Skipping performance tests in CI environment"
+        poetry run pytest tests/visual/ \
+            --verbose \
+            --tb=short \
+            --strict-markers \
+            --disable-warnings \
+            -m "not performance"
+    else
+        poetry run pytest tests/visual/ \
+            --verbose \
+            --tb=short \
+            --strict-markers \
+            --disable-warnings
+    fi
     print_success "Visual tests passed"
 }
 
