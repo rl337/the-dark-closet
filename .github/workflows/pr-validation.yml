@@ -80,11 +80,11 @@ jobs:
                       build/reports/
                       build/test_outputs/
 
-            - name: Upload coverage reports
-              uses: codecov/codecov-action@v4
-              if: always()
-              with:
-                  file: build/reports/coverage.xml
-                  flags: unittests
-                  name: codecov-umbrella
-                  fail_ci_if_error: false
+            # - name: Upload coverage reports
+            #   uses: codecov/codecov-action@v4
+            #   if: always()
+            #   with:
+            #       file: build/reports/coverage.xml
+            #       flags: unittests
+            #       name: codecov-umbrella
+            #       fail_ci_if_error: false

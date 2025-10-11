@@ -28,6 +28,9 @@ RUN poetry install --no-root && rm -rf $POETRY_CACHE_DIR
 # Copy source code
 COPY . .
 
+# Install the project itself
+RUN poetry install
+
 # Set environment variables for headless operation
 ENV SDL_VIDEODRIVER=dummy
 ENV DISPLAY=:99
