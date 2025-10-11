@@ -28,7 +28,7 @@ jobs:
                     -v $(pwd):/app \
                     -w /app \
                     the-dark-closet:test \
-                    ./run_checks.sh --structure --format --lint --unit --integration
+                    bash -c "chmod +x ./run_checks.sh && ./run_checks.sh --structure --format --lint --unit --integration"
 
             - name: Test headless operation
               run: |
