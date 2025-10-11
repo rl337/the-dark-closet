@@ -11,23 +11,39 @@ import pygame
 
 def render_brick_tile(surface: pygame.Surface, rect: pygame.Rect) -> None:
     """Render a brick tile with mortar lines and texture."""
-    # Brick tile with mortar lines
+    # Base brick color
     pygame.draw.rect(surface, (135, 90, 60), rect)
 
-    # Mortar lines
-    for i in range(0, rect.width, 64):
-        mortar_rect = pygame.Rect(rect.x + i, rect.y, 2, rect.height)
-        pygame.draw.rect(surface, (200, 200, 200), mortar_rect)
-    for j in range(0, rect.height, 32):
-        mortar_rect = pygame.Rect(rect.x, rect.y + j, rect.width, 2)
-        pygame.draw.rect(surface, (200, 200, 200), mortar_rect)
-
-    # Brick texture
-    for i in range(0, rect.width, 32):
-        for j in range(0, rect.height, 16):
-            if (i // 32 + j // 16) % 2 == 0:
-                brick_rect = pygame.Rect(rect.x + i + 2, rect.y + j + 2, 28, 12)
+    # Create brick pattern with alternating rows
+    brick_height = 16
+    brick_width = 32
+    
+    for row in range(0, rect.height, brick_height):
+        for col in range(0, rect.width, brick_width):
+            # Offset every other row to create brick pattern
+            offset = (brick_width // 2) if (row // brick_height) % 2 == 1 else 0
+            brick_x = rect.x + col + offset
+            brick_y = rect.y + row
+            
+            # Only draw brick if it's within the tile bounds
+            if brick_x < rect.x + rect.width and brick_y < rect.y + rect.height:
+                brick_rect = pygame.Rect(brick_x, brick_y, brick_width - 2, brick_height - 2)
                 pygame.draw.rect(surface, (155, 110, 80), brick_rect)
+                
+                # Add subtle highlight to each brick
+                highlight_rect = pygame.Rect(brick_x + 2, brick_y + 2, brick_width - 6, 4)
+                pygame.draw.rect(surface, (175, 130, 100), highlight_rect)
+
+    # Add subtle mortar lines
+    # Horizontal mortar lines
+    for j in range(brick_height, rect.height, brick_height):
+        mortar_rect = pygame.Rect(rect.x, rect.y + j, rect.width, 1)
+        pygame.draw.rect(surface, (200, 200, 200), mortar_rect)
+    
+    # Vertical mortar lines (fewer of them)
+    for i in range(brick_width, rect.width, brick_width):
+        mortar_rect = pygame.Rect(rect.x + i, rect.y, 1, rect.height)
+        pygame.draw.rect(surface, (200, 200, 200), mortar_rect)
 
 
 def render_platform_tile(surface: pygame.Surface, rect: pygame.Rect) -> None:
