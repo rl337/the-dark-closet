@@ -56,7 +56,8 @@ def test_debug_rendering():
 
     print(f"Different pixels between regular and clean: {different_pixels}")
 
-    # The clean version should have fewer different pixels (no HUD text)
+    # The clean version should have significantly fewer different pixels (no HUD text)
+    # HUD text takes up a significant portion of the image, so we expect a large difference
     assert (
-        different_pixels < 1000
-    ), f"Too many different pixels: {different_pixels} - HUD might not be disabled properly"
+        different_pixels > 5000
+    ), f"Too few different pixels: {different_pixels} - HUD might not be disabled properly"

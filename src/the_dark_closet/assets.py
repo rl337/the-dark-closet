@@ -464,6 +464,13 @@ def generate_character_assets(
     return asset_paths
 
 
+def reset_character_assets_cache():
+    """Reset the global character assets cache."""
+    global _character_assets_cache, _character_assets_output_dir
+    _character_assets_cache = None
+    _character_assets_output_dir = None
+
+
 if __name__ == "__main__":
     # Generate assets when run directly
     assets = generate_character_assets()

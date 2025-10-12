@@ -165,26 +165,12 @@ class SpriteLayoutValidator:
         surface = pygame.Surface((TILE_SIZE, TILE_SIZE))
         surface.fill((0, 0, 0, 0))  # Transparent background
 
-        # Draw brick using the exact same logic as _draw_detailed_tile
+        # Draw brick using the exact same logic as render_brick_tile from rendering_utils.py
         rect = pygame.Rect(0, 0, TILE_SIZE, TILE_SIZE)
-
-        # Brick tile with mortar lines (exact copy from game code)
-        pygame.draw.rect(surface, (135, 90, 60), rect)
-
-        # Mortar lines
-        for i in range(0, rect.width, 64):
-            mortar_rect = pygame.Rect(rect.x + i, rect.y, 2, rect.height)
-            pygame.draw.rect(surface, (200, 200, 200), mortar_rect)
-        for j in range(0, rect.height, 32):
-            mortar_rect = pygame.Rect(rect.x, rect.y + j, rect.width, 2)
-            pygame.draw.rect(surface, (200, 200, 200), mortar_rect)
-
-        # Brick texture
-        for i in range(0, rect.width, 32):
-            for j in range(0, rect.height, 16):
-                if (i // 32 + j // 16) % 2 == 0:
-                    brick_rect = pygame.Rect(rect.x + i + 2, rect.y + j + 2, 28, 12)
-                    pygame.draw.rect(surface, (155, 110, 80), brick_rect)
+        
+        # Use the new brick rendering algorithm
+        from the_dark_closet.rendering_utils import render_brick_tile
+        render_brick_tile(surface, rect)
 
         # Convert to PIL Image
         pygame_surface = pygame.surfarray.array3d(surface)
