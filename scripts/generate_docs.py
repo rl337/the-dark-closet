@@ -15,7 +15,12 @@ import shutil
 # Add src to path
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
-from the_dark_closet.game import GameApp, GameConfig, SideScrollerScene, ControlledTimeProvider
+from the_dark_closet.game import (
+    GameApp,
+    GameConfig,
+    SideScrollerScene,
+    ControlledTimeProvider,
+)
 from the_dark_closet.assets import generate_character_assets
 import pygame
 
@@ -23,18 +28,22 @@ import pygame
 def get_git_hash():
     """Get the current git commit hash."""
     try:
-        git_hash = subprocess.check_output(['git', 'rev-parse', '--short', 'HEAD'], text=True).strip()
-        git_hash_full = subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip()
+        git_hash = subprocess.check_output(
+            ["git", "rev-parse", "--short", "HEAD"], text=True
+        ).strip()
+        git_hash_full = subprocess.check_output(
+            ["git", "rev-parse", "HEAD"], text=True
+        ).strip()
         return git_hash, git_hash_full
     except Exception as e:
         print(f"Failed to get git hash: {e}")
-        return 'unknown', 'unknown'
+        return "unknown", "unknown"
 
 
 def generate_assets():
     """Generate procedural character assets."""
-    print('Generating procedural assets...')
-    temp_assets_dir = Path('temp_assets_for_docs')
+    print("Generating procedural assets...")
+    temp_assets_dir = Path("temp_assets_for_docs")
     temp_assets_dir.mkdir(exist_ok=True)
     asset_paths = generate_character_assets(temp_assets_dir)
     return asset_paths, temp_assets_dir
@@ -42,141 +51,143 @@ def generate_assets():
 
 def generate_test_sequences():
     """Generate test sequence screenshots."""
-    print('Generating test sequences...')
-    config = GameConfig(1024, 768, 'Test Game', 60)  # Increased window size
-    time_provider = ControlledTimeProvider(1.0/60.0)
+    print("Generating test sequences...")
+    config = GameConfig(1024, 768, "Test Game", 60)  # Increased window size
+    time_provider = ControlledTimeProvider(1.0 / 60.0)
     app = GameApp(config, time_provider)
 
     # Test sequences
     test_sequences = {
-        'movement': {
-            'room': [
-                'BBBBBBBBBBBB',
-                'B          B',
-                'B          B',
-                'B          B',
-                'B          B',
-                'B          B',
-                'B          B',
-                'BBBBBBBBBBBB',
+        "movement": {
+            "room": [
+                "BBBBBBBBBBBB",
+                "B          B",
+                "B          B",
+                "B          B",
+                "B          B",
+                "B          B",
+                "B          B",
+                "BBBBBBBBBBBB",
             ],
-            'spawn': (6 * 128, 4 * 128),
-            'actions': [
+            "spawn": (6 * 128, 4 * 128),
+            "actions": [
                 ({pygame.K_RIGHT}, 4),
                 ({pygame.K_LEFT}, 4),
             ],
-            'name': 'Character Movement'
+            "name": "Character Movement",
         },
-        'jumping': {
-            'room': [
-                'BBBBBBBBBBBB',
-                'B          B',
-                'B          B',
-                'B          B',
-                'B          B',
-                'B          B',
-                'B          B',
-                'BBBBBBBBBBBB',
+        "jumping": {
+            "room": [
+                "BBBBBBBBBBBB",
+                "B          B",
+                "B          B",
+                "B          B",
+                "B          B",
+                "B          B",
+                "B          B",
+                "BBBBBBBBBBBB",
             ],
-            'spawn': (6 * 128, 4 * 128),
-            'actions': [
+            "spawn": (6 * 128, 4 * 128),
+            "actions": [
                 ({pygame.K_SPACE}, 4),
                 (None, 4),
             ],
-            'name': 'Jumping & Falling'
+            "name": "Jumping & Falling",
         },
-        'brick_breaking': {
-            'room': [
-                'BBBBBBBBBBBB',
-                'B          B',
-                'B          B',
-                'B   BBBB   B',
-                'B          B',
-                'B          B',
-                'B          B',
-                'BBBBBBBBBBBB',
+        "brick_breaking": {
+            "room": [
+                "BBBBBBBBBBBB",
+                "B          B",
+                "B          B",
+                "B   BBBB   B",
+                "B          B",
+                "B          B",
+                "B          B",
+                "BBBBBBBBBBBB",
             ],
-            'spawn': (5 * 128, 4 * 128),
-            'actions': [
+            "spawn": (5 * 128, 4 * 128),
+            "actions": [
                 ({pygame.K_RIGHT}, 2),
                 ({pygame.K_SPACE}, 4),
             ],
-            'name': 'Brick Breaking'
+            "name": "Brick Breaking",
         },
-        'ladder_climbing': {
-            'room': [
-                'BBBBBBBBBBBB',
-                'B          B',
-                'B    HH    B',
-                'B    HH    B',
-                'B    HH    B',
-                'B          B',
-                'B          B',
-                'BBBBBBBBBBBB',
+        "ladder_climbing": {
+            "room": [
+                "BBBBBBBBBBBB",
+                "B          B",
+                "B    HH    B",
+                "B    HH    B",
+                "B    HH    B",
+                "B          B",
+                "B          B",
+                "BBBBBBBBBBBB",
             ],
-            'spawn': (6 * 128, 5 * 128),
-            'actions': [
+            "spawn": (6 * 128, 5 * 128),
+            "actions": [
                 ({pygame.K_RIGHT}, 2),
                 ({pygame.K_UP}, 4),
             ],
-            'name': 'Ladder Climbing'
-        }
+            "name": "Ladder Climbing",
+        },
     }
 
     # Create tests directory
-    tests_dir = Path('docs/tests')
+    tests_dir = Path("docs/tests")
     tests_dir.mkdir(parents=True, exist_ok=True)
 
     # Generate test sequence screenshots
     for test_name, test_data in test_sequences.items():
         test_dir = tests_dir / test_name
         test_dir.mkdir(exist_ok=True)
-        
-        room = test_data['room']
-        spawn = test_data['spawn']
-        actions = test_data['actions']
-        
+
+        room = test_data["room"]
+        spawn = test_data["spawn"]
+        actions = test_data["actions"]
+
         scene = SideScrollerScene(app, room, spawn)
         app.switch_scene(scene)
         app.advance_frame(None)
-        
+
         # Adjust camera to center the character in the viewport
         scene.camera_x = max(0, scene.player_rect.centerx - app.width // 2)
         scene.camera_y = max(0, scene.player_rect.centery - app.height // 2)
-        
+
         # Advance one more frame to ensure camera positioning is applied
         app.advance_frame(None)
-        
+
         frame_count = 0
         for keys, duration in actions:
             for i in range(duration):
                 app.advance_frame(keys)
-                screenshot_path = test_dir / f'{test_name}_{frame_count:02d}.png'
+                screenshot_path = test_dir / f"{test_name}_{frame_count:02d}.png"
                 # Use clean rendering without HUD
                 clean_surface = pygame.Surface(app._screen.get_size())
                 app.draw_clean(clean_surface)
                 pygame.image.save(clean_surface, str(screenshot_path))
                 frame_count += 1
-                
+
                 # Debug: Print character info for first frame
                 if frame_count == 1:
                     scene = app._current_scene
-                    if hasattr(scene, 'player_rect'):
-                        print(f'Character rect: {scene.player_rect}')
-                        print(f'Camera: ({scene.camera_x}, {scene.camera_y})')
-                        print(f'Window size: {app._screen.get_size()}')
-                        print(f'Character in viewport: ({scene.player_rect.x - scene.camera_x}, {scene.player_rect.y - scene.camera_y})')
-        
-        print(f'Generated {frame_count} frames for {test_name}')
+                    if hasattr(scene, "player_rect"):
+                        print(f"Character rect: {scene.player_rect}")
+                        print(f"Camera: ({scene.camera_x}, {scene.camera_y})")
+                        print(f"Window size: {app._screen.get_size()}")
+                        print(
+                            f"Character in viewport: ({scene.player_rect.x - scene.camera_x}, {scene.player_rect.y - scene.camera_y})"
+                        )
+
+        print(f"Generated {frame_count} frames for {test_name}")
 
     return test_sequences
 
 
 def generate_index_html(git_hash, git_hash_full):
     """Generate the main index.html page."""
-    print('Generating index.html...')
-    
-    index_html = f'''<!DOCTYPE html>
+    print("Generating index.html...")
+
+    index_html = f"""<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -344,37 +355,35 @@ def generate_index_html(git_hash, git_hash_full):
         </p>
     </div>
 </body>
-</html>'''
+</html>"""
 
     return index_html
 
 
 def generate_assets_html(asset_paths, git_hash, git_hash_full):
     """Generate the assets.html page."""
-    print('Generating assets.html...')
-    
+    print("Generating assets.html...")
+
     # Define asset categories
     asset_categories = {
-        'Body Parts': {
-            'head': 'Character head with facial features',
-            'torso': 'Main body torso section',
-            'left_arm': 'Left arm with joint details',
-            'right_arm': 'Right arm with joint details',
-            'left_leg': 'Left leg with joint details',
-            'right_leg': 'Right leg with joint details'
+        "Body Parts": {
+            "head": "Character head with facial features",
+            "torso": "Main body torso section",
+            "left_arm": "Left arm with joint details",
+            "right_arm": "Right arm with joint details",
+            "left_leg": "Left leg with joint details",
+            "right_leg": "Right leg with joint details",
         },
-        'Facial Features': {
-            'eyes_open': 'Open eyes expression',
-            'eyes_closed': 'Closed eyes expression',
-            'mouth_neutral': 'Neutral mouth expression',
-            'mouth_open': 'Open mouth expression'
+        "Facial Features": {
+            "eyes_open": "Open eyes expression",
+            "eyes_closed": "Closed eyes expression",
+            "mouth_neutral": "Neutral mouth expression",
+            "mouth_open": "Open mouth expression",
         },
-        'Accessories': {
-            'hat': 'Character hat accessory'
-        }
+        "Accessories": {"hat": "Character hat accessory"},
     }
 
-    assets_html = f'''<!DOCTYPE html>
+    assets_html = f"""<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -470,29 +479,29 @@ def generate_assets_html(asset_paths, git_hash, git_hash_full):
         <a href="index.html">🏠 Home</a>
         <a href="assets.html">🎨 Assets</a>
         <a href="tests.html">🧪 Test Sequences</a>
-    </div>'''
+    </div>"""
 
     # Generate sections for each category
     for category_name, assets in asset_categories.items():
-        assets_html += f'''
+        assets_html += f"""
     <div class="section">
         <h2>{category_name}</h2>
-        <div class="assets-grid">'''
-        
+        <div class="assets-grid">"""
+
         for asset_name, description in assets.items():
-            if (Path('docs/assets') / f'{asset_name}.png').exists():
-                assets_html += f'''
+            if (Path("docs/assets") / f"{asset_name}.png").exists():
+                assets_html += f"""
         <div class="asset-card">
             <img src="assets/{asset_name}.png" alt="{asset_name}">
             <h3>{asset_name.replace('_', ' ').title()}</h3>
             <p>{description}</p>
-        </div>'''
-        
-        assets_html += '''
-        </div>
-    </div>'''
+        </div>"""
 
-    assets_html += f'''
+        assets_html += """
+        </div>
+    </div>"""
+
+    assets_html += f"""
     <div class="footer">
         <p>All assets generated procedurally using Python & Pygame</p>
         <p style="font-size: 0.9em; color: #95a5a6; margin-top: 15px;">
@@ -501,16 +510,16 @@ def generate_assets_html(asset_paths, git_hash, git_hash_full):
         </p>
     </div>
 </body>
-</html>'''
+</html>"""
 
     return assets_html
 
 
 def generate_tests_html(test_sequences, git_hash, git_hash_full):
     """Generate the tests.html page with tabbed interface."""
-    print('Generating tests.html...')
-    
-    tests_html = f'''<!DOCTYPE html>
+    print("Generating tests.html...")
+
+    tests_html = f"""<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -678,63 +687,62 @@ def generate_tests_html(test_sequences, git_hash, git_hash_full):
         <a href="index.html">🏠 Home</a>
         <a href="assets.html">🎨 Assets</a>
         <a href="tests.html">🧪 Test Sequences</a>
-    </div>'''
+    </div>"""
 
     # Add test sequences with tabbed interface
     for test_name, test_data in test_sequences.items():
-        test_dir = Path('docs/tests') / test_name
+        test_dir = Path("docs/tests") / test_name
         if test_dir.exists():
             # Count frames
-            frame_files = list(test_dir.glob(f'{test_name}_*.png'))
+            frame_files = list(test_dir.glob(f"{test_name}_*.png"))
             frame_count = len(frame_files)
-            
+
             # Generate JSON source for this test sequence
             test_json = {
-                'metadata': {
-                    'name': test_data['name'],
-                    'width': len(test_data['room'][0]),
-                    'height': len(test_data['room'])
+                "metadata": {
+                    "name": test_data["name"],
+                    "width": len(test_data["room"][0]),
+                    "height": len(test_data["room"]),
                 },
-                'layers': {
-                    'tiles': {
-                        'parallax_factor': 1.0,
-                        'objects': []
-                    }
+                "layers": {"tiles": {"parallax_factor": 1.0, "objects": []}},
+                "player": {
+                    "spawn_x": test_data["spawn"][0],
+                    "spawn_y": test_data["spawn"][1],
                 },
-                'player': {
-                    'spawn_x': test_data['spawn'][0],
-                    'spawn_y': test_data['spawn'][1]
-                }
             }
-            
+
             # Convert room data to JSON objects
-            for y, row in enumerate(test_data['room']):
+            for y, row in enumerate(test_data["room"]):
                 for x, char in enumerate(row):
-                    if char == 'B':  # Brick
-                        test_json['layers']['tiles']['objects'].append({
-                            'id': f'brick_{x}_{y}',
-                            'type': 'brick',
-                            'x': x * 128,
-                            'y': y * 128,
-                            'width': 128,
-                            'height': 128,
-                            'color': [135, 90, 60]
-                        })
-                    elif char == 'H':  # Ladder
-                        test_json['layers']['tiles']['objects'].append({
-                            'id': f'ladder_{x}_{y}',
-                            'type': 'ladder',
-                            'x': x * 128,
-                            'y': y * 128,
-                            'width': 128,
-                            'height': 128,
-                            'color': [139, 69, 19]
-                        })
-            
+                    if char == "B":  # Brick
+                        test_json["layers"]["tiles"]["objects"].append(
+                            {
+                                "id": f"brick_{x}_{y}",
+                                "type": "brick",
+                                "x": x * 128,
+                                "y": y * 128,
+                                "width": 128,
+                                "height": 128,
+                                "color": [135, 90, 60],
+                            }
+                        )
+                    elif char == "H":  # Ladder
+                        test_json["layers"]["tiles"]["objects"].append(
+                            {
+                                "id": f"ladder_{x}_{y}",
+                                "type": "ladder",
+                                "x": x * 128,
+                                "y": y * 128,
+                                "width": 128,
+                                "height": 128,
+                                "color": [139, 69, 19],
+                            }
+                        )
+
             # Format JSON for display
             json_source = json.dumps(test_json, indent=2)
-            
-            tests_html += f'''
+
+            tests_html += f"""
     <div class="test-sequence">
         <div class="test-header">
             <h2 class="test-title">{test_data['name']}</h2>
@@ -747,17 +755,17 @@ def generate_tests_html(test_sequences, git_hash, git_hash_full):
             <button class="tab" onclick="switchTab('{test_name}', 'source')">📄 Source</button>
         </div>
         <div class="tab-content active" id="{test_name}_image">
-            <div class="sequence-container">'''
-            
+            <div class="sequence-container">"""
+
             for i in range(frame_count):
-                active_class = ' active' if i == 0 else ''
-                tests_html += f'''
+                active_class = " active" if i == 0 else ""
+                tests_html += f"""
                 <img src="tests/{test_name}/{test_name}_{i:02d}.png" 
                       class="sequence-image{active_class}" 
                       id="{test_name}_{i:02d}"
-                      alt="Frame {i+1}">'''
-            
-            tests_html += f'''
+                      alt="Frame {i+1}">"""
+
+            tests_html += f"""
             </div>
         </div>
         <div class="tab-content" id="{test_name}_source">
@@ -766,9 +774,10 @@ def generate_tests_html(test_sequences, git_hash, git_hash_full):
         <div class="sequence-info">
             <p>{frame_count} frames • Click play to see the sequence in action</p>
         </div>
-    </div>'''
+    </div>"""
 
-    tests_html += '''
+    tests_html += (
+        """
     </div>
     
     <script>
@@ -853,12 +862,17 @@ def generate_tests_html(test_sequences, git_hash, git_hash_full):
     <div class="footer">
         <p>All test sequences generated automatically by the CI/CD pipeline</p>
         <p style="font-size: 0.9em; color: #95a5a6; margin-top: 15px;">
-            Version: <code style="background: #34495e; padding: 2px 6px; border-radius: 3px;">''' + git_hash + '''</code>
-            | <a href="https://github.com/rl337/the-dark-closet/commit/''' + git_hash_full + '''" style="color: #3498db;">View Commit</a>
+            Version: <code style="background: #34495e; padding: 2px 6px; border-radius: 3px;">"""
+        + git_hash
+        + """</code>
+            | <a href="https://github.com/rl337/the-dark-closet/commit/"""
+        + git_hash_full
+        + """" style="color: #3498db;">View Commit</a>
         </p>
     </div>
 </body>
-</html>'''
+</html>"""
+    )
 
     return tests_html
 
@@ -866,59 +880,59 @@ def generate_tests_html(test_sequences, git_hash, git_hash_full):
 def main():
     """Main function to generate all documentation."""
     print("Starting documentation generation...")
-    
+
     # Initialize pygame
     pygame.init()
-    
+
     # Get git hash
     git_hash, git_hash_full = get_git_hash()
-    print(f'Git hash (short): {git_hash}')
-    print(f'Git hash (full): {git_hash_full}')
-    
+    print(f"Git hash (short): {git_hash}")
+    print(f"Git hash (full): {git_hash_full}")
+
     # Create docs directory structure
-    docs_dir = Path('docs')
+    docs_dir = Path("docs")
     docs_dir.mkdir(exist_ok=True)
-    assets_dir = docs_dir / 'assets'
-    tests_dir = docs_dir / 'tests'
+    assets_dir = docs_dir / "assets"
+    tests_dir = docs_dir / "tests"
     assets_dir.mkdir(exist_ok=True)
     tests_dir.mkdir(exist_ok=True)
-    
+
     # Generate procedural assets
     asset_paths, temp_assets_dir = generate_assets()
-    
+
     # Copy assets to docs
     for asset_name, asset_path in asset_paths.items():
         if Path(asset_path).exists():
-            dest_path = assets_dir / f'{asset_name}.png'
+            dest_path = assets_dir / f"{asset_name}.png"
             shutil.copy2(asset_path, dest_path)
-            print(f'Copied {asset_name} to {dest_path}')
-    
+            print(f"Copied {asset_name} to {dest_path}")
+
     # Generate test sequences
     test_sequences = generate_test_sequences()
-    
+
     # Generate HTML pages
     index_html = generate_index_html(git_hash, git_hash_full)
     assets_html = generate_assets_html(asset_paths, git_hash, git_hash_full)
     tests_html = generate_tests_html(test_sequences, git_hash, git_hash_full)
-    
+
     # Write HTML files
-    with open(docs_dir / 'index.html', 'w', encoding='utf-8') as f:
+    with open(docs_dir / "index.html", "w", encoding="utf-8") as f:
         f.write(index_html)
-    
-    with open(docs_dir / 'assets.html', 'w', encoding='utf-8') as f:
+
+    with open(docs_dir / "assets.html", "w", encoding="utf-8") as f:
         f.write(assets_html)
-    
-    with open(docs_dir / 'tests.html', 'w', encoding='utf-8') as f:
+
+    with open(docs_dir / "tests.html", "w", encoding="utf-8") as f:
         f.write(tests_html)
-    
+
     # Clean up temp directory
     shutil.rmtree(temp_assets_dir, ignore_errors=True)
-    
-    print('Documentation generation complete!')
-    print(f'Generated: index.html, assets.html, tests.html')
-    print(f'Assets: {len(list(assets_dir.glob("*.png")))} files')
-    print(f'Test sequences: {len(list(tests_dir.glob("*")))} directories')
+
+    print("Documentation generation complete!")
+    print(f"Generated: index.html, assets.html, tests.html")
+    print(f"Assets: {len(list(assets_dir.glob('*.png')))} files")
+    print(f"Test sequences: {len(list(tests_dir.glob('*')))} directories")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
