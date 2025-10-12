@@ -211,7 +211,16 @@ def generate_assets():
 def generate_test_sequences():
     """Generate test sequence screenshots."""
     print("Generating test sequences...")
-    config = GameConfig(1024, 768, "Test Game", 60)  # Increased window size
+    
+    # Set up headless operation
+    import os
+    os.environ["SDL_VIDEODRIVER"] = "dummy"
+    os.environ["SDL_AUDIODRIVER"] = "dummy"
+    os.environ["DISPLAY"] = ":99"
+    
+    # Use a larger window to capture the full level
+    # Room is 1536x1024, so we need at least that size
+    config = GameConfig(1536, 1024, "Test Game", 60)
     time_provider = ControlledTimeProvider(1.0 / 60.0)
     app = GameApp(config, time_provider)
 
@@ -323,8 +332,9 @@ def generate_test_sequences():
         room_height = len(room) * 128
         
         # Position camera to show the entire room
-        scene.camera_x = max(0, (room_width - app.width) // 2)
-        scene.camera_y = max(0, (room_height - app.height) // 2)
+        # With window size matching room size, we can show the full room
+        scene.camera_x = 0  # Start at left edge
+        scene.camera_y = 0  # Start at top edge
 
         # Advance one more frame to ensure camera positioning is applied
         app.advance_frame(None)
