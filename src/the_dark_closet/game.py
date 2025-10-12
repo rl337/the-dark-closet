@@ -404,11 +404,11 @@ class SideScrollerScene(Scene, PlayerMixin):
         # World tiles in view
         self._draw_tiles(surface)
 
-        # Player
+        # Player (drawn after tiles but before foreground)
         pr = self.player_rect.move(-int(self.camera_x), -int(self.camera_y))
         self._draw_procedural_player(surface, pr)
 
-        # Foreground accents (slightly faster than camera for depth)
+        # Foreground accents (drawn after player for proper depth)
         self._draw_foreground(surface)
 
         # HUD
@@ -468,8 +468,8 @@ class SideScrollerScene(Scene, PlayerMixin):
 
     def _draw_detailed_player(self, surface: pygame.Surface, rect: pygame.Rect) -> None:
         """Draw a detailed player sprite with multiple colors and features."""
-        # Main body (darker red)
-        pygame.draw.rect(surface, (180, 60, 60), rect)
+        # Main body (brighter red to avoid appearing black)
+        pygame.draw.rect(surface, (220, 80, 80), rect)
 
         # Head (lighter skin tone)
         head_rect = pygame.Rect(rect.x + 20, rect.y + 8, 64, 48)
@@ -927,7 +927,7 @@ class GameApp:
         scene = self._current_scene
         if scene is None or not isinstance(scene, SideScrollerScene):
             return
-            
+
         # Sky
         surface.fill((18, 22, 30))
 
@@ -937,11 +937,11 @@ class GameApp:
         # World tiles in view
         scene._draw_tiles(surface)
 
-        # Player
+        # Player (drawn after tiles but before foreground)
         pr = scene.player_rect.move(-int(scene.camera_x), -int(scene.camera_y))
         scene._draw_procedural_player(surface, pr)
 
-        # Foreground accents (slightly faster than camera for depth)
+        # Foreground accents (drawn after player for proper depth)
         scene._draw_foreground(surface)
 
         # Note: Skip HUD rendering for clean screenshots
