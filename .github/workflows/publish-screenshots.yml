@@ -236,7 +236,10 @@ jobs:
                   for i in range(duration):
                       app.advance_frame(keys)
                       screenshot_path = test_dir / f'{test_name}_{frame_count:02d}.png'
-                      pygame.image.save(app._screen, str(screenshot_path))
+                      # Use clean rendering without HUD
+                      clean_surface = pygame.Surface(app._screen.get_size())
+                      app.draw_clean(clean_surface)
+                      pygame.image.save(clean_surface, str(screenshot_path))
                       frame_count += 1
               
               print(f'Generated {frame_count} frames for {test_name}')

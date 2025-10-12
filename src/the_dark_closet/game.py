@@ -915,6 +915,34 @@ class GameApp:
 
             if isinstance(self._current_scene, JSONScene):
                 self._current_scene.draw(surface, show_hud=False)
+            elif isinstance(self._current_scene, SideScrollerScene):
+                # For SideScrollerScene, draw without HUD
+                self._draw_side_scroller_clean(surface)
             else:
                 # Fallback to regular draw
                 self._current_scene.draw(surface)
+
+    def _draw_side_scroller_clean(self, surface: pygame.Surface) -> None:
+        """Draw SideScrollerScene without HUD for clean screenshots."""
+        scene = self._current_scene
+        if scene is None:
+            return
+            
+        # Sky
+        surface.fill((18, 22, 30))
+
+        # Parallax backgrounds
+        scene._draw_parallax(surface)
+
+        # World tiles in view
+        scene._draw_tiles(surface)
+
+        # Player
+        pr = scene.player_rect.move(-int(scene.camera_x), -int(scene.camera_y))
+        scene._draw_procedural_player(surface, pr)
+
+        # Foreground accents (slightly faster than camera for depth)
+        scene._draw_foreground(surface)
+
+        # Note: Skip HUD rendering for clean screenshots
+        # Also skip center mass dot for clean screenshots
