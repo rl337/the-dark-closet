@@ -927,7 +927,7 @@ class GameApp:
         scene = self._current_scene
         if scene is None or not isinstance(scene, SideScrollerScene):
             return
-            
+
         # Sky
         surface.fill((18, 22, 30))
 
