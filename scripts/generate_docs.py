@@ -10,6 +10,12 @@ import shutil
 from pathlib import Path
 from datetime import datetime
 import json
+import os
+
+# Set up headless operation BEFORE any pygame imports
+os.environ["SDL_VIDEODRIVER"] = "dummy"
+os.environ["SDL_AUDIODRIVER"] = "dummy"
+os.environ["DISPLAY"] = ":99"
 
 # Add src to path
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
@@ -211,12 +217,6 @@ def generate_assets():
 def generate_test_sequences():
     """Generate test sequence screenshots."""
     print("Generating test sequences...")
-    
-    # Set up headless operation
-    import os
-    os.environ["SDL_VIDEODRIVER"] = "dummy"
-    os.environ["SDL_AUDIODRIVER"] = "dummy"
-    os.environ["DISPLAY"] = ":99"
     
     # Use a larger window to capture the full level
     # Room is 1536x1024, so we need at least that size
