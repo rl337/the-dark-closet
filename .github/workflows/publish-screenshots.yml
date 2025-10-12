@@ -802,24 +802,24 @@ jobs:
                   for y, row in enumerate(test_data['room']):
                       for x, char in enumerate(row):
                           if char == 'B':  # Brick
-                              test_json["layers"]["tiles"]["objects"].append({
-                                  "id": f"brick_{x}_{y}",
-                                  "type": "brick",
-                                  "x": x * 128,
-                                  "y": y * 128,
-                                  "width": 128,
-                                  "height": 128,
-                                  "color": [135, 90, 60]
+                              test_json['layers']['tiles']['objects'].append({
+                                  'id': f'brick_{x}_{y}',
+                                  'type': 'brick',
+                                  'x': x * 128,
+                                  'y': y * 128,
+                                  'width': 128,
+                                  'height': 128,
+                                  'color': [135, 90, 60]
                               })
                           elif char == 'H':  # Ladder
-                              test_json["layers"]["tiles"]["objects"].append({
-                                  "id": f"ladder_{x}_{y}",
-                                  "type": "ladder",
-                                  "x": x * 128,
-                                  "y": y * 128,
-                                  "width": 128,
-                                  "height": 128,
-                                  "color": [139, 69, 19]
+                              test_json['layers']['tiles']['objects'].append({
+                                  'id': f'ladder_{x}_{y}',
+                                  'type': 'ladder',
+                                  'x': x * 128,
+                                  'y': y * 128,
+                                  'width': 128,
+                                  'height': 128,
+                                  'color': [139, 69, 19]
                               })
                   
                   # Format JSON for display
