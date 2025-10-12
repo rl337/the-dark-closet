@@ -30,7 +30,7 @@ def get_git_hash():
         git_path = shutil.which("git")
         if not git_path:
             return "unknown", "unknown"
-        
+
         git_hash = subprocess.check_output(  # noqa: S603
             [git_path, "rev-parse", "--short", "HEAD"], text=True
         ).strip()
