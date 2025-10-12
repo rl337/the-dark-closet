@@ -93,7 +93,7 @@ class CharacterRenderingTester:
         # Look for HUD text color (210, 210, 220) specifically
         hud_color = np.array([210, 210, 220])
         hud_pixels = np.sum(np.all(hud_region == hud_color, axis=2))
-        
+
         # HUD text should have a significant number of pixels with the specific color
         return hud_pixels > 100
 

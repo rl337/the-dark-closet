@@ -59,7 +59,7 @@ def test_hud_text_detection():
         # Look for HUD text color (210, 210, 220) specifically
         hud_color = np.array([210, 210, 220])
         hud_pixels = np.sum(np.all(hud_region == hud_color, axis=2))
-        
+
         # HUD text should have a significant number of pixels with the specific color
         has_hud_text = hud_pixels > 100
 
@@ -82,7 +82,6 @@ def test_hud_text_detection():
     assert (
         not clean_has_hud
     ), f"Clean rendering should not have HUD text (HUD pixels: {clean_hud_pixels})"
-
 
 
 # Note: Removed test_character_rendering_consistency_isolation as it was checking for

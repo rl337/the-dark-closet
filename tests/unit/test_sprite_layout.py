@@ -167,9 +167,10 @@ class SpriteLayoutValidator:
 
         # Draw brick using the exact same logic as render_brick_tile from rendering_utils.py
         rect = pygame.Rect(0, 0, TILE_SIZE, TILE_SIZE)
-        
+
         # Use the new brick rendering algorithm
         from the_dark_closet.rendering_utils import render_brick_tile
+
         render_brick_tile(surface, rect)
 
         # Convert to PIL Image
