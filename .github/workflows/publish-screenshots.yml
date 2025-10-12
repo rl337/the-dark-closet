@@ -141,6 +141,9 @@ jobs:
           config = GameConfig(1024, 768, 'Test Game', 60)
           time_provider = ControlledTimeProvider(1.0/60.0)
           app = GameApp(config, time_provider)
+          
+          # Force camera to show more of the level for better visibility
+          # This ensures the character and level are properly visible in screenshots
 
           # Test sequences
           test_sequences = {
@@ -231,6 +234,11 @@ jobs:
               app.switch_scene(scene)
               app.advance_frame(None)
               
+              # Adjust camera to center the character in the viewport
+              # This ensures the character is visible and properly positioned
+              scene.camera_x = max(0, scene.player_rect.centerx - app.width // 2)
+              scene.camera_y = max(0, scene.player_rect.centery - app.height // 2)
+              
               frame_count = 0
               for keys, duration in actions:
                   for i in range(duration):
@@ -249,6 +257,7 @@ jobs:
                               print(f'Character rect: {scene.player_rect}')
                               print(f'Camera: ({scene.camera_x}, {scene.camera_y})')
                               print(f'Window size: {app._screen.get_size()}')
+                              print(f'Character in viewport: ({scene.player_rect.x - scene.camera_x}, {scene.player_rect.y - scene.camera_y})')
               
               print(f'Generated {frame_count} frames for {test_name}')
 
