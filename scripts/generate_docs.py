@@ -99,11 +99,11 @@ def detect_movement(prev_pos, curr_pos, threshold=2.0):
     """Detect if character has moved significantly between frames."""
     if prev_pos is None or curr_pos is None:
         return False
-    
+
     dx = abs(curr_pos[0] - prev_pos[0])
     dy = abs(curr_pos[1] - prev_pos[1])
     distance = (dx * dx + dy * dy) ** 0.5
-    
+
     return distance > threshold
 
 
@@ -112,22 +112,22 @@ def wait_for_stabilization(app, scene, max_frames=30, movement_threshold=2.0):
     prev_pos = None
     stable_frames = 0
     required_stable_frames = 5
-    
+
     for frame in range(max_frames):
         app.advance_frame(None)
-        
+
         if hasattr(scene, "player_rect"):
             curr_pos = (scene.player_rect.x, scene.player_rect.y)
-            
+
             if not detect_movement(prev_pos, curr_pos, movement_threshold):
                 stable_frames += 1
                 if stable_frames >= required_stable_frames:
                     return True
             else:
                 stable_frames = 0
-            
+
             prev_pos = curr_pos
-    
+
     return False
 
 
@@ -139,19 +139,19 @@ def capture_action_sequence(app, scene, keys, max_frames=60, movement_threshold=
     action_ended = False
     stable_frames = 0
     required_stable_frames = 5
-    
+
     for frame in range(max_frames):
         app.advance_frame(keys)
-        
+
         if hasattr(scene, "player_rect"):
             curr_pos = (scene.player_rect.x, scene.player_rect.y)
             is_moving = detect_movement(prev_pos, curr_pos, movement_threshold)
-            
+
             # Capture frame
             clean_surface = pygame.Surface(app._screen.get_size())
             app.draw_clean(clean_surface)
             frames.append(clean_surface.copy())
-            
+
             if not action_started and is_moving:
                 # Action just started
                 action_started = True
@@ -166,9 +166,9 @@ def capture_action_sequence(app, scene, keys, max_frames=60, movement_threshold=
             elif action_started and is_moving:
                 # Reset stable counter if character starts moving again
                 stable_frames = 0
-            
+
             prev_pos = curr_pos
-    
+
     return frames, action_started, action_ended
 
 
@@ -176,32 +176,32 @@ def select_meaningful_frames(frames, action_started, action_ended, target_count=
     """Select meaningful frames from the captured sequence."""
     if not frames:
         return []
-    
+
     if len(frames) <= target_count:
         return frames
-    
+
     if not action_started:
         # No action detected, return evenly spaced frames
         step = len(frames) // target_count
         return [frames[i * step] for i in range(target_count)]
-    
+
     # Find action phase
     action_frames = frames
     if action_ended:
         # Use frames from start to end of action
         action_frames = frames
-    
+
     # Select representative frames from action phase
     if len(action_frames) <= target_count:
         return action_frames
-    
+
     # Distribute frames across the action
     step = len(action_frames) // target_count
     selected = []
     for i in range(target_count):
         idx = min(i * step, len(action_frames) - 1)
         selected.append(action_frames[idx])
-    
+
     return selected
 
 
@@ -217,7 +217,7 @@ def generate_assets():
 def generate_test_sequences():
     """Generate test sequence screenshots."""
     print("Generating test sequences...")
-    
+
     # Use a larger window to capture the full level
     # Room is 1536x1024, so we need at least that size
     config = GameConfig(1536, 1024, "Test Game", 60)
@@ -239,8 +239,14 @@ def generate_test_sequences():
             ],
             "spawn": (6 * 128, 6 * 128),  # Spawn on ground level
             "actions": [
-                ({pygame.K_RIGHT}, 30),  # Move right - intelligent selection will pick meaningful frames
-                ({pygame.K_LEFT}, 30),   # Move left - intelligent selection will pick meaningful frames
+                (
+                    {pygame.K_RIGHT},
+                    30,
+                ),  # Move right - intelligent selection will pick meaningful frames
+                (
+                    {pygame.K_LEFT},
+                    30,
+                ),  # Move left - intelligent selection will pick meaningful frames
             ],
             "name": "Character Movement",
         },
@@ -257,7 +263,10 @@ def generate_test_sequences():
             ],
             "spawn": (6 * 128, 6 * 128),  # Spawn on ground level
             "actions": [
-                ({pygame.K_SPACE}, 40),  # Jump - intelligent selection will pick jump and fall frames
+                (
+                    {pygame.K_SPACE},
+                    40,
+                ),  # Jump - intelligent selection will pick jump and fall frames
             ],
             "name": "Jumping & Falling",
         },
@@ -293,7 +302,7 @@ def generate_test_sequences():
             "spawn": (5 * 128, 6 * 128),  # Spawn on ground, near ladder
             "actions": [
                 ({pygame.K_RIGHT}, 20),  # Move to ladder
-                ({pygame.K_UP}, 40),     # Climb ladder
+                ({pygame.K_UP}, 40),  # Climb ladder
             ],
             "name": "Ladder Climbing",
         },
@@ -307,7 +316,7 @@ def generate_test_sequences():
     for test_name, test_data in test_sequences.items():
         test_dir = tests_dir / test_name
         test_dir.mkdir(exist_ok=True)
-        
+
         # Clean up any existing frames from previous runs
         for old_file in test_dir.glob(f"{test_name}_*.png"):
             old_file.unlink()
@@ -317,20 +326,20 @@ def generate_test_sequences():
         actions = test_data["actions"]
 
         print(f"Generating {test_name}...")
-        
+
         scene = SideScrollerScene(app, room, spawn)
         app.switch_scene(scene)
         app.advance_frame(None)
 
         # Wait for character to stabilize
-        print(f"  Waiting for character to stabilize...")
+        print("  Waiting for character to stabilize...")
         if not wait_for_stabilization(app, scene):
-            print(f"  Warning: Character did not stabilize within timeout")
+            print("  Warning: Character did not stabilize within timeout")
 
         # Adjust camera to show the full level for tests
         room_width = len(room[0]) * 128
         room_height = len(room) * 128
-        
+
         # Position camera to show the entire room
         # With window size matching room size, we can show the full room
         scene.camera_x = 0  # Start at left edge
@@ -345,32 +354,38 @@ def generate_test_sequences():
             print(f"  Camera: ({scene.camera_x}, {scene.camera_y})")
             print(f"  Window size: {app._screen.get_size()}")
             print(f"  Room size: {room_width}x{room_height}")
-            print(f"  Character in viewport: ({scene.player_rect.x - scene.camera_x}, {scene.player_rect.y - scene.camera_y})")
+            print(
+                f"  Character in viewport: ({scene.player_rect.x - scene.camera_x}, {scene.player_rect.y - scene.camera_y})"
+            )
 
         # Process each action with intelligent frame selection
-        all_selected_frames = []
         frame_count = 0
-        
+
         for action_idx, (keys, duration) in enumerate(actions):
             print(f"  Processing action {action_idx + 1}: {keys if keys else 'None'}")
-            
+
             # Capture frames during this action
             captured_frames, action_started, action_ended = capture_action_sequence(
-                app, scene, keys, max_frames=duration * 10  # Allow more frames for detection
+                app,
+                scene,
+                keys,
+                max_frames=duration * 10,  # Allow more frames for detection
             )
-            
+
             # Select meaningful frames from this action
             selected_frames = select_meaningful_frames(
                 captured_frames, action_started, action_ended, target_count=4
             )
-            
+
             # Save selected frames
             for i, frame in enumerate(selected_frames):
                 screenshot_path = test_dir / f"{test_name}_{frame_count:02d}.png"
                 pygame.image.save(frame, str(screenshot_path))
                 frame_count += 1
-            
-            print(f"    Selected {len(selected_frames)} frames from {len(captured_frames)} captured")
+
+            print(
+                f"    Selected {len(selected_frames)} frames from {len(captured_frames)} captured"
+            )
 
         print(f"Generated {frame_count} frames for {test_name}")
 
