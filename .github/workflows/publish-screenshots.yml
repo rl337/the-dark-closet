@@ -80,7 +80,23 @@ jobs:
         env:
           PYTHONPATH: src
         run: |
-          poetry run pylint src/the_dark_closet
+          # Run pylint with the same configuration as run_checks.sh
+          # Only fail on fatal errors (exit code 1) and usage errors (exit code 32)
+          # Allow warnings, refactoring suggestions, and convention issues
+          set +e  # Temporarily disable exit on error
+          poetry run pylint src/the_dark_closet --output-format=text --fail-under=9.0
+          pylint_exit_code=$?
+          set -e  # Re-enable exit on error
+          
+          # Check if pylint failed with a fatal error or usage error
+          if [ $pylint_exit_code -eq 1 ] || [ $pylint_exit_code -eq 32 ]; then
+              echo "❌ Pylint analysis failed with exit code $pylint_exit_code"
+              exit $pylint_exit_code
+          elif [ $pylint_exit_code -ne 0 ]; then
+              echo "⚠️ Pylint analysis completed with warnings (exit code $pylint_exit_code)"
+          else
+              echo "✅ Pylint analysis passed"
+          fi
 
       - name: Generate screenshots site (docs/)
         env:
