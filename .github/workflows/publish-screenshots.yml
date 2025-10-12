@@ -899,27 +899,40 @@ jobs:
                   }
                   
                   function switchTab(testName, tabType) {
-                      // Update tab buttons
-                      const tabs = document.querySelectorAll(`#${testName}_image, #${testName}_source`).forEach(el => {
-                          const tabButtons = el.closest('.test-sequence').querySelectorAll('.tab');
-                          tabButtons.forEach(btn => btn.classList.remove('active'));
-                      });
+                      // Stop any playing animation when switching tabs
+                      if (animations[testName]) {
+                          const button = document.querySelector(`[onclick*=\\\"toggleAnimation('\\${testName}'\\\"]\`);
+                          if (button) {
+                              clearInterval(animations[testName]);
+                              delete animations[testName];
+                              button.textContent = '▶️ Play';
+                              button.classList.remove('playing');
+                          }
+                      }
+
+                      // Update tab buttons and content
+                      const imageContent = document.getElementById(testName + '_image');
+                      const sourceContent = document.getElementById(testName + '_source');
+                      const testSequence = imageContent.closest('.test-sequence');
+                      const tabButtons = testSequence.querySelectorAll('.tab');
                       
-                      // Update tab content
-                      const imageContent = document.getElementById(`${testName}_image`);
-                      const sourceContent = document.getElementById(`${testName}_source`);
+                      // Remove active class from all tabs
+                      tabButtons.forEach(btn => btn.classList.remove('active'));
                       
                       if (tabType === 'image') {
                           imageContent.classList.add('active');
                           sourceContent.classList.remove('active');
-                          // Update tab button
-                          const tabButtons = imageContent.closest('.test-sequence').querySelectorAll('.tab');
                           tabButtons[0].classList.add('active');
+                          
+                          // Ensure the first image is shown when switching back to image tab
+                          const images = imageContent.querySelectorAll('.sequence-image');
+                          if (images.length > 0) {
+                              images.forEach(img => img.classList.remove('active'));
+                              images[0].classList.add('active');
+                          }
                       } else {
                           imageContent.classList.remove('active');
                           sourceContent.classList.add('active');
-                          // Update tab button
-                          const tabButtons = sourceContent.closest('.test-sequence').querySelectorAll('.tab');
                           tabButtons[1].classList.add('active');
                       }
                   }
