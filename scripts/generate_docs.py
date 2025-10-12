@@ -4,7 +4,6 @@ Generate documentation for The Dark Closet project.
 This script creates HTML pages with game screenshots, assets, and test sequences.
 """
 
-import os
 import sys
 import subprocess
 from pathlib import Path
@@ -383,14 +382,14 @@ def generate_assets_html(asset_paths, git_hash, git_hash_full):
         "Accessories": {"hat": "Character hat accessory"},
     }
 
-    assets_html = f"""<!DOCTYPE html>
+    assets_html = """<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Assets - The Dark Closet</title>
     <style>
-        body {{
+        body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             max-width: 1200px;
             margin: 0 auto;
@@ -398,19 +397,19 @@ def generate_assets_html(asset_paths, git_hash, git_hash_full):
             background: #1a1a1a;
             color: #ffffff;
             line-height: 1.6;
-        }}
-        .header {{
+        }
+        .header {
             text-align: center;
             margin-bottom: 40px;
             padding: 20px;
             background: linear-gradient(135deg, #2c3e50, #34495e);
             border-radius: 10px;
-        }}
-        .nav {{
+        }
+        .nav {
             text-align: center;
             margin: 20px 0;
-        }}
-        .nav a {{
+        }
+        .nav a {
             display: inline-block;
             margin: 0 15px;
             padding: 10px 20px;
@@ -419,37 +418,37 @@ def generate_assets_html(asset_paths, git_hash, git_hash_full):
             text-decoration: none;
             border-radius: 5px;
             transition: background 0.3s;
-        }}
-        .nav a:hover {{
+        }
+        .nav a:hover {
             background: #2980b9;
-        }}
-        .section {{
+        }
+        .section {
             margin: 40px 0;
-        }}
-        .section h2 {{
+        }
+        .section h2 {
             color: #3498db;
             border-bottom: 2px solid #3498db;
             padding-bottom: 10px;
             margin-bottom: 20px;
-        }}
-        .assets-grid {{
+        }
+        .assets-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 20px;
             margin: 20px 0;
-        }}
-        .asset-card {{
+        }
+        .asset-card {
             background: #2c2c2c;
             padding: 20px;
             border-radius: 10px;
             text-align: center;
             border: 2px solid transparent;
             transition: border-color 0.3s;
-        }}
-        .asset-card:hover {{
+        }
+        .asset-card:hover {
             border-color: #3498db;
-        }}
-        .asset-card img {{
+        }
+        .asset-card img {
             width: 128px; /* Fixed width */
             height: 128px; /* Fixed height */
             object-fit: contain; /* Ensure image fits without cropping */
@@ -457,16 +456,16 @@ def generate_assets_html(asset_paths, git_hash, git_hash_full):
             margin-bottom: 10px;
             background: #1a1a1a;
             padding: 10px;
-        }}
-        .asset-card h3 {{
+        }
+        .asset-card h3 {
             margin: 0 0 10px 0;
             color: #3498db;
-        }}
-        .asset-card p {{
+        }
+        .asset-card p {
             margin: 0;
             color: #bdc3c7;
             font-size: 0.9em;
-        }}
+        }
     </style>
 </head>
 <body>
@@ -519,14 +518,14 @@ def generate_tests_html(test_sequences, git_hash, git_hash_full):
     """Generate the tests.html page with tabbed interface."""
     print("Generating tests.html...")
 
-    tests_html = f"""<!DOCTYPE html>
+    tests_html = """<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Test Sequences - The Dark Closet</title>
     <style>
-        body {{
+        body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             max-width: 1200px;
             margin: 0 auto;
@@ -534,19 +533,19 @@ def generate_tests_html(test_sequences, git_hash, git_hash_full):
             background: #1a1a1a;
             color: #ffffff;
             line-height: 1.6;
-        }}
-        .header {{
+        }
+        .header {
             text-align: center;
             margin-bottom: 40px;
             padding: 20px;
             background: linear-gradient(135deg, #2c3e50, #34495e);
             border-radius: 10px;
-        }}
-        .nav {{
+        }
+        .nav {
             text-align: center;
             margin: 20px 0;
-        }}
-        .nav a {{
+        }
+        .nav a {
             display: inline-block;
             margin: 0 15px;
             padding: 10px 20px;
@@ -555,28 +554,28 @@ def generate_tests_html(test_sequences, git_hash, git_hash_full):
             text-decoration: none;
             border-radius: 5px;
             transition: background 0.3s;
-        }}
-        .nav a:hover {{
+        }
+        .nav a:hover {
             background: #2980b9;
-        }}
-        .test-sequence {{
+        }
+        .test-sequence {
             background: #2c2c2c;
             padding: 20px;
             border-radius: 10px;
             margin: 30px 0;
-        }}
-        .test-header {{
+        }
+        .test-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 20px;
-        }}
-        .test-title {{
+        }
+        .test-title {
             font-size: 1.5em;
             color: #3498db;
             margin: 0;
-        }}
-        .play-button {{
+        }
+        .play-button {
             background: #27ae60;
             color: white;
             border: none;
@@ -585,22 +584,22 @@ def generate_tests_html(test_sequences, git_hash, git_hash_full):
             cursor: pointer;
             font-size: 1em;
             transition: background 0.3s;
-        }}
-        .play-button:hover {{
+        }
+        .play-button:hover {
             background: #229954;
-        }}
-        .play-button.playing {{
+        }
+        .play-button.playing {
             background: #e74c3c;
-        }}
-        .play-button.playing:hover {{
+        }
+        .play-button.playing:hover {
             background: #c0392b;
-        }}
-        .tabs {{
+        }
+        .tabs {
             display: flex;
             margin-bottom: 20px;
             border-bottom: 2px solid #34495e;
-        }}
-        .tab {{
+        }
+        .tab {
             background: #34495e;
             color: #bdc3c7;
             border: none;
@@ -610,21 +609,21 @@ def generate_tests_html(test_sequences, git_hash, git_hash_full):
             transition: all 0.3s;
             border-radius: 5px 5px 0 0;
             margin-right: 5px;
-        }}
-        .tab.active {{
+        }
+        .tab.active {
             background: #3498db;
             color: white;
-        }}
-        .tab:hover:not(.active) {{
+        }
+        .tab:hover:not(.active) {
             background: #2c3e50;
-        }}
-        .tab-content {{
+        }
+        .tab-content {
             display: none;
-        }}
-        .tab-content.active {{
+        }
+        .tab-content.active {
             display: block;
-        }}
-        .sequence-container {{
+        }
+        .sequence-container {
             position: relative;
             text-align: center;
             background: #1a1a1a;
@@ -637,8 +636,8 @@ def generate_tests_html(test_sequences, git_hash, git_hash_full):
             align-items: center;
             justify-content: center;
             overflow: hidden; /* Prevent overflow */
-        }}
-        .sequence-image {{
+        }
+        .sequence-image {
             max-width: 100%;
             max-height: 100%;
             width: auto;
@@ -652,11 +651,11 @@ def generate_tests_html(test_sequences, git_hash, git_hash_full):
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-        }}
-        .sequence-image.active {{
+        }
+        .sequence-image.active {
             opacity: 1;
-        }}
-        .source-code {{
+        }
+        .source-code {
             background: #1a1a1a;
             border: 1px solid #34495e;
             border-radius: 5px;
@@ -669,12 +668,12 @@ def generate_tests_html(test_sequences, git_hash, git_hash_full):
             overflow-x: auto;
             max-height: 400px;
             overflow-y: auto;
-        }}
-        .sequence-info {{
+        }
+        .sequence-info {
             text-align: center;
             margin-top: 15px;
             color: #bdc3c7;
-        }}
+        }
     </style>
 </head>
 <body>
@@ -929,7 +928,7 @@ def main():
     shutil.rmtree(temp_assets_dir, ignore_errors=True)
 
     print("Documentation generation complete!")
-    print(f"Generated: index.html, assets.html, tests.html")
+    print("Generated: index.html, assets.html, tests.html")
     print(f"Assets: {len(list(assets_dir.glob('*.png')))} files")
     print(f"Test sequences: {len(list(tests_dir.glob('*')))} directories")
 
