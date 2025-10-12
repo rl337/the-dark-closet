@@ -781,20 +781,20 @@ jobs:
                   
                   # Generate JSON source for this test sequence
                   test_json = {
-                      "metadata": {
-                          "name": test_data['name'],
-                          "width": len(test_data['room'][0]),
-                          "height": len(test_data['room'])
+                      'metadata': {
+                          'name': test_data['name'],
+                          'width': len(test_data['room'][0]),
+                          'height': len(test_data['room'])
                       },
-                      "layers": {
-                          "tiles": {
-                              "parallax_factor": 1.0,
-                              "objects": []
+                      'layers': {
+                          'tiles': {
+                              'parallax_factor': 1.0,
+                              'objects': []
                           }
                       },
-                      "player": {
-                          "spawn_x": test_data['spawn'][0],
-                          "spawn_y": test_data['spawn'][1]
+                      'player': {
+                          'spawn_x': test_data['spawn'][0],
+                          'spawn_y': test_data['spawn'][1]
                       }
                   }
                   
