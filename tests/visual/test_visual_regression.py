@@ -117,7 +117,7 @@ class VisualRegressionTester:
 @pytest.fixture
 def visual_tester():
     """Create a visual regression tester."""
-    baseline_dir = Path("build/visual_baselines")
+    baseline_dir = Path("tests/baselines")
     current_dir = Path("build/visual_current")
     return VisualRegressionTester(baseline_dir, current_dir)
 
