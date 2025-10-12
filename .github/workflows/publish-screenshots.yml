@@ -241,6 +241,18 @@ jobs:
               
               print(f'Generated {frame_count} frames for {test_name}')
 
+          # Get git commit hash for version display
+          import subprocess
+          try:
+              git_hash = subprocess.check_output(['git', 'rev-parse', '--short', 'HEAD'], text=True).strip()
+              git_hash_full = subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip()
+              print(f'Git hash (short): {git_hash}')
+              print(f'Git hash (full): {git_hash_full}')
+          except Exception as e:
+              git_hash = 'unknown'
+              git_hash_full = 'unknown'
+              print(f'Failed to get git hash: {e}')
+
           # Generate main index.html
           print('Generating index.html...')
           index_html = '''<!DOCTYPE html>
@@ -400,6 +412,10 @@ jobs:
               <div class=\"footer\">
                   <p>Built with ❤️ using Python, Pygame, Poetry, and GitHub Actions</p>
                   <p><a href=\"https://github.com/rlee/the-dark-closet\" style=\"color: #3498db;\">View Source Code</a></p>
+                  <p style=\"font-size: 0.9em; color: #95a5a6; margin-top: 15px;\">
+                      Version: <code style=\"background: #34495e; padding: 2px 6px; border-radius: 3px;\">''' + git_hash + '''</code>
+                      | <a href=\"https://github.com/rl337/the-dark-closet/commit/''' + git_hash_full + '''\" style=\"color: #3498db;\">View Commit</a>
+                  </p>
               </div>
           </body>
           </html>'''
@@ -528,6 +544,10 @@ jobs:
               
               <div class=\"footer\">
                   <p>All assets generated procedurally using Python & Pygame</p>
+                  <p style=\"font-size: 0.9em; color: #95a5a6; margin-top: 15px;\">
+                      Version: <code style=\"background: #34495e; padding: 2px 6px; border-radius: 3px;\">''' + git_hash + '''</code>
+                      | <a href=\"https://github.com/rl337/the-dark-closet/commit/''' + git_hash_full + '''\" style=\"color: #3498db;\">View Commit</a>
+                  </p>
               </div>
           </body>
           </html>'''
@@ -734,6 +754,10 @@ jobs:
               
               <div class=\"footer\">
                   <p>All test sequences generated automatically by the CI/CD pipeline</p>
+                  <p style=\"font-size: 0.9em; color: #95a5a6; margin-top: 15px;\">
+                      Version: <code style=\"background: #34495e; padding: 2px 6px; border-radius: 3px;\">''' + git_hash + '''</code>
+                      | <a href=\"https://github.com/rl337/the-dark-closet/commit/''' + git_hash_full + '''\" style=\"color: #3498db;\">View Commit</a>
+                  </p>
               </div>
           </body>
           </html>'''
