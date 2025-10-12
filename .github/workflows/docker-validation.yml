@@ -1,38 +1,36 @@
 name: Docker Validation
 
 on:
-    pull_request:
-        branches: [main, develop]
-    push:
-        branches: [main, develop]
+  push:
+    branches: [main, develop]
 
 jobs:
-    docker-validate:
-        runs-on: ubuntu-latest
+  docker-validate:
+    runs-on: ubuntu-latest
 
-        steps:
-            - name: Checkout code
-              uses: actions/checkout@v4
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-            - name: Build Docker image
-              run: docker build -t the-dark-closet:test .
+      - name: Build Docker image
+        run: docker build -t the-dark-closet:test .
 
-            - name: Test Docker image
-              run: |
-                  # Test that the image builds and runs
-                  docker run --rm the-dark-closet:test --help || true
+      - name: Test Docker image
+        run: |
+          # Test that the image builds and runs
+          docker run --rm the-dark-closet:test --help || true
 
-            - name: Run validation in Docker
-              run: |
-                  docker run --rm \
-                    -v $(pwd):/app \
-                    -w /app \
-                    the-dark-closet:test \
-                    bash -c "chmod +x ./run_checks.sh && ./run_checks.sh --structure --format --lint --unit --integration"
+      - name: Run validation in Docker
+        run: |
+          docker run --rm \
+            -v $(pwd):/app \
+            -w /app \
+            the-dark-closet:test \
+            bash -c "chmod +x ./run_checks.sh && ./run_checks.sh --structure --format --lint --unit --integration"
 
-            - name: Test headless operation
-              run: |
-                  docker run --rm \
-                    -e TDC_MAX_FRAMES=3 \
-                    -e SDL_VIDEODRIVER=dummy \
-                    the-dark-closet:test
+      - name: Test headless operation
+        run: |
+          docker run --rm \
+            -e TDC_MAX_FRAMES=3 \
+            -e SDL_VIDEODRIVER=dummy \
+            the-dark-closet:test

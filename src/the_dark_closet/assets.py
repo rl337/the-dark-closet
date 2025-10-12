@@ -434,12 +434,41 @@ class PinocchioAssetGenerator:
         return str(file_path)
 
 
+# Global cache for character assets to ensure consistency
+_character_assets_cache: Optional[Dict[str, str]] = None
+_character_assets_output_dir: Optional[Path] = None
+
+
 def generate_character_assets(
     output_dir: Path = Path("generated_assets"),
 ) -> Dict[str, str]:
     """Generate all Pinocchio-inspired character assets."""
+    global _character_assets_cache, _character_assets_output_dir
+
+    # Return cached assets if they exist and output directory is the same
+    if (
+        _character_assets_cache is not None
+        and _character_assets_output_dir is not None
+        and _character_assets_output_dir == output_dir
+    ):
+        return _character_assets_cache
+
+    # Generate new assets
     generator = PinocchioAssetGenerator()
-    return generator.generate_all_assets(output_dir)
+    asset_paths = generator.generate_all_assets(output_dir)
+
+    # Cache the results
+    _character_assets_cache = asset_paths
+    _character_assets_output_dir = output_dir
+
+    return asset_paths
+
+
+def reset_character_assets_cache():
+    """Reset the global character assets cache."""
+    global _character_assets_cache, _character_assets_output_dir
+    _character_assets_cache = None
+    _character_assets_output_dir = None
 
 
 if __name__ == "__main__":

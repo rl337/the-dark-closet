@@ -906,3 +906,15 @@ class GameApp:
         if isinstance(self._time_provider, ControlledTimeProvider):
             return self._time_provider.get_current_time()
         return 0.0  # Real time providers don't track time
+
+    def draw_clean(self, surface: pygame.Surface) -> None:
+        """Draw the current scene without HUD for clean screenshots."""
+        if self._current_scene is not None:
+            # Check if the scene is a JSONScene and supports show_hud parameter
+            from .json_scene import JSONScene
+
+            if isinstance(self._current_scene, JSONScene):
+                self._current_scene.draw(surface, show_hud=False)
+            else:
+                # Fallback to regular draw
+                self._current_scene.draw(surface)

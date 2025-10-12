@@ -41,6 +41,9 @@ class JSONScene(Scene, PlayerMixin):
         # Initialize player state using shared configuration
         self._init_player_state(spawn_x, spawn_y)
 
+        # Initialize HUD font immediately
+        self.hud_font = pygame.font.Font(None, 96)  # 4x 24 for higher resolution
+
         # Level dimensions
         self.level_width = self.level_data.metadata.get("width", 12) * TILE_SIZE
         self.level_height = self.level_data.metadata.get("height", 8) * TILE_SIZE
@@ -130,7 +133,7 @@ class JSONScene(Scene, PlayerMixin):
             0, min(target_camera_y, self.level_height - self.app.height)
         )
 
-    def draw(self, surface: pygame.Surface) -> None:
+    def draw(self, surface: pygame.Surface, show_hud: bool = True) -> None:
         """Draw the scene."""
         # Sky
         surface.fill((18, 22, 30))
@@ -146,8 +149,9 @@ class JSONScene(Scene, PlayerMixin):
         pr = self.player_rect.move(-int(self.camera_x), -int(self.camera_y))
         self._draw_procedural_player(surface, pr)
 
-        # HUD
-        render_hud(surface, self.hud_font)
+        # HUD (optional)
+        if show_hud:
+            render_hud(surface, self.hud_font)
 
         # Draw center mass dot after all other rendering (so it's not overwritten)
         render_center_mass_dot(surface, self.player_rect, self.camera_x, self.camera_y)
@@ -192,15 +196,18 @@ class JSONScene(Scene, PlayerMixin):
         try:
             from .assets import generate_character_assets
 
-            # Generate assets to a temporary directory
-            temp_assets_dir = Path("build/generated_assets")
-            temp_assets_dir.mkdir(parents=True, exist_ok=True)
+            # Use a consistent assets directory for this scene instance
+            if not hasattr(self, "_assets_dir"):
+                self._assets_dir = Path("build/generated_assets")
+                self._assets_dir.mkdir(parents=True, exist_ok=True)
 
-            asset_paths = generate_character_assets(temp_assets_dir)
+                # Generate assets only once
+                asset_paths = generate_character_assets(self._assets_dir)
+                self._asset_paths = asset_paths
 
             # Load the generated assets
             assets = {}
-            for asset_name, asset_path in asset_paths.items():
+            for asset_name, asset_path in self._asset_paths.items():
                 if Path(asset_path).exists():
                     assets[asset_name] = pygame.image.load(asset_path)
 

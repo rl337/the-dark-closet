@@ -221,6 +221,12 @@ build/reports/
 !docs/assets/*.jpeg
 !docs/assets/*.gif
 !docs/assets/*.bmp
+# And keep visual regression test baselines
+!tests/baselines/*.png
+!tests/baselines/*.jpg
+!tests/baselines/*.jpeg
+!tests/baselines/*.gif
+!tests/baselines/*.bmp
 
 # Logs
 *.log
