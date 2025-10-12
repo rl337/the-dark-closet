@@ -43,6 +43,52 @@ def get_git_hash():
         return "unknown", "unknown"
 
 
+def generate_ascii_level(room_data, spawn_pos):
+    """Generate ASCII representation of the level similar to NetHack style."""
+    # Character mappings for different tile types
+    char_map = {
+        "B": "█",  # Brick - solid block
+        "H": "║",  # Ladder - vertical line
+        " ": "·",  # Empty space - middle dot
+    }
+
+    # Convert spawn position to grid coordinates
+    spawn_x = spawn_pos[0] // 128
+    spawn_y = spawn_pos[1] // 128
+
+    # Create ASCII representation
+    ascii_lines = []
+    for y, row in enumerate(room_data):
+        ascii_row = ""
+        for x, char in enumerate(row):
+            if x == spawn_x and y == spawn_y:
+                # Show player position with '@' symbol
+                ascii_row += "@"
+            else:
+                # Use character mapping
+                ascii_row += char_map.get(char, char)
+        ascii_lines.append(ascii_row)
+
+    # Add border and legend
+    width = len(room_data[0])
+    border = "┌" + "─" * width + "┐"
+
+    result = [border]
+    for line in ascii_lines:
+        result.append("│" + line + "│")
+    result.append("└" + "─" * width + "┘")
+
+    # Add legend
+    result.append("")
+    result.append("Legend:")
+    result.append("  @ = Player spawn position")
+    result.append("  █ = Brick wall (128x128 pixels)")
+    result.append("  ║ = Ladder (128x128 pixels)")
+    result.append("  · = Empty space (128x128 pixels)")
+
+    return "\n".join(result)
+
+
 def generate_assets():
     """Generate procedural character assets."""
     print("Generating procedural assets...")
@@ -673,6 +719,21 @@ def generate_tests_html(test_sequences, git_hash, git_hash_full):
             max-height: 400px;
             overflow-y: auto;
         }
+        .ascii-render {
+            background: #1a1a1a;
+            border: 1px solid #34495e;
+            border-radius: 5px;
+            padding: 20px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 1.1em;
+            line-height: 1.2;
+            color: #00ff00;
+            white-space: pre;
+            overflow-x: auto;
+            max-height: 400px;
+            overflow-y: auto;
+            text-align: center;
+        }
         .sequence-info {
             text-align: center;
             margin-top: 15px;
@@ -755,6 +816,7 @@ def generate_tests_html(test_sequences, git_hash, git_hash_full):
         </div>
         <div class="tabs">
             <button class="tab active" onclick="switchTab('{test_name}', 'image')">🖼️ Image</button>
+            <button class="tab" onclick="switchTab('{test_name}', 'ascii')">🎮 ASCII</button>
             <button class="tab" onclick="switchTab('{test_name}', 'source')">📄 Source</button>
         </div>
         <div class="tab-content active" id="{test_name}_image">
@@ -770,6 +832,9 @@ def generate_tests_html(test_sequences, git_hash, git_hash_full):
 
             tests_html += f"""
             </div>
+        </div>
+        <div class="tab-content" id="{test_name}_ascii">
+            <div class="ascii-render">{generate_ascii_level(test_data['room'], test_data['spawn'])}</div>
         </div>
         <div class="tab-content" id="{test_name}_source">
             <div class="source-code">{json_source}</div>
@@ -836,6 +901,7 @@ def generate_tests_html(test_sequences, git_hash, git_hash_full):
 
             // Update tab buttons and content
             const imageContent = document.getElementById(testName + '_image');
+            const asciiContent = document.getElementById(testName + '_ascii');
             const sourceContent = document.getElementById(testName + '_source');
             const testSequence = imageContent.closest('.test-sequence');
             const tabButtons = testSequence.querySelectorAll('.tab');
@@ -845,6 +911,7 @@ def generate_tests_html(test_sequences, git_hash, git_hash_full):
             
             if (tabType === 'image') {
                 imageContent.classList.add('active');
+                asciiContent.classList.remove('active');
                 sourceContent.classList.remove('active');
                 tabButtons[0].classList.add('active');
                 
@@ -854,10 +921,16 @@ def generate_tests_html(test_sequences, git_hash, git_hash_full):
                     images.forEach(img => img.classList.remove('active'));
                     images[0].classList.add('active');
                 }
+            } else if (tabType === 'ascii') {
+                imageContent.classList.remove('active');
+                asciiContent.classList.add('active');
+                sourceContent.classList.remove('active');
+                tabButtons[1].classList.add('active');
             } else {
                 imageContent.classList.remove('active');
+                asciiContent.classList.remove('active');
                 sourceContent.classList.add('active');
-                tabButtons[1].classList.add('active');
+                tabButtons[2].classList.add('active');
             }
         }
     </script>
