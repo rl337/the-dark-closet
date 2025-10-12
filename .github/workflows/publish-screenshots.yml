@@ -548,36 +548,6 @@ jobs:
                           <a href=\"tests.html\">🧪 Test Sequences</a>
                       </div>'''
 
-                 # Generate level assets
-                 print('Generating level assets...')
-                 level_assets_dir = docs_dir / 'level_assets'
-                 level_assets_dir.mkdir(exist_ok=True)
-                 
-                 # Generate brick tile
-                 brick_surface = pygame.Surface((128, 128))
-                 brick_surface.fill((0, 0, 0, 0))  # Transparent background
-                 from the_dark_closet.rendering_utils import render_brick_tile
-                 render_brick_tile(brick_surface, pygame.Rect(0, 0, 128, 128))
-                 pygame.image.save(brick_surface, str(level_assets_dir / 'brick_tile.png'))
-                 
-                 # Generate ladder tile
-                 ladder_surface = pygame.Surface((128, 128))
-                 ladder_surface.fill((0, 0, 0, 0))  # Transparent background
-                 from the_dark_closet.rendering_utils import render_ladder_tile
-                 render_ladder_tile(ladder_surface, pygame.Rect(0, 0, 128, 128))
-                 pygame.image.save(ladder_surface, str(level_assets_dir / 'ladder_tile.png'))
-                 
-                 # Generate background layers
-                 for i, color in enumerate([(30, 40, 50), (40, 50, 60), (50, 60, 70)]):
-                     bg_surface = pygame.Surface((256, 256))
-                     bg_surface.fill(color)
-                     # Add some texture
-                     for y in range(0, 256, 32):
-                         for x in range(0, 256, 32):
-                             if (x + y) % 64 == 0:
-                                 pygame.draw.rect(bg_surface, (color[0] + 10, color[1] + 10, color[2] + 10), (x, y, 16, 16))
-                     pygame.image.save(bg_surface, str(level_assets_dir / f'background_layer_{i+1}.png'))
-
                  # Define asset categories
                  asset_categories = {
                      'Body Parts': {
@@ -596,13 +566,6 @@ jobs:
                      },
                      'Accessories': {
                          'hat': 'Character hat accessory'
-                     },
-                     'Level Assets': {
-                         'brick_tile': 'Brick tile for level construction',
-                         'ladder_tile': 'Ladder tile for climbing',
-                         'background_layer_1': 'Background parallax layer 1 (far)',
-                         'background_layer_2': 'Background parallax layer 2 (mid)',
-                         'background_layer_3': 'Background parallax layer 3 (near)'
                      }
                  }
 
@@ -614,19 +577,10 @@ jobs:
                           <div class=\"assets-grid\">'''
                       
                   for asset_name, description in assets.items():
-                      # Check both character assets and level assets directories
-                      asset_path = None
-                      if category_name == 'Level Assets':
-                          if (level_assets_dir / f'{asset_name}.png').exists():
-                              asset_path = f'level_assets/{asset_name}.png'
-                      else:
-                          if (assets_dir / f'{asset_name}.png').exists():
-                              asset_path = f'assets/{asset_name}.png'
-                      
-                      if asset_path:
+                      if (assets_dir / f'{asset_name}.png').exists():
                           assets_html += f'''
                           <div class=\"asset-card\">
-                              <img src=\"{asset_path}\" alt=\"{asset_name}\">
+                              <img src=\"assets/{asset_name}.png\" alt=\"{asset_name}\">
                               <h3>{asset_name.replace('_', ' ').title()}</h3>
                               <p>{description}</p>
                           </div>'''
