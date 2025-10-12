@@ -6,10 +6,10 @@ This script creates HTML pages with game screenshots, assets, and test sequences
 
 import sys
 import subprocess
+import shutil
 from pathlib import Path
 from datetime import datetime
 import json
-import shutil
 
 # Add src to path
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
@@ -27,11 +27,15 @@ import pygame
 def get_git_hash():
     """Get the current git commit hash."""
     try:
-        git_hash = subprocess.check_output(
-            ["git", "rev-parse", "--short", "HEAD"], text=True
+        git_path = shutil.which("git")
+        if not git_path:
+            return "unknown", "unknown"
+        
+        git_hash = subprocess.check_output(  # noqa: S603
+            [git_path, "rev-parse", "--short", "HEAD"], text=True
         ).strip()
-        git_hash_full = subprocess.check_output(
-            ["git", "rev-parse", "HEAD"], text=True
+        git_hash_full = subprocess.check_output(  # noqa: S603
+            [git_path, "rev-parse", "HEAD"], text=True
         ).strip()
         return git_hash, git_hash_full
     except Exception as e:
