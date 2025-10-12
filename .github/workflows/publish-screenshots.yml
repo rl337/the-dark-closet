@@ -239,6 +239,9 @@ jobs:
               scene.camera_x = max(0, scene.player_rect.centerx - app.width // 2)
               scene.camera_y = max(0, scene.player_rect.centery - app.height // 2)
               
+              # Advance one more frame to ensure camera positioning is applied
+              app.advance_frame(None)
+              
               frame_count = 0
               for keys, duration in actions:
                   for i in range(duration):
