@@ -138,7 +138,7 @@ jobs:
 
           # Generate test sequences
           print('Generating test sequences...')
-          config = GameConfig(512, 384, 'Test Game', 60)
+          config = GameConfig(1024, 768, 'Test Game', 60)
           time_provider = ControlledTimeProvider(1.0/60.0)
           app = GameApp(config, time_provider)
 
@@ -241,6 +241,14 @@ jobs:
                       app.draw_clean(clean_surface)
                       pygame.image.save(clean_surface, str(screenshot_path))
                       frame_count += 1
+                      
+                      # Debug: Print character info for first frame
+                      if frame_count == 1:
+                          scene = app._current_scene
+                          if hasattr(scene, 'player_rect'):
+                              print(f'Character rect: {scene.player_rect}')
+                              print(f'Camera: ({scene.camera_x}, {scene.camera_y})')
+                              print(f'Window size: {app._screen.get_size()}')
               
               print(f'Generated {frame_count} frames for {test_name}')
 
