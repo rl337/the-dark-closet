@@ -901,8 +901,10 @@ jobs:
                   function switchTab(testName, tabType) {
                       // Stop any playing animation when switching tabs
                       if (animations[testName]) {
-                          const button = document.querySelector(`[onclick*=\\\"toggleAnimation('\\${testName}'\\\"]\`);
-                          if (button) {
+                          // Find the play button for this test sequence
+                          const testSequence = document.getElementById(testName + '_image').closest('.test-sequence');
+                          const button = testSequence.querySelector('.play-button');
+                          if (button && button.classList.contains('playing')) {
                               clearInterval(animations[testName]);
                               delete animations[testName];
                               button.textContent = '▶️ Play';
