@@ -925,7 +925,7 @@ class GameApp:
     def _draw_side_scroller_clean(self, surface: pygame.Surface) -> None:
         """Draw SideScrollerScene without HUD for clean screenshots."""
         scene = self._current_scene
-        if scene is None:
+        if scene is None or not isinstance(scene, SideScrollerScene):
             return
             
         # Sky
