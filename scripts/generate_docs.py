@@ -118,10 +118,10 @@ def generate_test_sequences():
                 "B          B",
                 "BBBBBBBBBBBB",
             ],
-            "spawn": (6 * 128, 4 * 128),
+            "spawn": (6 * 128, 6 * 128),  # Spawn on ground level
             "actions": [
-                ({pygame.K_RIGHT}, 4),
-                ({pygame.K_LEFT}, 4),
+                ({pygame.K_RIGHT}, 8),  # More frames for better distribution
+                ({pygame.K_LEFT}, 8),
             ],
             "name": "Character Movement",
         },
@@ -136,10 +136,11 @@ def generate_test_sequences():
                 "B          B",
                 "BBBBBBBBBBBB",
             ],
-            "spawn": (6 * 128, 4 * 128),
+            "spawn": (6 * 128, 6 * 128),  # Spawn on ground level
             "actions": [
-                ({pygame.K_SPACE}, 4),
-                (None, 4),
+                (None, 4),  # Let character stabilize first
+                ({pygame.K_SPACE}, 8),  # More frames for jump
+                (None, 8),  # More frames for fall
             ],
             "name": "Jumping & Falling",
         },
@@ -154,10 +155,11 @@ def generate_test_sequences():
                 "B          B",
                 "BBBBBBBBBBBB",
             ],
-            "spawn": (5 * 128, 4 * 128),
+            "spawn": (4 * 128, 6 * 128),  # Spawn on ground, closer to bricks
             "actions": [
-                ({pygame.K_RIGHT}, 2),
-                ({pygame.K_SPACE}, 4),
+                (None, 4),  # Let character stabilize first
+                ({pygame.K_RIGHT}, 4),  # Move to bricks
+                ({pygame.K_SPACE}, 8),  # Break bricks
             ],
             "name": "Brick Breaking",
         },
@@ -172,10 +174,11 @@ def generate_test_sequences():
                 "B          B",
                 "BBBBBBBBBBBB",
             ],
-            "spawn": (6 * 128, 5 * 128),
+            "spawn": (5 * 128, 6 * 128),  # Spawn on ground, near ladder
             "actions": [
-                ({pygame.K_RIGHT}, 2),
-                ({pygame.K_UP}, 4),
+                (None, 4),  # Let character stabilize first
+                ({pygame.K_RIGHT}, 4),  # Move to ladder
+                ({pygame.K_UP}, 8),  # Climb ladder
             ],
             "name": "Ladder Climbing",
         },
@@ -198,15 +201,28 @@ def generate_test_sequences():
         app.switch_scene(scene)
         app.advance_frame(None)
 
-        # Adjust camera to center the character in the viewport
-        scene.camera_x = max(0, scene.player_rect.centerx - app.width // 2)
-        scene.camera_y = max(0, scene.player_rect.centery - app.height // 2)
+        # Let character fall to ground and stabilize
+        for _ in range(10):  # Give character time to fall and stabilize
+            app.advance_frame(None)
+
+        # Adjust camera to show the full scene, not just centered on character
+        # Position camera to show the entire room width and height
+        room_width = len(room[0]) * 128
+        room_height = len(room) * 128
+        
+        # Center camera on the room, not just the character
+        scene.camera_x = max(0, (room_width - app.width) // 2)
+        scene.camera_y = max(0, (room_height - app.height) // 2)
 
         # Advance one more frame to ensure camera positioning is applied
         app.advance_frame(None)
 
+        # Calculate total frames and distribute them evenly across actions
+        total_frames = sum(duration for _, duration in actions)
         frame_count = 0
-        for keys, duration in actions:
+        
+        for action_idx, (keys, duration) in enumerate(actions):
+            # Distribute frames evenly across this action
             for i in range(duration):
                 app.advance_frame(keys)
                 screenshot_path = test_dir / f"{test_name}_{frame_count:02d}.png"
@@ -223,6 +239,7 @@ def generate_test_sequences():
                         print(f"Character rect: {scene.player_rect}")
                         print(f"Camera: ({scene.camera_x}, {scene.camera_y})")
                         print(f"Window size: {app._screen.get_size()}")
+                        print(f"Room size: {room_width}x{room_height}")
                         print(
                             f"Character in viewport: ({scene.player_rect.x - scene.camera_x}, {scene.player_rect.y - scene.camera_y})"
                         )
