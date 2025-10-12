@@ -1,0 +1,2628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Sequences - The Dark Closet</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #1a1a1a;
+            color: #ffffff;
+            line-height: 1.6;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 20px;
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            border-radius: 10px;
+        }
+        .nav {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .nav a {
+            display: inline-block;
+            margin: 0 15px;
+            padding: 10px 20px;
+            background: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+        .nav a:hover {
+            background: #2980b9;
+        }
+        .test-sequence {
+            background: #2c2c2c;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 30px 0;
+        }
+        .test-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .test-title {
+            font-size: 1.5em;
+            color: #3498db;
+            margin: 0;
+        }
+        .play-button {
+            background: #27ae60;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background 0.3s;
+        }
+        .play-button:hover {
+            background: #229954;
+        }
+        .play-button.playing {
+            background: #e74c3c;
+        }
+        .play-button.playing:hover {
+            background: #c0392b;
+        }
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #34495e;
+        }
+        .tab {
+            background: #34495e;
+            color: #bdc3c7;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.3s;
+            border-radius: 5px 5px 0 0;
+            margin-right: 5px;
+        }
+        .tab.active {
+            background: #3498db;
+            color: white;
+        }
+        .tab:hover:not(.active) {
+            background: #2c3e50;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .sequence-container {
+            position: relative;
+            text-align: center;
+            background: #1a1a1a;
+            border-radius: 5px;
+            padding: 20px;
+            width: 100%;
+            max-width: 1024px;
+            height: 600px; /* Fixed height for consistent sizing */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden; /* Prevent overflow */
+        }
+        .sequence-image {
+            max-width: 100%;
+            max-height: 100%;
+            width: auto;
+            height: auto;
+            object-fit: contain; /* Ensure image fits without cropping */
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            opacity: 0;
+            transition: opacity 0.3s;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        .sequence-image.active {
+            opacity: 1;
+        }
+        .source-code {
+            background: #1a1a1a;
+            border: 1px solid #34495e;
+            border-radius: 5px;
+            padding: 20px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.9em;
+            line-height: 1.4;
+            color: #e8e8e8;
+            white-space: pre-wrap;
+            overflow-x: auto;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .ascii-render {
+            background: #1a1a1a;
+            border: 1px solid #34495e;
+            border-radius: 5px;
+            padding: 20px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 1.1em;
+            line-height: 1.2;
+            color: #00ff00;
+            white-space: pre;
+            overflow-x: auto;
+            max-height: 400px;
+            overflow-y: auto;
+            text-align: center;
+        }
+        .sequence-info {
+            text-align: center;
+            margin-top: 15px;
+            color: #bdc3c7;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🧪 Test Sequences</h1>
+        <p>Interactive test demonstrations with play controls and source code</p>
+    </div>
+    
+    <div class="nav">
+        <a href="index.html">🏠 Home</a>
+        <a href="assets.html">🎨 Assets</a>
+        <a href="tests.html">🧪 Test Sequences</a>
+    </div>
+    <div class="test-sequence">
+        <div class="test-header">
+            <h2 class="test-title">Character Movement</h2>
+            <button class="play-button" onclick="toggleAnimation('movement', 8)">
+                ▶️ Play
+            </button>
+        </div>
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('movement', 'image')">🖼️ Image</button>
+            <button class="tab" onclick="switchTab('movement', 'ascii')">🎮 ASCII</button>
+            <button class="tab" onclick="switchTab('movement', 'source')">📄 Source</button>
+        </div>
+        <div class="tab-content active" id="movement_image">
+            <div class="sequence-container">
+                <img src="tests/movement/movement_00.png" 
+                      class="sequence-image active" 
+                      id="movement_00"
+                      alt="Frame 1">
+                <img src="tests/movement/movement_01.png" 
+                      class="sequence-image" 
+                      id="movement_01"
+                      alt="Frame 2">
+                <img src="tests/movement/movement_02.png" 
+                      class="sequence-image" 
+                      id="movement_02"
+                      alt="Frame 3">
+                <img src="tests/movement/movement_03.png" 
+                      class="sequence-image" 
+                      id="movement_03"
+                      alt="Frame 4">
+                <img src="tests/movement/movement_04.png" 
+                      class="sequence-image" 
+                      id="movement_04"
+                      alt="Frame 5">
+                <img src="tests/movement/movement_05.png" 
+                      class="sequence-image" 
+                      id="movement_05"
+                      alt="Frame 6">
+                <img src="tests/movement/movement_06.png" 
+                      class="sequence-image" 
+                      id="movement_06"
+                      alt="Frame 7">
+                <img src="tests/movement/movement_07.png" 
+                      class="sequence-image" 
+                      id="movement_07"
+                      alt="Frame 8">
+            </div>
+        </div>
+        <div class="tab-content" id="movement_ascii">
+            <div class="ascii-render">┌────────────┐
+│████████████│
+│█··········█│
+│█··········█│
+│█··········█│
+│█·····@····█│
+│█··········█│
+│█··········█│
+│████████████│
+└────────────┘
+
+Legend:
+  @ = Player spawn position
+  █ = Brick wall (128x128 pixels)
+  ║ = Ladder (128x128 pixels)
+  · = Empty space (128x128 pixels)</div>
+        </div>
+        <div class="tab-content" id="movement_source">
+            <div class="source-code">{
+  "metadata": {
+    "name": "Character Movement",
+    "width": 12,
+    "height": 8
+  },
+  "layers": {
+    "tiles": {
+      "parallax_factor": 1.0,
+      "objects": [
+        {
+          "id": "brick_0_0",
+          "type": "brick",
+          "x": 0,
+          "y": 0,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_1_0",
+          "type": "brick",
+          "x": 128,
+          "y": 0,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_2_0",
+          "type": "brick",
+          "x": 256,
+          "y": 0,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_3_0",
+          "type": "brick",
+          "x": 384,
+          "y": 0,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_4_0",
+          "type": "brick",
+          "x": 512,
+          "y": 0,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_5_0",
+          "type": "brick",
+          "x": 640,
+          "y": 0,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_6_0",
+          "type": "brick",
+          "x": 768,
+          "y": 0,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_7_0",
+          "type": "brick",
+          "x": 896,
+          "y": 0,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_8_0",
+          "type": "brick",
+          "x": 1024,
+          "y": 0,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_9_0",
+          "type": "brick",
+          "x": 1152,
+          "y": 0,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_10_0",
+          "type": "brick",
+          "x": 1280,
+          "y": 0,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_11_0",
+          "type": "brick",
+          "x": 1408,
+          "y": 0,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_0_1",
+          "type": "brick",
+          "x": 0,
+          "y": 128,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_11_1",
+          "type": "brick",
+          "x": 1408,
+          "y": 128,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_0_2",
+          "type": "brick",
+          "x": 0,
+          "y": 256,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_11_2",
+          "type": "brick",
+          "x": 1408,
+          "y": 256,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_0_3",
+          "type": "brick",
+          "x": 0,
+          "y": 384,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_11_3",
+          "type": "brick",
+          "x": 1408,
+          "y": 384,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_0_4",
+          "type": "brick",
+          "x": 0,
+          "y": 512,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_11_4",
+          "type": "brick",
+          "x": 1408,
+          "y": 512,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_0_5",
+          "type": "brick",
+          "x": 0,
+          "y": 640,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_11_5",
+          "type": "brick",
+          "x": 1408,
+          "y": 640,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_0_6",
+          "type": "brick",
+          "x": 0,
+          "y": 768,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_11_6",
+          "type": "brick",
+          "x": 1408,
+          "y": 768,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_0_7",
+          "type": "brick",
+          "x": 0,
+          "y": 896,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_1_7",
+          "type": "brick",
+          "x": 128,
+          "y": 896,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_2_7",
+          "type": "brick",
+          "x": 256,
+          "y": 896,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_3_7",
+          "type": "brick",
+          "x": 384,
+          "y": 896,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_4_7",
+          "type": "brick",
+          "x": 512,
+          "y": 896,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_5_7",
+          "type": "brick",
+          "x": 640,
+          "y": 896,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_6_7",
+          "type": "brick",
+          "x": 768,
+          "y": 896,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_7_7",
+          "type": "brick",
+          "x": 896,
+          "y": 896,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_8_7",
+          "type": "brick",
+          "x": 1024,
+          "y": 896,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_9_7",
+          "type": "brick",
+          "x": 1152,
+          "y": 896,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_10_7",
+          "type": "brick",
+          "x": 1280,
+          "y": 896,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_11_7",
+          "type": "brick",
+          "x": 1408,
+          "y": 896,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        }
+      ]
+    }
+  },
+  "player": {
+    "spawn_x": 768,
+    "spawn_y": 512
+  }
+}</div>
+        </div>
+        <div class="sequence-info">
+            <p>8 frames • Click play to see the sequence in action</p>
+        </div>
+    </div>
+    <div class="test-sequence">
+        <div class="test-header">
+            <h2 class="test-title">Jumping & Falling</h2>
+            <button class="play-button" onclick="toggleAnimation('jumping', 8)">
+                ▶️ Play
+            </button>
+        </div>
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('jumping', 'image')">🖼️ Image</button>
+            <button class="tab" onclick="switchTab('jumping', 'ascii')">🎮 ASCII</button>
+            <button class="tab" onclick="switchTab('jumping', 'source')">📄 Source</button>
+        </div>
+        <div class="tab-content active" id="jumping_image">
+            <div class="sequence-container">
+                <img src="tests/jumping/jumping_00.png" 
+                      class="sequence-image active" 
+                      id="jumping_00"
+                      alt="Frame 1">
+                <img src="tests/jumping/jumping_01.png" 
+                      class="sequence-image" 
+                      id="jumping_01"
+                      alt="Frame 2">
+                <img src="tests/jumping/jumping_02.png" 
+                      class="sequence-image" 
+                      id="jumping_02"
+                      alt="Frame 3">
+                <img src="tests/jumping/jumping_03.png" 
+                      class="sequence-image" 
+                      id="jumping_03"
+                      alt="Frame 4">
+                <img src="tests/jumping/jumping_04.png" 
+                      class="sequence-image" 
+                      id="jumping_04"
+                      alt="Frame 5">
+                <img src="tests/jumping/jumping_05.png" 
+                      class="sequence-image" 
+                      id="jumping_05"
+                      alt="Frame 6">
+                <img src="tests/jumping/jumping_06.png" 
+                      class="sequence-image" 
+                      id="jumping_06"
+                      alt="Frame 7">
+                <img src="tests/jumping/jumping_07.png" 
+                      class="sequence-image" 
+                      id="jumping_07"
+                      alt="Frame 8">
+            </div>
+        </div>
+        <div class="tab-content" id="jumping_ascii">
+            <div class="ascii-render">┌────────────┐
+│████████████│
+│█··········█│
+│█··········█│
+│█··········█│
+│█·····@····█│
+│█··········█│
+│█··········█│
+│████████████│
+└────────────┘
+
+Legend:
+  @ = Player spawn position
+  █ = Brick wall (128x128 pixels)
+  ║ = Ladder (128x128 pixels)
+  · = Empty space (128x128 pixels)</div>
+        </div>
+        <div class="tab-content" id="jumping_source">
+            <div class="source-code">{
+  "metadata": {
+    "name": "Jumping & Falling",
+    "width": 12,
+    "height": 8
+  },
+  "layers": {
+    "tiles": {
+      "parallax_factor": 1.0,
+      "objects": [
+        {
+          "id": "brick_0_0",
+          "type": "brick",
+          "x": 0,
+          "y": 0,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_1_0",
+          "type": "brick",
+          "x": 128,
+          "y": 0,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_2_0",
+          "type": "brick",
+          "x": 256,
+          "y": 0,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_3_0",
+          "type": "brick",
+          "x": 384,
+          "y": 0,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_4_0",
+          "type": "brick",
+          "x": 512,
+          "y": 0,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_5_0",
+          "type": "brick",
+          "x": 640,
+          "y": 0,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_6_0",
+          "type": "brick",
+          "x": 768,
+          "y": 0,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_7_0",
+          "type": "brick",
+          "x": 896,
+          "y": 0,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_8_0",
+          "type": "brick",
+          "x": 1024,
+          "y": 0,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_9_0",
+          "type": "brick",
+          "x": 1152,
+          "y": 0,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_10_0",
+          "type": "brick",
+          "x": 1280,
+          "y": 0,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_11_0",
+          "type": "brick",
+          "x": 1408,
+          "y": 0,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_0_1",
+          "type": "brick",
+          "x": 0,
+          "y": 128,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_11_1",
+          "type": "brick",
+          "x": 1408,
+          "y": 128,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_0_2",
+          "type": "brick",
+          "x": 0,
+          "y": 256,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_11_2",
+          "type": "brick",
+          "x": 1408,
+          "y": 256,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_0_3",
+          "type": "brick",
+          "x": 0,
+          "y": 384,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_11_3",
+          "type": "brick",
+          "x": 1408,
+          "y": 384,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_0_4",
+          "type": "brick",
+          "x": 0,
+          "y": 512,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_11_4",
+          "type": "brick",
+          "x": 1408,
+          "y": 512,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_0_5",
+          "type": "brick",
+          "x": 0,
+          "y": 640,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_11_5",
+          "type": "brick",
+          "x": 1408,
+          "y": 640,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_0_6",
+          "type": "brick",
+          "x": 0,
+          "y": 768,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_11_6",
+          "type": "brick",
+          "x": 1408,
+          "y": 768,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_0_7",
+          "type": "brick",
+          "x": 0,
+          "y": 896,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_1_7",
+          "type": "brick",
+          "x": 128,
+          "y": 896,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_2_7",
+          "type": "brick",
+          "x": 256,
+          "y": 896,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_3_7",
+          "type": "brick",
+          "x": 384,
+          "y": 896,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_4_7",
+          "type": "brick",
+          "x": 512,
+          "y": 896,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_5_7",
+          "type": "brick",
+          "x": 640,
+          "y": 896,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_6_7",
+          "type": "brick",
+          "x": 768,
+          "y": 896,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_7_7",
+          "type": "brick",
+          "x": 896,
+          "y": 896,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_8_7",
+          "type": "brick",
+          "x": 1024,
+          "y": 896,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_9_7",
+          "type": "brick",
+          "x": 1152,
+          "y": 896,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_10_7",
+          "type": "brick",
+          "x": 1280,
+          "y": 896,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_11_7",
+          "type": "brick",
+          "x": 1408,
+          "y": 896,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        }
+      ]
+    }
+  },
+  "player": {
+    "spawn_x": 768,
+    "spawn_y": 512
+  }
+}</div>
+        </div>
+        <div class="sequence-info">
+            <p>8 frames • Click play to see the sequence in action</p>
+        </div>
+    </div>
+    <div class="test-sequence">
+        <div class="test-header">
+            <h2 class="test-title">Brick Breaking</h2>
+            <button class="play-button" onclick="toggleAnimation('brick_breaking', 6)">
+                ▶️ Play
+            </button>
+        </div>
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('brick_breaking', 'image')">🖼️ Image</button>
+            <button class="tab" onclick="switchTab('brick_breaking', 'ascii')">🎮 ASCII</button>
+            <button class="tab" onclick="switchTab('brick_breaking', 'source')">📄 Source</button>
+        </div>
+        <div class="tab-content active" id="brick_breaking_image">
+            <div class="sequence-container">
+                <img src="tests/brick_breaking/brick_breaking_00.png" 
+                      class="sequence-image active" 
+                      id="brick_breaking_00"
+                      alt="Frame 1">
+                <img src="tests/brick_breaking/brick_breaking_01.png" 
+                      class="sequence-image" 
+                      id="brick_breaking_01"
+                      alt="Frame 2">
+                <img src="tests/brick_breaking/brick_breaking_02.png" 
+                      class="sequence-image" 
+                      id="brick_breaking_02"
+                      alt="Frame 3">
+                <img src="tests/brick_breaking/brick_breaking_03.png" 
+                      class="sequence-image" 
+                      id="brick_breaking_03"
+                      alt="Frame 4">
+                <img src="tests/brick_breaking/brick_breaking_04.png" 
+                      class="sequence-image" 
+                      id="brick_breaking_04"
+                      alt="Frame 5">
+                <img src="tests/brick_breaking/brick_breaking_05.png" 
+                      class="sequence-image" 
+                      id="brick_breaking_05"
+                      alt="Frame 6">
+            </div>
+        </div>
+        <div class="tab-content" id="brick_breaking_ascii">
+            <div class="ascii-render">┌────────────┐
+│████████████│
+│█··········█│
+│█··········█│
+│█···████···█│
+│█····@·····█│
+│█··········█│
+│█··········█│
+│████████████│
+└────────────┘
+
+Legend:
+  @ = Player spawn position
+  █ = Brick wall (128x128 pixels)
+  ║ = Ladder (128x128 pixels)
+  · = Empty space (128x128 pixels)</div>
+        </div>
+        <div class="tab-content" id="brick_breaking_source">
+            <div class="source-code">{
+  "metadata": {
+    "name": "Brick Breaking",
+    "width": 12,
+    "height": 8
+  },
+  "layers": {
+    "tiles": {
+      "parallax_factor": 1.0,
+      "objects": [
+        {
+          "id": "brick_0_0",
+          "type": "brick",
+          "x": 0,
+          "y": 0,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_1_0",
+          "type": "brick",
+          "x": 128,
+          "y": 0,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_2_0",
+          "type": "brick",
+          "x": 256,
+          "y": 0,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_3_0",
+          "type": "brick",
+          "x": 384,
+          "y": 0,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_4_0",
+          "type": "brick",
+          "x": 512,
+          "y": 0,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_5_0",
+          "type": "brick",
+          "x": 640,
+          "y": 0,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_6_0",
+          "type": "brick",
+          "x": 768,
+          "y": 0,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_7_0",
+          "type": "brick",
+          "x": 896,
+          "y": 0,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_8_0",
+          "type": "brick",
+          "x": 1024,
+          "y": 0,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_9_0",
+          "type": "brick",
+          "x": 1152,
+          "y": 0,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_10_0",
+          "type": "brick",
+          "x": 1280,
+          "y": 0,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_11_0",
+          "type": "brick",
+          "x": 1408,
+          "y": 0,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_0_1",
+          "type": "brick",
+          "x": 0,
+          "y": 128,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_11_1",
+          "type": "brick",
+          "x": 1408,
+          "y": 128,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_0_2",
+          "type": "brick",
+          "x": 0,
+          "y": 256,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_11_2",
+          "type": "brick",
+          "x": 1408,
+          "y": 256,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_0_3",
+          "type": "brick",
+          "x": 0,
+          "y": 384,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_4_3",
+          "type": "brick",
+          "x": 512,
+          "y": 384,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_5_3",
+          "type": "brick",
+          "x": 640,
+          "y": 384,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_6_3",
+          "type": "brick",
+          "x": 768,
+          "y": 384,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_7_3",
+          "type": "brick",
+          "x": 896,
+          "y": 384,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_11_3",
+          "type": "brick",
+          "x": 1408,
+          "y": 384,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_0_4",
+          "type": "brick",
+          "x": 0,
+          "y": 512,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_11_4",
+          "type": "brick",
+          "x": 1408,
+          "y": 512,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_0_5",
+          "type": "brick",
+          "x": 0,
+          "y": 640,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_11_5",
+          "type": "brick",
+          "x": 1408,
+          "y": 640,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_0_6",
+          "type": "brick",
+          "x": 0,
+          "y": 768,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_11_6",
+          "type": "brick",
+          "x": 1408,
+          "y": 768,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_0_7",
+          "type": "brick",
+          "x": 0,
+          "y": 896,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_1_7",
+          "type": "brick",
+          "x": 128,
+          "y": 896,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_2_7",
+          "type": "brick",
+          "x": 256,
+          "y": 896,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_3_7",
+          "type": "brick",
+          "x": 384,
+          "y": 896,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_4_7",
+          "type": "brick",
+          "x": 512,
+          "y": 896,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_5_7",
+          "type": "brick",
+          "x": 640,
+          "y": 896,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_6_7",
+          "type": "brick",
+          "x": 768,
+          "y": 896,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_7_7",
+          "type": "brick",
+          "x": 896,
+          "y": 896,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_8_7",
+          "type": "brick",
+          "x": 1024,
+          "y": 896,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_9_7",
+          "type": "brick",
+          "x": 1152,
+          "y": 896,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_10_7",
+          "type": "brick",
+          "x": 1280,
+          "y": 896,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_11_7",
+          "type": "brick",
+          "x": 1408,
+          "y": 896,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        }
+      ]
+    }
+  },
+  "player": {
+    "spawn_x": 640,
+    "spawn_y": 512
+  }
+}</div>
+        </div>
+        <div class="sequence-info">
+            <p>6 frames • Click play to see the sequence in action</p>
+        </div>
+    </div>
+    <div class="test-sequence">
+        <div class="test-header">
+            <h2 class="test-title">Ladder Climbing</h2>
+            <button class="play-button" onclick="toggleAnimation('ladder_climbing', 6)">
+                ▶️ Play
+            </button>
+        </div>
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('ladder_climbing', 'image')">🖼️ Image</button>
+            <button class="tab" onclick="switchTab('ladder_climbing', 'ascii')">🎮 ASCII</button>
+            <button class="tab" onclick="switchTab('ladder_climbing', 'source')">📄 Source</button>
+        </div>
+        <div class="tab-content active" id="ladder_climbing_image">
+            <div class="sequence-container">
+                <img src="tests/ladder_climbing/ladder_climbing_00.png" 
+                      class="sequence-image active" 
+                      id="ladder_climbing_00"
+                      alt="Frame 1">
+                <img src="tests/ladder_climbing/ladder_climbing_01.png" 
+                      class="sequence-image" 
+                      id="ladder_climbing_01"
+                      alt="Frame 2">
+                <img src="tests/ladder_climbing/ladder_climbing_02.png" 
+                      class="sequence-image" 
+                      id="ladder_climbing_02"
+                      alt="Frame 3">
+                <img src="tests/ladder_climbing/ladder_climbing_03.png" 
+                      class="sequence-image" 
+                      id="ladder_climbing_03"
+                      alt="Frame 4">
+                <img src="tests/ladder_climbing/ladder_climbing_04.png" 
+                      class="sequence-image" 
+                      id="ladder_climbing_04"
+                      alt="Frame 5">
+                <img src="tests/ladder_climbing/ladder_climbing_05.png" 
+                      class="sequence-image" 
+                      id="ladder_climbing_05"
+                      alt="Frame 6">
+            </div>
+        </div>
+        <div class="tab-content" id="ladder_climbing_ascii">
+            <div class="ascii-render">┌────────────┐
+│████████████│
+│█··········█│
+│█····║║····█│
+│█····║║····█│
+│█····║║····█│
+│█·····@····█│
+│█··········█│
+│████████████│
+└────────────┘
+
+Legend:
+  @ = Player spawn position
+  █ = Brick wall (128x128 pixels)
+  ║ = Ladder (128x128 pixels)
+  · = Empty space (128x128 pixels)</div>
+        </div>
+        <div class="tab-content" id="ladder_climbing_source">
+            <div class="source-code">{
+  "metadata": {
+    "name": "Ladder Climbing",
+    "width": 12,
+    "height": 8
+  },
+  "layers": {
+    "tiles": {
+      "parallax_factor": 1.0,
+      "objects": [
+        {
+          "id": "brick_0_0",
+          "type": "brick",
+          "x": 0,
+          "y": 0,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_1_0",
+          "type": "brick",
+          "x": 128,
+          "y": 0,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_2_0",
+          "type": "brick",
+          "x": 256,
+          "y": 0,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_3_0",
+          "type": "brick",
+          "x": 384,
+          "y": 0,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_4_0",
+          "type": "brick",
+          "x": 512,
+          "y": 0,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_5_0",
+          "type": "brick",
+          "x": 640,
+          "y": 0,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_6_0",
+          "type": "brick",
+          "x": 768,
+          "y": 0,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_7_0",
+          "type": "brick",
+          "x": 896,
+          "y": 0,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_8_0",
+          "type": "brick",
+          "x": 1024,
+          "y": 0,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_9_0",
+          "type": "brick",
+          "x": 1152,
+          "y": 0,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_10_0",
+          "type": "brick",
+          "x": 1280,
+          "y": 0,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_11_0",
+          "type": "brick",
+          "x": 1408,
+          "y": 0,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_0_1",
+          "type": "brick",
+          "x": 0,
+          "y": 128,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_11_1",
+          "type": "brick",
+          "x": 1408,
+          "y": 128,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_0_2",
+          "type": "brick",
+          "x": 0,
+          "y": 256,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "ladder_5_2",
+          "type": "ladder",
+          "x": 640,
+          "y": 256,
+          "width": 128,
+          "height": 128,
+          "color": [
+            139,
+            69,
+            19
+          ]
+        },
+        {
+          "id": "ladder_6_2",
+          "type": "ladder",
+          "x": 768,
+          "y": 256,
+          "width": 128,
+          "height": 128,
+          "color": [
+            139,
+            69,
+            19
+          ]
+        },
+        {
+          "id": "brick_11_2",
+          "type": "brick",
+          "x": 1408,
+          "y": 256,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_0_3",
+          "type": "brick",
+          "x": 0,
+          "y": 384,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "ladder_5_3",
+          "type": "ladder",
+          "x": 640,
+          "y": 384,
+          "width": 128,
+          "height": 128,
+          "color": [
+            139,
+            69,
+            19
+          ]
+        },
+        {
+          "id": "ladder_6_3",
+          "type": "ladder",
+          "x": 768,
+          "y": 384,
+          "width": 128,
+          "height": 128,
+          "color": [
+            139,
+            69,
+            19
+          ]
+        },
+        {
+          "id": "brick_11_3",
+          "type": "brick",
+          "x": 1408,
+          "y": 384,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_0_4",
+          "type": "brick",
+          "x": 0,
+          "y": 512,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "ladder_5_4",
+          "type": "ladder",
+          "x": 640,
+          "y": 512,
+          "width": 128,
+          "height": 128,
+          "color": [
+            139,
+            69,
+            19
+          ]
+        },
+        {
+          "id": "ladder_6_4",
+          "type": "ladder",
+          "x": 768,
+          "y": 512,
+          "width": 128,
+          "height": 128,
+          "color": [
+            139,
+            69,
+            19
+          ]
+        },
+        {
+          "id": "brick_11_4",
+          "type": "brick",
+          "x": 1408,
+          "y": 512,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_0_5",
+          "type": "brick",
+          "x": 0,
+          "y": 640,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_11_5",
+          "type": "brick",
+          "x": 1408,
+          "y": 640,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_0_6",
+          "type": "brick",
+          "x": 0,
+          "y": 768,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_11_6",
+          "type": "brick",
+          "x": 1408,
+          "y": 768,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_0_7",
+          "type": "brick",
+          "x": 0,
+          "y": 896,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_1_7",
+          "type": "brick",
+          "x": 128,
+          "y": 896,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_2_7",
+          "type": "brick",
+          "x": 256,
+          "y": 896,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_3_7",
+          "type": "brick",
+          "x": 384,
+          "y": 896,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_4_7",
+          "type": "brick",
+          "x": 512,
+          "y": 896,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_5_7",
+          "type": "brick",
+          "x": 640,
+          "y": 896,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_6_7",
+          "type": "brick",
+          "x": 768,
+          "y": 896,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_7_7",
+          "type": "brick",
+          "x": 896,
+          "y": 896,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_8_7",
+          "type": "brick",
+          "x": 1024,
+          "y": 896,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_9_7",
+          "type": "brick",
+          "x": 1152,
+          "y": 896,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_10_7",
+          "type": "brick",
+          "x": 1280,
+          "y": 896,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_11_7",
+          "type": "brick",
+          "x": 1408,
+          "y": 896,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        }
+      ]
+    }
+  },
+  "player": {
+    "spawn_x": 768,
+    "spawn_y": 640
+  }
+}</div>
+        </div>
+        <div class="sequence-info">
+            <p>6 frames • Click play to see the sequence in action</p>
+        </div>
+    </div>
+    </div>
+    
+    <script>
+        const animations = {};
+        
+        function toggleAnimation(testName, frameCount) {
+            const button = event.target;
+            const container = button.closest('.test-sequence').querySelector('.sequence-container');
+            
+            if (animations[testName]) {
+                // Stop animation
+                clearInterval(animations[testName]);
+                delete animations[testName];
+                button.textContent = '▶️ Play';
+                button.classList.remove('playing');
+                
+                // Hide all images
+                const images = container.querySelectorAll('.sequence-image');
+                images.forEach(img => img.classList.remove('active'));
+            } else {
+                // Start animation
+                let currentFrame = 0;
+                const images = container.querySelectorAll('.sequence-image');
+                
+                // Show first frame
+                images.forEach(img => img.classList.remove('active'));
+                images[0].classList.add('active');
+                
+                animations[testName] = setInterval(() => {
+                    images.forEach(img => img.classList.remove('active'));
+                    images[currentFrame].classList.add('active');
+                    currentFrame = (currentFrame + 1) % frameCount;
+                }, 200); // 5 FPS
+                
+                button.textContent = '⏸️ Stop';
+                button.classList.add('playing');
+            }
+        }
+        
+        function switchTab(testName, tabType) {
+            // Stop any playing animation when switching tabs
+            if (animations[testName]) {
+                // Find the play button for this test sequence
+                const testSequence = document.getElementById(testName + '_image').closest('.test-sequence');
+                const button = testSequence.querySelector('.play-button');
+                if (button && button.classList.contains('playing')) {
+                    clearInterval(animations[testName]);
+                    delete animations[testName];
+                    button.textContent = '▶️ Play';
+                    button.classList.remove('playing');
+                }
+            }
+
+            // Update tab buttons and content
+            const imageContent = document.getElementById(testName + '_image');
+            const asciiContent = document.getElementById(testName + '_ascii');
+            const sourceContent = document.getElementById(testName + '_source');
+            const testSequence = imageContent.closest('.test-sequence');
+            const tabButtons = testSequence.querySelectorAll('.tab');
+            
+            // Remove active class from all tabs
+            tabButtons.forEach(btn => btn.classList.remove('active'));
+            
+            if (tabType === 'image') {
+                imageContent.classList.add('active');
+                asciiContent.classList.remove('active');
+                sourceContent.classList.remove('active');
+                tabButtons[0].classList.add('active');
+                
+                // Ensure the first image is shown when switching back to image tab
+                const images = imageContent.querySelectorAll('.sequence-image');
+                if (images.length > 0) {
+                    images.forEach(img => img.classList.remove('active'));
+                    images[0].classList.add('active');
+                }
+            } else if (tabType === 'ascii') {
+                imageContent.classList.remove('active');
+                asciiContent.classList.add('active');
+                sourceContent.classList.remove('active');
+                tabButtons[1].classList.add('active');
+            } else {
+                imageContent.classList.remove('active');
+                asciiContent.classList.remove('active');
+                sourceContent.classList.add('active');
+                tabButtons[2].classList.add('active');
+            }
+        }
+    </script>
+    
+    <div class="footer">
+        <p>All test sequences generated automatically by the CI/CD pipeline</p>
+        <p style="font-size: 0.9em; color: #95a5a6; margin-top: 15px;">
+            Version: <code style="background: #34495e; padding: 2px 6px; border-radius: 3px;">d1abe3f</code>
+            | <a href="https://github.com/rl337/the-dark-closet/commit/d1abe3fd24814becf15d722aecc68808ef9cef69" style="color: #3498db;">View Commit</a>
+        </p>
+    </div>
+</body>
+</html>

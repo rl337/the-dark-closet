@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assets - The Dark Closet</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #1a1a1a;
+            color: #ffffff;
+            line-height: 1.6;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 20px;
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            border-radius: 10px;
+        }
+        .nav {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .nav a {
+            display: inline-block;
+            margin: 0 15px;
+            padding: 10px 20px;
+            background: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+        .nav a:hover {
+            background: #2980b9;
+        }
+        .section {
+            margin: 40px 0;
+        }
+        .section h2 {
+            color: #3498db;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .assets-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .asset-card {
+            background: #2c2c2c;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            border: 2px solid transparent;
+            transition: border-color 0.3s;
+        }
+        .asset-card:hover {
+            border-color: #3498db;
+        }
+        .asset-card img {
+            width: 128px; /* Fixed width */
+            height: 128px; /* Fixed height */
+            object-fit: contain; /* Ensure image fits without cropping */
+            border-radius: 5px;
+            margin-bottom: 10px;
+            background: #1a1a1a;
+            padding: 10px;
+        }
+        .asset-card h3 {
+            margin: 0 0 10px 0;
+            color: #3498db;
+        }
+        .asset-card p {
+            margin: 0;
+            color: #bdc3c7;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🎨 Procedural Assets</h1>
+        <p>All character components generated programmatically</p>
+    </div>
+    
+    <div class="nav">
+        <a href="index.html">🏠 Home</a>
+        <a href="assets.html">🎨 Assets</a>
+        <a href="tests.html">🧪 Test Sequences</a>
+    </div>
+    <div class="section">
+        <h2>Body Parts</h2>
+        <div class="assets-grid">
+        <div class="asset-card">
+            <img src="assets/head.png" alt="head">
+            <h3>Head</h3>
+            <p>Character head with facial features</p>
+        </div>
+        <div class="asset-card">
+            <img src="assets/torso.png" alt="torso">
+            <h3>Torso</h3>
+            <p>Main body torso section</p>
+        </div>
+        <div class="asset-card">
+            <img src="assets/left_arm.png" alt="left_arm">
+            <h3>Left Arm</h3>
+            <p>Left arm with joint details</p>
+        </div>
+        <div class="asset-card">
+            <img src="assets/right_arm.png" alt="right_arm">
+            <h3>Right Arm</h3>
+            <p>Right arm with joint details</p>
+        </div>
+        <div class="asset-card">
+            <img src="assets/left_leg.png" alt="left_leg">
+            <h3>Left Leg</h3>
+            <p>Left leg with joint details</p>
+        </div>
+        <div class="asset-card">
+            <img src="assets/right_leg.png" alt="right_leg">
+            <h3>Right Leg</h3>
+            <p>Right leg with joint details</p>
+        </div>
+        </div>
+    </div>
+    <div class="section">
+        <h2>Facial Features</h2>
+        <div class="assets-grid">
+        <div class="asset-card">
+            <img src="assets/eyes_open.png" alt="eyes_open">
+            <h3>Eyes Open</h3>
+            <p>Open eyes expression</p>
+        </div>
+        <div class="asset-card">
+            <img src="assets/eyes_closed.png" alt="eyes_closed">
+            <h3>Eyes Closed</h3>
+            <p>Closed eyes expression</p>
+        </div>
+        <div class="asset-card">
+            <img src="assets/mouth_neutral.png" alt="mouth_neutral">
+            <h3>Mouth Neutral</h3>
+            <p>Neutral mouth expression</p>
+        </div>
+        <div class="asset-card">
+            <img src="assets/mouth_open.png" alt="mouth_open">
+            <h3>Mouth Open</h3>
+            <p>Open mouth expression</p>
+        </div>
+        </div>
+    </div>
+    <div class="section">
+        <h2>Accessories</h2>
+        <div class="assets-grid">
+        <div class="asset-card">
+            <img src="assets/hat.png" alt="hat">
+            <h3>Hat</h3>
+            <p>Character hat accessory</p>
+        </div>
+        </div>
+    </div>
+    <div class="footer">
+        <p>All assets generated procedurally using Python & Pygame</p>
+        <p style="font-size: 0.9em; color: #95a5a6; margin-top: 15px;">
+            Version: <code style="background: #34495e; padding: 2px 6px; border-radius: 3px;">d1abe3f</code>
+            | <a href="https://github.com/rl337/the-dark-closet/commit/d1abe3fd24814becf15d722aecc68808ef9cef69" style="color: #3498db;">View Commit</a>
+        </p>
+    </div>
+</body>
+</html>
