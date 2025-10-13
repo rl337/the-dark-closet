@@ -101,18 +101,18 @@ def generate_ascii_level_for_test(test_data):
         # For JSON level files, load the level data and convert to ASCII
         with open(test_data["level_file"], "r") as f:
             level_data = json.load(f)
-        
+
         # Extract spawn position
         spawn_x = level_data["player"]["spawn_x"]
         spawn_y = level_data["player"]["spawn_y"]
-        
+
         # Create a grid representation from the level data
         width = level_data["metadata"]["width"]
         height = level_data["metadata"]["height"]
-        
+
         # Initialize grid with empty spaces
         grid = [[" " for _ in range(width)] for _ in range(height)]
-        
+
         # Place objects from the level data
         for obj in level_data["layers"]["tiles"]["objects"]:
             x = obj["x"] // 128
@@ -122,11 +122,11 @@ def generate_ascii_level_for_test(test_data):
                     grid[y][x] = "B"
                 elif obj["type"] == "ladder":
                     grid[y][x] = "H"
-        
+
         # Convert spawn position to grid coordinates
         spawn_grid_x = spawn_x // 128
         spawn_grid_y = spawn_y // 128
-        
+
         # Create ASCII representation
         ascii_lines = []
         for y, row in enumerate(grid):
@@ -142,14 +142,14 @@ def generate_ascii_level_for_test(test_data):
                     }
                     ascii_row += char_map.get(char, char)
             ascii_lines.append(ascii_row)
-        
+
         # Add border and legend
         border = "┌" + "─" * width + "┐"
         result = [border]
         for line in ascii_lines:
             result.append("│" + line + "│")
         result.append("└" + "─" * width + "┘")
-        
+
         # Add legend
         result.append("")
         result.append("Legend:")
@@ -157,7 +157,7 @@ def generate_ascii_level_for_test(test_data):
         result.append("  █ = Brick wall (128x128 pixels)")
         result.append("  ║ = Ladder (128x128 pixels)")
         result.append("  · = Empty space (128x128 pixels)")
-        
+
         return "\n".join(result)
     else:
         # For string-based rooms, use the original function
@@ -387,6 +387,7 @@ def generate_test_sequences():
         # Check if this test uses a JSON level file
         if "level_file" in test_data:
             from the_dark_closet.json_scene import JSONScene
+
             level_path = Path(test_data["level_file"])
             scene = JSONScene(app, level_path)
         else:
@@ -394,7 +395,7 @@ def generate_test_sequences():
             room = test_data["room"]
             spawn = test_data["spawn"]
             scene = SideScrollerScene(app, room, spawn)
-        
+
         app.switch_scene(scene)
         app.advance_frame(None)
 
@@ -1003,10 +1004,14 @@ def generate_tests_html(test_sequences, git_hash, git_hash_full):
                 serializable_actions = []
                 for keys, duration in test_data["actions"]:
                     if keys is None:
-                        serializable_actions.append({"keys": None, "duration": duration})
+                        serializable_actions.append(
+                            {"keys": None, "duration": duration}
+                        )
                     else:
-                        serializable_actions.append({"keys": list(keys), "duration": duration})
-                
+                        serializable_actions.append(
+                            {"keys": list(keys), "duration": duration}
+                        )
+
                 test_json = {
                     "level_file": test_data["level_file"],
                     "level_data": level_data,

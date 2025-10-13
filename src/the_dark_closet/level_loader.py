@@ -7,7 +7,7 @@ object placement across different rendering layers.
 
 import json
 from pathlib import Path
-from typing import Dict, List, Any, Optional, Tuple
+from typing import Dict, List, Any, Optional, Tuple, Callable
 import pygame
 from .rendering_utils import render_brick_tile, render_platform_tile, render_ladder_tile
 
@@ -25,7 +25,7 @@ class LevelObject:
         self.color: Optional[Tuple[int, int, int]] = None
         self.properties: Dict[str, Any] = {}
         self.active: bool = True  # Whether object is active/visible
-        self.callbacks: Dict[str, callable] = {}  # Action callbacks
+        self.callbacks: Dict[str, Callable] = {}  # Action callbacks
 
         # Extract color if present
         if "color" in obj_data:
@@ -50,7 +50,7 @@ class LevelObject:
             self.x - offset_x, self.y - offset_y, self.width, self.height
         )
 
-    def register_callback(self, action: str, callback: callable) -> None:
+    def register_callback(self, action: str, callback: Callable) -> None:
         """Register a callback for a specific action."""
         self.callbacks[action] = callback
 
@@ -196,7 +196,7 @@ class LevelRenderer:
         # Only render active objects
         if not obj.is_active():
             return
-            
+
         rect = obj.get_rect_with_camera(camera_x, camera_y, parallax_factor)
 
         if obj.type == "brick":

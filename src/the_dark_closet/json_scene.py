@@ -92,7 +92,11 @@ class JSONScene(Scene, PlayerMixin):
     def _check_collisions(self) -> None:
         """Check collisions with level objects."""
         # Get all active brick objects for collision
-        brick_objects = [obj for obj in self.level_data.get_objects_by_type("brick") if obj.is_active()]
+        brick_objects = [
+            obj
+            for obj in self.level_data.get_objects_by_type("brick")
+            if obj.is_active()
+        ]
 
         # Check ground collision
         self.on_ground = False
@@ -116,7 +120,7 @@ class JSONScene(Scene, PlayerMixin):
         # Check for brick breaking (jumping up into bricks)
         for brick in brick_objects:
             brick_rect = brick.get_rect()
-            
+
             # Check if player is hitting brick from below while jumping
             if (
                 self.player_rect.colliderect(brick_rect)
