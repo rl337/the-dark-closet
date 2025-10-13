@@ -582,7 +582,7 @@ class SideScrollerScene(Scene, PlayerMixin):
         scale_x = rect.width / 256.0
         scale_y = rect.height / 256.0
 
-        # Draw body parts in order (back to front)
+        # Draw body parts in order (back to front) with relative positioning
         parts_order = [
             "left_leg",
             "right_leg",
@@ -599,20 +599,43 @@ class SideScrollerScene(Scene, PlayerMixin):
                     assets[part], (int(256 * scale_x), int(256 * scale_y))
                 )
 
-                # Center the asset in our rect
+                # Position parts relative to the main rect, similar to _draw_detailed_player
                 asset_rect = scaled_asset.get_rect()
-                asset_rect.center = rect.center
+
+                # Position each part relative to the main rect
+                if part == "torso":
+                    asset_rect.centerx = rect.centerx
+                    asset_rect.centery = rect.centery + 10
+                elif part == "head":
+                    asset_rect.centerx = rect.centerx
+                    asset_rect.centery = rect.centery - 20
+                elif part == "left_arm":
+                    asset_rect.centerx = rect.centerx - 30
+                    asset_rect.centery = rect.centery + 5
+                elif part == "right_arm":
+                    asset_rect.centerx = rect.centerx + 30
+                    asset_rect.centery = rect.centery + 5
+                elif part == "left_leg":
+                    asset_rect.centerx = rect.centerx - 15
+                    asset_rect.centery = rect.centery + 35
+                elif part == "right_leg":
+                    asset_rect.centerx = rect.centerx + 15
+                    asset_rect.centery = rect.centery + 35
+                else:
+                    # Fallback to center
+                    asset_rect.center = rect.center
 
                 # Blit the asset
                 surface.blit(scaled_asset, asset_rect)
 
-        # Draw facial features
+        # Draw facial features positioned relative to head
         if "eyes_open" in assets:
             scaled_eyes = pygame.transform.scale(
                 assets["eyes_open"], (int(256 * scale_x), int(256 * scale_y))
             )
             eyes_rect = scaled_eyes.get_rect()
-            eyes_rect.center = rect.center
+            eyes_rect.centerx = rect.centerx
+            eyes_rect.centery = rect.centery - 25  # Above head center
             surface.blit(scaled_eyes, eyes_rect)
 
         if "mouth_neutral" in assets:
@@ -620,16 +643,18 @@ class SideScrollerScene(Scene, PlayerMixin):
                 assets["mouth_neutral"], (int(256 * scale_x), int(256 * scale_y))
             )
             mouth_rect = scaled_mouth.get_rect()
-            mouth_rect.center = rect.center
+            mouth_rect.centerx = rect.centerx
+            mouth_rect.centery = rect.centery - 15  # Below eyes
             surface.blit(scaled_mouth, mouth_rect)
 
-        # Draw gear
+        # Draw gear positioned relative to head
         if "hat" in assets:
             scaled_hat = pygame.transform.scale(
                 assets["hat"], (int(256 * scale_x), int(256 * scale_y))
             )
             hat_rect = scaled_hat.get_rect()
-            hat_rect.center = rect.center
+            hat_rect.centerx = rect.centerx
+            hat_rect.centery = rect.centery - 35  # Above head
             surface.blit(scaled_hat, hat_rect)
 
         # Center mass dot will be drawn after all other rendering
