@@ -91,8 +91,12 @@ class JSONScene(Scene, PlayerMixin):
 
     def _check_collisions(self) -> None:
         """Check collisions with level objects."""
-        # Get all brick objects for collision
-        brick_objects = self.level_data.get_objects_by_type("brick")
+        # Get all active brick objects for collision
+        brick_objects = [
+            obj
+            for obj in self.level_data.get_objects_by_type("brick")
+            if obj.is_active()
+        ]
 
         # Check ground collision
         self.on_ground = False
@@ -111,6 +115,24 @@ class JSONScene(Scene, PlayerMixin):
                 self.player_rect.bottom = brick_rect.top
                 self.player_velocity_y = 0
                 self.on_ground = True
+                break
+
+        # Check for brick breaking (jumping up into bricks)
+        for brick in brick_objects:
+            brick_rect = brick.get_rect()
+
+            # Check if player is hitting brick from below while jumping
+            if (
+                self.player_rect.colliderect(brick_rect)
+                and self.player_velocity_y < 0  # Moving upward
+                and self.player_rect.top < brick_rect.bottom
+                and self.player_rect.bottom > brick_rect.top
+            ):
+                print(f"Breaking brick {brick.id} at {brick_rect}")
+                # Trigger OnBreak callback
+                brick.trigger_callback("OnBreak", brick)
+                # Deactivate the brick
+                brick.deactivate()
                 break
 
         # Gravity is now handled in update method

@@ -95,6 +95,75 @@ def generate_ascii_level(room_data, spawn_pos):
     return "\n".join(result)
 
 
+def generate_ascii_level_for_test(test_data):
+    """Generate ASCII representation for a test sequence."""
+    if "level_file" in test_data:
+        # For JSON level files, load the level data and convert to ASCII
+        with open(test_data["level_file"], "r") as f:
+            level_data = json.load(f)
+
+        # Extract spawn position
+        spawn_x = level_data["player"]["spawn_x"]
+        spawn_y = level_data["player"]["spawn_y"]
+
+        # Create a grid representation from the level data
+        width = level_data["metadata"]["width"]
+        height = level_data["metadata"]["height"]
+
+        # Initialize grid with empty spaces
+        grid = [[" " for _ in range(width)] for _ in range(height)]
+
+        # Place objects from the level data
+        for obj in level_data["layers"]["tiles"]["objects"]:
+            x = obj["x"] // 128
+            y = obj["y"] // 128
+            if 0 <= x < width and 0 <= y < height:
+                if obj["type"] == "brick":
+                    grid[y][x] = "B"
+                elif obj["type"] == "ladder":
+                    grid[y][x] = "H"
+
+        # Convert spawn position to grid coordinates
+        spawn_grid_x = spawn_x // 128
+        spawn_grid_y = spawn_y // 128
+
+        # Create ASCII representation
+        ascii_lines = []
+        for y, row in enumerate(grid):
+            ascii_row = ""
+            for x, char in enumerate(row):
+                if x == spawn_grid_x and y == spawn_grid_y:
+                    ascii_row += "@"
+                else:
+                    char_map = {
+                        "B": "█",  # Brick - solid block
+                        "H": "║",  # Ladder - vertical line
+                        " ": "·",  # Empty space - middle dot
+                    }
+                    ascii_row += char_map.get(char, char)
+            ascii_lines.append(ascii_row)
+
+        # Add border and legend
+        border = "┌" + "─" * width + "┐"
+        result = [border]
+        for line in ascii_lines:
+            result.append("│" + line + "│")
+        result.append("└" + "─" * width + "┘")
+
+        # Add legend
+        result.append("")
+        result.append("Legend:")
+        result.append("  @ = Player spawn position")
+        result.append("  █ = Brick wall (128x128 pixels)")
+        result.append("  ║ = Ladder (128x128 pixels)")
+        result.append("  · = Empty space (128x128 pixels)")
+
+        return "\n".join(result)
+    else:
+        # For string-based rooms, use the original function
+        return generate_ascii_level(test_data["room"], test_data["spawn"])
+
+
 def detect_movement(prev_pos, curr_pos, threshold=2.0):
     """Detect if character has moved significantly between frames."""
     if prev_pos is None or curr_pos is None:
@@ -271,17 +340,7 @@ def generate_test_sequences():
             "name": "Jumping & Falling",
         },
         "brick_breaking": {
-            "room": [
-                "BBBBBBBBBBBB",
-                "B          B",
-                "B          B",
-                "B          B",
-                "B          B",
-                "B   BBBB   B",  # Move bricks to ground level
-                "B          B",
-                "BBBBBBBBBBBB",
-            ],
-            "spawn": (4 * 128, 5 * 128),  # Spawn above the bricks
+            "level_file": "levels/test_brick_breaking.json",
             "actions": [
                 ({pygame.K_RIGHT}, 20),  # Move to bricks
                 ({pygame.K_SPACE}, 30),  # Break bricks
@@ -321,13 +380,22 @@ def generate_test_sequences():
         for old_file in test_dir.glob(f"{test_name}_*.png"):
             old_file.unlink()
 
-        room = test_data["room"]
-        spawn = test_data["spawn"]
         actions = test_data["actions"]
 
         print(f"Generating {test_name}...")
 
-        scene = SideScrollerScene(app, room, spawn)
+        # Check if this test uses a JSON level file
+        if "level_file" in test_data:
+            from the_dark_closet.json_scene import JSONScene
+
+            level_path = Path(test_data["level_file"])
+            scene = JSONScene(app, level_path)
+        else:
+            # Use the old string-based room format
+            room = test_data["room"]
+            spawn = test_data["spawn"]
+            scene = SideScrollerScene(app, room, spawn)
+
         app.switch_scene(scene)
         app.advance_frame(None)
 
@@ -337,8 +405,14 @@ def generate_test_sequences():
             print("  Warning: Character did not stabilize within timeout")
 
         # Adjust camera to show the full level for tests
-        room_width = len(room[0]) * 128
-        room_height = len(room) * 128
+        if "level_file" in test_data:
+            # For JSON scenes, use the level dimensions
+            room_width = scene.level_width
+            room_height = scene.level_height
+        else:
+            # For string-based rooms
+            room_width = len(room[0]) * 128
+            room_height = len(room) * 128
 
         # Position camera to show the entire room
         # With window size matching room size, we can show the full room
@@ -922,46 +996,69 @@ def generate_tests_html(test_sequences, git_hash, git_hash_full):
             frame_count = len(frame_files)
 
             # Generate JSON source for this test sequence
-            test_json = {
-                "metadata": {
-                    "name": test_data["name"],
-                    "width": len(test_data["room"][0]),
-                    "height": len(test_data["room"]),
-                },
-                "layers": {"tiles": {"parallax_factor": 1.0, "objects": []}},
-                "player": {
-                    "spawn_x": test_data["spawn"][0],
-                    "spawn_y": test_data["spawn"][1],
-                },
-            }
+            if "level_file" in test_data:
+                # For JSON level files, load and display the level data
+                with open(test_data["level_file"], "r") as f:
+                    level_data = json.load(f)
+                # Convert pygame key sets to lists for JSON serialization
+                serializable_actions = []
+                for keys, duration in test_data["actions"]:
+                    if keys is None:
+                        serializable_actions.append(
+                            {"keys": None, "duration": duration}
+                        )
+                    else:
+                        serializable_actions.append(
+                            {"keys": list(keys), "duration": duration}
+                        )
 
-            # Convert room data to JSON objects
-            for y, row in enumerate(test_data["room"]):
-                for x, char in enumerate(row):
-                    if char == "B":  # Brick
-                        test_json["layers"]["tiles"]["objects"].append(
-                            {
-                                "id": f"brick_{x}_{y}",
-                                "type": "brick",
-                                "x": x * 128,
-                                "y": y * 128,
-                                "width": 128,
-                                "height": 128,
-                                "color": [135, 90, 60],
-                            }
-                        )
-                    elif char == "H":  # Ladder
-                        test_json["layers"]["tiles"]["objects"].append(
-                            {
-                                "id": f"ladder_{x}_{y}",
-                                "type": "ladder",
-                                "x": x * 128,
-                                "y": y * 128,
-                                "width": 128,
-                                "height": 128,
-                                "color": [139, 69, 19],
-                            }
-                        )
+                test_json = {
+                    "level_file": test_data["level_file"],
+                    "level_data": level_data,
+                    "actions": serializable_actions,
+                }
+            else:
+                # For string-based rooms
+                test_json = {
+                    "metadata": {
+                        "name": test_data["name"],
+                        "width": len(test_data["room"][0]),
+                        "height": len(test_data["room"]),
+                    },
+                    "layers": {"tiles": {"parallax_factor": 1.0, "objects": []}},
+                    "player": {
+                        "spawn_x": test_data["spawn"][0],
+                        "spawn_y": test_data["spawn"][1],
+                    },
+                }
+
+                # Convert room data to JSON objects
+                for y, row in enumerate(test_data["room"]):
+                    for x, char in enumerate(row):
+                        if char == "B":  # Brick
+                            test_json["layers"]["tiles"]["objects"].append(
+                                {
+                                    "id": f"brick_{x}_{y}",
+                                    "type": "brick",
+                                    "x": x * 128,
+                                    "y": y * 128,
+                                    "width": 128,
+                                    "height": 128,
+                                    "color": [135, 90, 60],
+                                }
+                            )
+                        elif char == "H":  # Ladder
+                            test_json["layers"]["tiles"]["objects"].append(
+                                {
+                                    "id": f"ladder_{x}_{y}",
+                                    "type": "ladder",
+                                    "x": x * 128,
+                                    "y": y * 128,
+                                    "width": 128,
+                                    "height": 128,
+                                    "color": [139, 69, 19],
+                                }
+                            )
 
             # Format JSON for display
             json_source = json.dumps(test_json, indent=2)
@@ -993,9 +1090,9 @@ def generate_tests_html(test_sequences, git_hash, git_hash_full):
             tests_html += f"""
             </div>
         </div>
-        <div class="tab-content" id="{test_name}_ascii">
-            <div class="ascii-render">{generate_ascii_level(test_data['room'], test_data['spawn'])}</div>
-        </div>
+            <div class="tab-content" id="{test_name}_ascii">
+                <div class="ascii-render">{generate_ascii_level_for_test(test_data)}</div>
+            </div>
         <div class="tab-content" id="{test_name}_source">
             <div class="source-code">{json_source}</div>
         </div>

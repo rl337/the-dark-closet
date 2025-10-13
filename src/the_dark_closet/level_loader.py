@@ -7,7 +7,7 @@ object placement across different rendering layers.
 
 import json
 from pathlib import Path
-from typing import Dict, List, Any, Optional, Tuple
+from typing import Dict, List, Any, Optional, Tuple, Callable
 import pygame
 from .rendering_utils import render_brick_tile, render_platform_tile, render_ladder_tile
 
@@ -24,6 +24,8 @@ class LevelObject:
         self.height: int = obj_data["height"]
         self.color: Optional[Tuple[int, int, int]] = None
         self.properties: Dict[str, Any] = {}
+        self.active: bool = True  # Whether object is active/visible
+        self.callbacks: Dict[str, Callable] = {}  # Action callbacks
 
         # Extract color if present
         if "color" in obj_data:
@@ -47,6 +49,24 @@ class LevelObject:
         return pygame.Rect(
             self.x - offset_x, self.y - offset_y, self.width, self.height
         )
+
+    def register_callback(self, action: str, callback: Callable) -> None:
+        """Register a callback for a specific action."""
+        self.callbacks[action] = callback
+
+    def trigger_callback(self, action: str, *args, **kwargs) -> Any:
+        """Trigger a callback for a specific action."""
+        if action in self.callbacks:
+            return self.callbacks[action](*args, **kwargs)
+        return None
+
+    def deactivate(self) -> None:
+        """Deactivate the object (make it invisible and non-interactive)."""
+        self.active = False
+
+    def is_active(self) -> bool:
+        """Check if the object is active."""
+        return self.active
 
 
 class LevelLayer:
@@ -173,6 +193,10 @@ class LevelRenderer:
         parallax_factor: float,
     ) -> None:
         """Render a single level object."""
+        # Only render active objects
+        if not obj.is_active():
+            return
+
         rect = obj.get_rect_with_camera(camera_x, camera_y, parallax_factor)
 
         if obj.type == "brick":
