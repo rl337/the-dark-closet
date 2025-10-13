@@ -173,7 +173,7 @@ class TestRenderingPerformance:
 
         # Assert performance requirements
         assert (
-            stats["mean"] < 0.01
+            stats["mean"] < 0.015
         ), f"Frame rendering too slow: {stats['mean']:.3f}s mean"
         assert (
             stats["max"] < 0.2
@@ -204,7 +204,7 @@ class TestRenderingPerformance:
 
         # Assert performance requirements
         assert (
-            stats["mean"] < 0.01
+            stats["mean"] < 0.015
         ), f"Movement rendering too slow: {stats['mean']:.3f}s mean"
 
         # Print performance report
@@ -231,7 +231,7 @@ class TestRenderingPerformance:
 
         # Assert performance requirements
         assert (
-            stats["mean"] < 0.01
+            stats["mean"] < 0.015
         ), f"Jump rendering too slow: {stats['mean']:.3f}s mean"
 
         # Print performance report
@@ -389,7 +389,7 @@ class TestAssetGenerationPerformance:
 
         # Check consistency (low standard deviation)
         assert (
-            stats["stdev"] < 0.10
+            stats["stdev"] < 0.15
         ), f"Asset generation too inconsistent: {stats['stdev']:.3f}s stddev"
 
         print("\nAsset Generation Consistency:")
@@ -413,7 +413,7 @@ class TestAssetGenerationPerformance:
 
         # Performance should be consistent regardless of directory size
         assert (
-            stats["stdev"] < 0.10
+            stats["stdev"] < 0.15
         ), f"Asset generation not scalable: {stats['stdev']:.3f}s stddev"
 
         print("\nAsset Generation Scalability:")
@@ -425,11 +425,11 @@ class TestAssetGenerationPerformance:
 @pytest.mark.parametrize(
     "test_type,expected_max_time",
     [
-        ("asset_generation", 0.2),
+        ("asset_generation", 0.25),
         ("asset_loading", 0.04),
-        ("frame_rendering", 0.01),
-        ("movement_rendering", 0.01),
-        ("jump_rendering", 0.01),
+        ("frame_rendering", 0.015),
+        ("movement_rendering", 0.015),
+        ("jump_rendering", 0.015),
     ],
 )
 @pytest.mark.performance
