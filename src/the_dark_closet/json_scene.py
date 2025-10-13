@@ -124,6 +124,7 @@ class JSONScene(Scene, PlayerMixin):
                 and self.player_rect.top < brick_rect.bottom
                 and self.player_rect.bottom > brick_rect.top
             ):
+                print(f"Breaking brick {brick.id} at {brick_rect}")
                 # Trigger OnBreak callback
                 brick.trigger_callback("OnBreak", brick)
                 # Deactivate the brick
