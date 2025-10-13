@@ -236,9 +236,9 @@
 │█··········█│
 │█··········█│
 │█··········█│
+│█··········█│
+│█··········█│
 │█·····@····█│
-│█··········█│
-│█··········█│
 │████████████│
 └────────────┘
 
@@ -732,7 +732,7 @@ Legend:
   },
   "player": {
     "spawn_x": 768,
-    "spawn_y": 512
+    "spawn_y": 768
   }
 }</div>
         </div>
@@ -743,7 +743,7 @@ Legend:
     <div class="test-sequence">
         <div class="test-header">
             <h2 class="test-title">Jumping & Falling</h2>
-            <button class="play-button" onclick="toggleAnimation('jumping', 8)">
+            <button class="play-button" onclick="toggleAnimation('jumping', 4)">
                 ▶️ Play
             </button>
         </div>
@@ -770,22 +770,6 @@ Legend:
                       class="sequence-image" 
                       id="jumping_03"
                       alt="Frame 4">
-                <img src="tests/jumping/jumping_04.png" 
-                      class="sequence-image" 
-                      id="jumping_04"
-                      alt="Frame 5">
-                <img src="tests/jumping/jumping_05.png" 
-                      class="sequence-image" 
-                      id="jumping_05"
-                      alt="Frame 6">
-                <img src="tests/jumping/jumping_06.png" 
-                      class="sequence-image" 
-                      id="jumping_06"
-                      alt="Frame 7">
-                <img src="tests/jumping/jumping_07.png" 
-                      class="sequence-image" 
-                      id="jumping_07"
-                      alt="Frame 8">
             </div>
         </div>
         <div class="tab-content" id="jumping_ascii">
@@ -794,9 +778,9 @@ Legend:
 │█··········█│
 │█··········█│
 │█··········█│
+│█··········█│
+│█··········█│
 │█·····@····█│
-│█··········█│
-│█··········█│
 │████████████│
 └────────────┘
 
@@ -1290,18 +1274,18 @@ Legend:
   },
   "player": {
     "spawn_x": 768,
-    "spawn_y": 512
+    "spawn_y": 768
   }
 }</div>
         </div>
         <div class="sequence-info">
-            <p>8 frames • Click play to see the sequence in action</p>
+            <p>4 frames • Click play to see the sequence in action</p>
         </div>
     </div>
     <div class="test-sequence">
         <div class="test-header">
             <h2 class="test-title">Brick Breaking</h2>
-            <button class="play-button" onclick="toggleAnimation('brick_breaking', 6)">
+            <button class="play-button" onclick="toggleAnimation('brick_breaking', 8)">
                 ▶️ Play
             </button>
         </div>
@@ -1336,6 +1320,14 @@ Legend:
                       class="sequence-image" 
                       id="brick_breaking_05"
                       alt="Frame 6">
+                <img src="tests/brick_breaking/brick_breaking_06.png" 
+                      class="sequence-image" 
+                      id="brick_breaking_06"
+                      alt="Frame 7">
+                <img src="tests/brick_breaking/brick_breaking_07.png" 
+                      class="sequence-image" 
+                      id="brick_breaking_07"
+                      alt="Frame 8">
             </div>
         </div>
         <div class="tab-content" id="brick_breaking_ascii">
@@ -1343,9 +1335,9 @@ Legend:
 │████████████│
 │█··········█│
 │█··········█│
-│█···████···█│
-│█····@·····█│
 │█··········█│
+│█··········█│
+│█···@███···█│
 │█··········█│
 │████████████│
 └────────────┘
@@ -1589,58 +1581,6 @@ Legend:
           ]
         },
         {
-          "id": "brick_4_3",
-          "type": "brick",
-          "x": 512,
-          "y": 384,
-          "width": 128,
-          "height": 128,
-          "color": [
-            135,
-            90,
-            60
-          ]
-        },
-        {
-          "id": "brick_5_3",
-          "type": "brick",
-          "x": 640,
-          "y": 384,
-          "width": 128,
-          "height": 128,
-          "color": [
-            135,
-            90,
-            60
-          ]
-        },
-        {
-          "id": "brick_6_3",
-          "type": "brick",
-          "x": 768,
-          "y": 384,
-          "width": 128,
-          "height": 128,
-          "color": [
-            135,
-            90,
-            60
-          ]
-        },
-        {
-          "id": "brick_7_3",
-          "type": "brick",
-          "x": 896,
-          "y": 384,
-          "width": 128,
-          "height": 128,
-          "color": [
-            135,
-            90,
-            60
-          ]
-        },
-        {
           "id": "brick_11_3",
           "type": "brick",
           "x": 1408,
@@ -1683,6 +1623,58 @@ Legend:
           "id": "brick_0_5",
           "type": "brick",
           "x": 0,
+          "y": 640,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_4_5",
+          "type": "brick",
+          "x": 512,
+          "y": 640,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_5_5",
+          "type": "brick",
+          "x": 640,
+          "y": 640,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_6_5",
+          "type": "brick",
+          "x": 768,
+          "y": 640,
+          "width": 128,
+          "height": 128,
+          "color": [
+            135,
+            90,
+            60
+          ]
+        },
+        {
+          "id": "brick_7_5",
+          "type": "brick",
+          "x": 896,
           "y": 640,
           "width": 128,
           "height": 128,
@@ -1891,19 +1883,19 @@ Legend:
     }
   },
   "player": {
-    "spawn_x": 640,
-    "spawn_y": 512
+    "spawn_x": 512,
+    "spawn_y": 640
   }
 }</div>
         </div>
         <div class="sequence-info">
-            <p>6 frames • Click play to see the sequence in action</p>
+            <p>8 frames • Click play to see the sequence in action</p>
         </div>
     </div>
     <div class="test-sequence">
         <div class="test-header">
             <h2 class="test-title">Ladder Climbing</h2>
-            <button class="play-button" onclick="toggleAnimation('ladder_climbing', 6)">
+            <button class="play-button" onclick="toggleAnimation('ladder_climbing', 8)">
                 ▶️ Play
             </button>
         </div>
@@ -1938,16 +1930,24 @@ Legend:
                       class="sequence-image" 
                       id="ladder_climbing_05"
                       alt="Frame 6">
+                <img src="tests/ladder_climbing/ladder_climbing_06.png" 
+                      class="sequence-image" 
+                      id="ladder_climbing_06"
+                      alt="Frame 7">
+                <img src="tests/ladder_climbing/ladder_climbing_07.png" 
+                      class="sequence-image" 
+                      id="ladder_climbing_07"
+                      alt="Frame 8">
             </div>
         </div>
         <div class="tab-content" id="ladder_climbing_ascii">
             <div class="ascii-render">┌────────────┐
 │████████████│
 │█··········█│
+│█··········█│
+│█··········█│
 │█····║║····█│
-│█····║║····█│
-│█····║║····█│
-│█·····@····█│
+│█····@║····█│
 │█··········█│
 │████████████│
 └────────────┘
@@ -2165,32 +2165,6 @@ Legend:
           ]
         },
         {
-          "id": "ladder_5_2",
-          "type": "ladder",
-          "x": 640,
-          "y": 256,
-          "width": 128,
-          "height": 128,
-          "color": [
-            139,
-            69,
-            19
-          ]
-        },
-        {
-          "id": "ladder_6_2",
-          "type": "ladder",
-          "x": 768,
-          "y": 256,
-          "width": 128,
-          "height": 128,
-          "color": [
-            139,
-            69,
-            19
-          ]
-        },
-        {
           "id": "brick_11_2",
           "type": "brick",
           "x": 1408,
@@ -2214,32 +2188,6 @@ Legend:
             135,
             90,
             60
-          ]
-        },
-        {
-          "id": "ladder_5_3",
-          "type": "ladder",
-          "x": 640,
-          "y": 384,
-          "width": 128,
-          "height": 128,
-          "color": [
-            139,
-            69,
-            19
-          ]
-        },
-        {
-          "id": "ladder_6_3",
-          "type": "ladder",
-          "x": 768,
-          "y": 384,
-          "width": 128,
-          "height": 128,
-          "color": [
-            139,
-            69,
-            19
           ]
         },
         {
@@ -2318,6 +2266,32 @@ Legend:
             135,
             90,
             60
+          ]
+        },
+        {
+          "id": "ladder_5_5",
+          "type": "ladder",
+          "x": 640,
+          "y": 640,
+          "width": 128,
+          "height": 128,
+          "color": [
+            139,
+            69,
+            19
+          ]
+        },
+        {
+          "id": "ladder_6_5",
+          "type": "ladder",
+          "x": 768,
+          "y": 640,
+          "width": 128,
+          "height": 128,
+          "color": [
+            139,
+            69,
+            19
           ]
         },
         {
@@ -2519,13 +2493,13 @@ Legend:
     }
   },
   "player": {
-    "spawn_x": 768,
+    "spawn_x": 640,
     "spawn_y": 640
   }
 }</div>
         </div>
         <div class="sequence-info">
-            <p>6 frames • Click play to see the sequence in action</p>
+            <p>8 frames • Click play to see the sequence in action</p>
         </div>
     </div>
     </div>
@@ -2620,8 +2594,8 @@ Legend:
     <div class="footer">
         <p>All test sequences generated automatically by the CI/CD pipeline</p>
         <p style="font-size: 0.9em; color: #95a5a6; margin-top: 15px;">
-            Version: <code style="background: #34495e; padding: 2px 6px; border-radius: 3px;">d1abe3f</code>
-            | <a href="https://github.com/rl337/the-dark-closet/commit/d1abe3fd24814becf15d722aecc68808ef9cef69" style="color: #3498db;">View Commit</a>
+            Version: <code style="background: #34495e; padding: 2px 6px; border-radius: 3px;">bd36601</code>
+            | <a href="https://github.com/rl337/the-dark-closet/commit/bd36601bcecd7e4d28e3af36c69fb9b67e35c6b0" style="color: #3498db;">View Commit</a>
         </p>
     </div>
 </body>
