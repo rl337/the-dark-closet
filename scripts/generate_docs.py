@@ -275,13 +275,13 @@ def generate_test_sequences():
                 "BBBBBBBBBBBB",
                 "B          B",
                 "B          B",
-                "B   BBBB   B",
                 "B          B",
                 "B          B",
+                "B   BBBB   B",  # Move bricks to ground level
                 "B          B",
                 "BBBBBBBBBBBB",
             ],
-            "spawn": (4 * 128, 6 * 128),  # Spawn on ground, closer to bricks
+            "spawn": (4 * 128, 5 * 128),  # Spawn above the bricks
             "actions": [
                 ({pygame.K_RIGHT}, 20),  # Move to bricks
                 ({pygame.K_SPACE}, 30),  # Break bricks
@@ -292,14 +292,14 @@ def generate_test_sequences():
             "room": [
                 "BBBBBBBBBBBB",
                 "B          B",
-                "B    HH    B",
-                "B    HH    B",
-                "B    HH    B",
                 "B          B",
+                "B          B",
+                "B    HH    B",  # Move ladders to ground level
+                "B    HH    B",
                 "B          B",
                 "BBBBBBBBBBBB",
             ],
-            "spawn": (5 * 128, 6 * 128),  # Spawn on ground, near ladder
+            "spawn": (5 * 128, 5 * 128),  # Spawn at ground level near ladder
             "actions": [
                 ({pygame.K_RIGHT}, 20),  # Move to ladder
                 ({pygame.K_UP}, 40),  # Climb ladder

@@ -931,8 +931,8 @@ class GameApp:
         # Sky
         surface.fill((18, 22, 30))
 
-        # Parallax backgrounds
-        scene._draw_parallax(surface)
+        # Skip parallax backgrounds for clean test screenshots
+        # scene._draw_parallax(surface)
 
         # World tiles in view
         scene._draw_tiles(surface)
@@ -941,8 +941,8 @@ class GameApp:
         pr = scene.player_rect.move(-int(scene.camera_x), -int(scene.camera_y))
         scene._draw_procedural_player(surface, pr)
 
-        # Foreground accents (drawn after player for proper depth)
-        scene._draw_foreground(surface)
+        # Skip foreground accents for clean test screenshots
+        # scene._draw_foreground(surface)
 
         # Note: Skip HUD rendering for clean screenshots
         # Also skip center mass dot for clean screenshots
