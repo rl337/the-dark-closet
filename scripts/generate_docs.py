@@ -27,6 +27,7 @@ from the_dark_closet.game import (
     ControlledTimeProvider,
 )
 from the_dark_closet.assets import generate_character_assets
+from the_dark_closet.character import Character, CharacterState, CharacterDirection
 import pygame
 
 
@@ -466,6 +467,142 @@ def generate_test_sequences():
     return test_sequences
 
 
+def generate_character_showcase():
+    """Generate character showcase screenshots."""
+    print("Generating character showcase...")
+
+    # Create test game
+    config = GameConfig(1024, 768, "Character Showcase", 60)
+    time_provider = ControlledTimeProvider(1.0 / 60.0)
+    GameApp(config, time_provider)  # Initialize pygame
+
+    # Create showcase directory
+    showcase_dir = Path("docs/character_showcase")
+    showcase_dir.mkdir(parents=True, exist_ok=True)
+
+    # Test surface
+    surface = pygame.Surface((1024, 768))
+
+    # 1. Character Directions Showcase
+    print("  Generating character directions...")
+    directions = [
+        (CharacterDirection.FORWARD, "forward"),
+        (CharacterDirection.LEFT, "left"),
+        (CharacterDirection.RIGHT, "right"),
+        (CharacterDirection.BACK, "back"),
+    ]
+
+    for direction, name in directions:
+        character = Character(x=400, y=300)
+        character.set_direction(direction)
+        character.idle()
+
+        surface.fill((18, 22, 30))  # Sky background
+        character.draw(surface, camera_x=0, camera_y=0)
+
+        filename = f"character_direction_{name}.png"
+        pygame.image.save(surface, str(showcase_dir / filename))
+
+    # 2. Character States Showcase
+    print("  Generating character states...")
+    states = [
+        (CharacterState.IDLE, "idle"),
+        (CharacterState.WALKING_LEFT, "walking_left"),
+        (CharacterState.WALKING_RIGHT, "walking_right"),
+        (CharacterState.JUMPING, "jumping"),
+    ]
+
+    for state, name in states:
+        character = Character(x=400, y=300)
+        character.set_state(state)
+
+        if state == CharacterState.WALKING_LEFT:
+            character.set_direction(CharacterDirection.LEFT)
+        elif state == CharacterState.WALKING_RIGHT:
+            character.set_direction(CharacterDirection.RIGHT)
+        else:
+            character.set_direction(CharacterDirection.FORWARD)
+
+        surface.fill((18, 22, 30))  # Sky background
+        character.draw(surface, camera_x=0, camera_y=0)
+
+        filename = f"character_state_{name}.png"
+        pygame.image.save(surface, str(showcase_dir / filename))
+
+    # 3. Walk Cycle Showcase
+    print("  Generating walk cycles...")
+    for direction_name, direction in [
+        ("left", CharacterDirection.LEFT),
+        ("right", CharacterDirection.RIGHT),
+    ]:
+        character = Character(x=400, y=300)
+        character.set_direction(direction)
+
+        if direction_name == "left":
+            character.walk_left()
+        else:
+            character.walk_right()
+
+        # Generate walk cycle frames
+        for frame in range(8):  # 2 complete cycles
+            character.update(1.0 / 60.0)  # 60 FPS
+
+            # Move character horizontally
+            if direction_name == "left":
+                character.move(-3, 0)  # Move left
+            else:
+                character.move(3, 0)  # Move right
+
+            surface.fill((18, 22, 30))  # Sky background
+            character.draw(surface, camera_x=0, camera_y=0)
+
+            filename = f"character_walk_{direction_name}_{frame:02d}.png"
+            pygame.image.save(surface, str(showcase_dir / filename))
+
+    # 4. Character Movement Sequence
+    print("  Generating movement sequence...")
+    character = Character(x=100, y=300)
+
+    # Movement sequence: idle -> walk right -> idle -> walk left -> idle
+    sequence = [
+        ("idle", 30, 0, 0),
+        ("walk_right", 60, 3, 0),  # Move right
+        ("idle", 30, 0, 0),
+        ("walk_left", 60, -3, 0),  # Move left
+        ("idle", 30, 0, 0),
+    ]
+
+    frame_count = 0
+    for phase_name, duration, dx, dy in sequence:
+        # Set character state
+        if phase_name == "idle":
+            character.idle()
+        elif phase_name == "walk_left":
+            character.walk_left()
+        elif phase_name == "walk_right":
+            character.walk_right()
+
+        # Run phase
+        for frame in range(duration):
+            character.update(1.0 / 60.0)  # 60 FPS
+            character.move(dx, dy)
+
+            surface.fill((18, 22, 30))  # Sky background
+            character.draw(surface, camera_x=0, camera_y=0)
+
+            # Save every 5th frame for the showcase
+            if frame_count % 5 == 0:
+                filename = f"character_movement_{frame_count:03d}_{phase_name}.png"
+                pygame.image.save(surface, str(showcase_dir / filename))
+
+            frame_count += 1
+
+    print(
+        f"Generated character showcase with {len(list(showcase_dir.glob('*.png')))} images"
+    )
+    return showcase_dir
+
+
 def generate_index_html(git_hash, git_hash_full):
     """Generate the main index.html page."""
     print("Generating index.html...")
@@ -582,6 +719,7 @@ def generate_index_html(git_hash, git_hash_full):
         <a href="index.html">🏠 Home</a>
         <a href="assets.html">🎨 Assets</a>
         <a href="tests.html">🧪 Test Sequences</a>
+        <a href="character_showcase.html">🎭 Character Showcase</a>
     </div>
     
     <div class="status">
@@ -762,6 +900,7 @@ def generate_assets_html(asset_paths, git_hash, git_hash_full):
         <a href="index.html">🏠 Home</a>
         <a href="assets.html">🎨 Assets</a>
         <a href="tests.html">🧪 Test Sequences</a>
+        <a href="character_showcase.html">🎭 Character Showcase</a>
     </div>"""
 
     # Generate sections for each category
@@ -985,6 +1124,7 @@ def generate_tests_html(test_sequences, git_hash, git_hash_full):
         <a href="index.html">🏠 Home</a>
         <a href="assets.html">🎨 Assets</a>
         <a href="tests.html">🧪 Test Sequences</a>
+        <a href="character_showcase.html">🎭 Character Showcase</a>
     </div>"""
 
     # Add test sequences with tabbed interface
@@ -1210,6 +1350,256 @@ def generate_tests_html(test_sequences, git_hash, git_hash_full):
     return tests_html
 
 
+def generate_character_showcase_html(git_hash, git_hash_full):
+    """Generate the character showcase HTML page."""
+    print("Generating character showcase HTML...")
+
+    showcase_dir = Path("docs/character_showcase")
+
+    # Get showcase images
+    direction_images = sorted(showcase_dir.glob("character_direction_*.png"))
+    state_images = sorted(showcase_dir.glob("character_state_*.png"))
+    walk_images = sorted(showcase_dir.glob("character_walk_*.png"))
+    movement_images = sorted(showcase_dir.glob("character_movement_*.png"))
+
+    character_html = """<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Character Showcase - The Dark Closet</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #1a1a1a;
+            color: #ffffff;
+            line-height: 1.6;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 20px;
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            border-radius: 10px;
+        }
+        .nav {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .nav a {
+            display: inline-block;
+            margin: 0 15px;
+            padding: 10px 20px;
+            background: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+        .nav a:hover {
+            background: #2980b9;
+        }
+        .showcase-section {
+            background: #2c2c2c;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 30px 0;
+        }
+        .showcase-title {
+            font-size: 1.5em;
+            color: #3498db;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .image-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .image-item {
+            text-align: center;
+            background: #1a1a1a;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #34495e;
+        }
+        .image-item img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+        .image-caption {
+            margin-top: 10px;
+            color: #bdc3c7;
+            font-size: 0.9em;
+        }
+        .walk-cycle {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        .walk-cycle img {
+            width: 120px;
+            height: auto;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        .movement-sequence {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        .movement-sequence img {
+            width: 150px;
+            height: auto;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        .description {
+            background: #34495e;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+            color: #ecf0f1;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            background: #2c3e50;
+            border-radius: 10px;
+            color: #bdc3c7;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🎭 Character Showcase</h1>
+        <p>Demonstration of the new character composite object system</p>
+    </div>
+    
+    <div class="nav">
+        <a href="index.html">🏠 Home</a>
+        <a href="assets.html">🎨 Assets</a>
+        <a href="tests.html">🧪 Test Sequences</a>
+        <a href="character_showcase.html">🎭 Character Showcase</a>
+    </div>
+    
+    <div class="showcase-section">
+        <h2 class="showcase-title">Character Directions</h2>
+        <div class="description">
+            The character can face in four different directions: forward (toward camera), left, right, and back (away from camera).
+            Each direction uses appropriate directional assets for realistic rendering.
+        </div>
+        <div class="image-grid">
+"""
+
+    # Add direction images
+    for img_path in direction_images:
+        img_name = (
+            img_path.stem.replace("character_direction_", "").replace("_", " ").title()
+        )
+        character_html += f"""
+            <div class="image-item">
+                <img src="character_showcase/{img_path.name}" alt="{img_name}">
+                <div class="image-caption">{img_name}</div>
+            </div>"""
+
+    character_html += """
+        </div>
+    </div>
+    
+    <div class="showcase-section">
+        <h2 class="showcase-title">Character States</h2>
+        <div class="description">
+            The character has different animation states: idle (standing still), walking left, walking right, and jumping.
+            Each state has its own animation cycle and appropriate directional assets.
+        </div>
+        <div class="image-grid">
+"""
+
+    # Add state images
+    for img_path in state_images:
+        img_name = (
+            img_path.stem.replace("character_state_", "").replace("_", " ").title()
+        )
+        character_html += f"""
+            <div class="image-item">
+                <img src="character_showcase/{img_path.name}" alt="{img_name}">
+                <div class="image-caption">{img_name}</div>
+            </div>"""
+
+    character_html += """
+        </div>
+    </div>
+    
+    <div class="showcase-section">
+        <h2 class="showcase-title">Walk Cycle Animation</h2>
+        <div class="description">
+            The character features smooth walk cycle animations with 4 frames per direction.
+            Arms and legs move in opposition to create realistic walking motion.
+        </div>
+        <h3>Walking Left</h3>
+        <div class="walk-cycle">
+"""
+
+    # Add left walk cycle images
+    left_walk_images = [img for img in walk_images if "left" in img.name]
+    for img_path in left_walk_images:
+        character_html += f'            <img src="character_showcase/{img_path.name}" alt="Walk Left Frame">'
+
+    character_html += """
+        </div>
+        <h3>Walking Right</h3>
+        <div class="walk-cycle">
+"""
+
+    # Add right walk cycle images
+    right_walk_images = [img for img in walk_images if "right" in img.name]
+    for img_path in right_walk_images:
+        character_html += f'            <img src="character_showcase/{img_path.name}" alt="Walk Right Frame">'
+
+    character_html += """
+        </div>
+    </div>
+    
+    <div class="showcase-section">
+        <h2 class="showcase-title">Movement Sequence</h2>
+        <div class="description">
+            Complete movement sequence: idle → walk right → idle → walk left → idle.
+            This demonstrates the character's ability to transition between states smoothly.
+        </div>
+        <div class="movement-sequence">
+"""
+
+    # Add movement sequence images
+    for img_path in movement_images:
+        character_html += f'            <img src="character_showcase/{img_path.name}" alt="Movement Frame">'
+
+    character_html += f"""
+        </div>
+    </div>
+    
+    <div class="footer">
+        <p>Generated on {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</p>
+        <p>Git Hash: {git_hash} | Full Hash: {git_hash_full}</p>
+        <p>The Dark Closet - Character Composite Object System</p>
+    </div>
+</body>
+</html>"""
+
+    return character_html
+
+
 def main():
     """Main function to generate all documentation."""
     print("Starting documentation generation...")
@@ -1243,10 +1633,14 @@ def main():
     # Generate test sequences
     test_sequences = generate_test_sequences()
 
+    # Generate character showcase
+    showcase_dir = generate_character_showcase()
+
     # Generate HTML pages
     index_html = generate_index_html(git_hash, git_hash_full)
     assets_html = generate_assets_html(asset_paths, git_hash, git_hash_full)
     tests_html = generate_tests_html(test_sequences, git_hash, git_hash_full)
+    character_html = generate_character_showcase_html(git_hash, git_hash_full)
 
     # Write HTML files
     with open(docs_dir / "index.html", "w", encoding="utf-8") as f:
@@ -1258,13 +1652,17 @@ def main():
     with open(docs_dir / "tests.html", "w", encoding="utf-8") as f:
         f.write(tests_html)
 
+    with open(docs_dir / "character_showcase.html", "w", encoding="utf-8") as f:
+        f.write(character_html)
+
     # Clean up temp directory
     shutil.rmtree(temp_assets_dir, ignore_errors=True)
 
     print("Documentation generation complete!")
-    print("Generated: index.html, assets.html, tests.html")
+    print("Generated: index.html, assets.html, tests.html, character_showcase.html")
     print(f"Assets: {len(list(assets_dir.glob('*.png')))} files")
     print(f"Test sequences: {len(list(tests_dir.glob('*')))} directories")
+    print(f"Character showcase: {len(list(showcase_dir.glob('*.png')))} images")
 
 
 if __name__ == "__main__":

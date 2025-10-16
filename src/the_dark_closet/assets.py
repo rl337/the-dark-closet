@@ -373,6 +373,129 @@ class PinocchioAssetGenerator:
 
         return surface
 
+    def generate_head_directional(self, direction: str) -> pygame.Surface:
+        """Generate head asset for a specific direction."""
+        if direction == "left":
+            # For left-facing, we can flip the head horizontally
+            head = self.generate_head()
+            return pygame.transform.flip(head, True, False)
+        elif direction == "right":
+            # For right-facing, we can flip the head horizontally
+            head = self.generate_head()
+            return pygame.transform.flip(head, True, False)
+        else:
+            # Forward and back use the same head
+            return self.generate_head()
+
+    def generate_torso_directional(self, direction: str) -> pygame.Surface:
+        """Generate torso asset for a specific direction."""
+        if direction == "left":
+            # For left-facing, we can flip the torso horizontally
+            torso = self.generate_torso()
+            return pygame.transform.flip(torso, True, False)
+        elif direction == "right":
+            # For right-facing, we can flip the torso horizontally
+            torso = self.generate_torso()
+            return pygame.transform.flip(torso, True, False)
+        else:
+            # Forward and back use the same torso
+            return self.generate_torso()
+
+    def generate_arm_directional(self, side: str, direction: str) -> pygame.Surface:
+        """Generate arm asset for a specific side and direction."""
+        if side == "left":
+            base_arm = self.generate_left_arm()
+        else:
+            base_arm = self.generate_right_arm()
+
+        if direction == "left":
+            # For left-facing, swap arm positions
+            return pygame.transform.flip(base_arm, True, False)
+        elif direction == "right":
+            # For right-facing, swap arm positions
+            return pygame.transform.flip(base_arm, True, False)
+        else:
+            # Forward and back use the same arms
+            return base_arm
+
+    def generate_leg_directional(self, side: str, direction: str) -> pygame.Surface:
+        """Generate leg asset for a specific side and direction."""
+        if side == "left":
+            base_leg = self.generate_left_leg()
+        else:
+            base_leg = self.generate_right_leg()
+
+        if direction == "left":
+            # For left-facing, swap leg positions
+            return pygame.transform.flip(base_leg, True, False)
+        elif direction == "right":
+            # For right-facing, swap leg positions
+            return pygame.transform.flip(base_leg, True, False)
+        else:
+            # Forward and back use the same legs
+            return base_leg
+
+    def generate_walk_cycle_frame(self, direction: str, frame: int) -> pygame.Surface:
+        """Generate a walk cycle frame for a specific direction."""
+        # For now, we'll create simple walk cycle by slightly modifying the base assets
+        # This is a placeholder - in a real implementation, we'd have more sophisticated animation
+
+        # Create a composite surface with all body parts
+        surface = self.create_surface()
+        center_x = self.width // 2
+        center_y = self.height // 2
+
+        # Calculate walk cycle offset (simple sine wave)
+        walk_offset = int(5 * math.sin(frame * math.pi / 2))  # 5 pixel max offset
+
+        # Draw torso
+        torso = self.generate_torso_directional(direction)
+        torso_rect = torso.get_rect(center=(center_x, center_y + 10))
+        surface.blit(torso, torso_rect)
+
+        # Draw head
+        head = self.generate_head_directional(direction)
+        head_rect = head.get_rect(center=(center_x, center_y - 20))
+        surface.blit(head, head_rect)
+
+        # Draw arms with walk cycle animation
+        left_arm = self.generate_arm_directional("left", direction)
+        right_arm = self.generate_arm_directional("right", direction)
+
+        # Arms swing opposite to each other
+        left_arm_offset = walk_offset
+        right_arm_offset = -walk_offset
+
+        left_arm_rect = left_arm.get_rect(
+            center=(center_x - 30, center_y + 5 + left_arm_offset)
+        )
+        right_arm_rect = right_arm.get_rect(
+            center=(center_x + 30, center_y + 5 + right_arm_offset)
+        )
+
+        surface.blit(left_arm, left_arm_rect)
+        surface.blit(right_arm, right_arm_rect)
+
+        # Draw legs with walk cycle animation
+        left_leg = self.generate_leg_directional("left", direction)
+        right_leg = self.generate_leg_directional("right", direction)
+
+        # Legs alternate
+        left_leg_offset = walk_offset
+        right_leg_offset = -walk_offset
+
+        left_leg_rect = left_leg.get_rect(
+            center=(center_x - 15, center_y + 35 + left_leg_offset)
+        )
+        right_leg_rect = right_leg.get_rect(
+            center=(center_x + 15, center_y + 35 + right_leg_offset)
+        )
+
+        surface.blit(left_leg, left_leg_rect)
+        surface.blit(right_leg, right_leg_rect)
+
+        return surface
+
     def generate_all_assets(self, output_dir: Path) -> Dict[str, str]:
         """Generate all character assets and save them."""
         output_dir.mkdir(parents=True, exist_ok=True)
@@ -382,14 +505,23 @@ class PinocchioAssetGenerator:
         face_dir = output_dir / "face" / "eyes"
         mouth_dir = output_dir / "face" / "mouths"
         gear_dir = output_dir / "gear"
+        directional_dir = output_dir / "directional"
+        walk_cycle_dir = output_dir / "walk_cycles"
 
-        for dir_path in [body_dir, face_dir, mouth_dir, gear_dir]:
+        for dir_path in [
+            body_dir,
+            face_dir,
+            mouth_dir,
+            gear_dir,
+            directional_dir,
+            walk_cycle_dir,
+        ]:
             dir_path.mkdir(parents=True, exist_ok=True)
 
         # Generate and save assets
         asset_paths = {}
 
-        # Body parts
+        # Body parts (forward-facing)
         asset_paths["head"] = self._save_asset(
             self.generate_head(), body_dir / "head.png"
         )
@@ -425,6 +557,47 @@ class PinocchioAssetGenerator:
 
         # Gear
         asset_paths["hat"] = self._save_asset(self.generate_hat(), gear_dir / "hat.png")
+
+        # Directional assets
+        directions = ["left", "right", "forward", "back"]
+        for direction in directions:
+            # Head directional
+            asset_paths[f"head_{direction}"] = self._save_asset(
+                self.generate_head_directional(direction),
+                directional_dir / f"head_{direction}.png",
+            )
+            # Torso directional
+            asset_paths[f"torso_{direction}"] = self._save_asset(
+                self.generate_torso_directional(direction),
+                directional_dir / f"torso_{direction}.png",
+            )
+            # Arms directional
+            asset_paths[f"left_arm_{direction}"] = self._save_asset(
+                self.generate_arm_directional("left", direction),
+                directional_dir / f"left_arm_{direction}.png",
+            )
+            asset_paths[f"right_arm_{direction}"] = self._save_asset(
+                self.generate_arm_directional("right", direction),
+                directional_dir / f"right_arm_{direction}.png",
+            )
+            # Legs directional
+            asset_paths[f"left_leg_{direction}"] = self._save_asset(
+                self.generate_leg_directional("left", direction),
+                directional_dir / f"left_leg_{direction}.png",
+            )
+            asset_paths[f"right_leg_{direction}"] = self._save_asset(
+                self.generate_leg_directional("right", direction),
+                directional_dir / f"right_leg_{direction}.png",
+            )
+
+        # Walk cycle assets
+        walk_directions = ["left", "right"]
+        for direction in walk_directions:
+            for frame in range(4):  # 4 frames per walk cycle
+                asset_paths[f"walk_{direction}_{frame}"] = self._save_asset(
+                    self.generate_walk_cycle_frame(direction, frame),
+                    walk_cycle_dir / f"walk_{direction}_{frame}.png",
+                )
 
         return asset_paths
 

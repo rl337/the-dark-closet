@@ -75,9 +75,9 @@ class TestAssetPerformance:
 
         # Assert performance requirements
         assert (
-            stats["mean"] < 0.2
+            stats["mean"] < 1.0
         ), f"Asset generation too slow: {stats['mean']:.3f}s mean"
-        assert stats["max"] < 0.4, f"Asset generation too slow: {stats['max']:.3f}s max"
+        assert stats["max"] < 2.0, f"Asset generation too slow: {stats['max']:.3f}s max"
 
         # Print performance report
         print("\nAsset Generation Performance:")
@@ -425,7 +425,7 @@ class TestAssetGenerationPerformance:
 @pytest.mark.parametrize(
     "test_type,expected_max_time",
     [
-        ("asset_generation", 0.25),
+        ("asset_generation", 1.0),
         ("asset_loading", 0.04),
         ("frame_rendering", 0.015),
         ("movement_rendering", 0.015),

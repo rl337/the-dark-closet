@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Character Showcase - The Dark Closet</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #1a1a1a;
+            color: #ffffff;
+            line-height: 1.6;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 20px;
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            border-radius: 10px;
+        }
+        .nav {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .nav a {
+            display: inline-block;
+            margin: 0 15px;
+            padding: 10px 20px;
+            background: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+        .nav a:hover {
+            background: #2980b9;
+        }
+        .showcase-section {
+            background: #2c2c2c;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 30px 0;
+        }
+        .showcase-title {
+            font-size: 1.5em;
+            color: #3498db;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .image-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .image-item {
+            text-align: center;
+            background: #1a1a1a;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #34495e;
+        }
+        .image-item img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+        .image-caption {
+            margin-top: 10px;
+            color: #bdc3c7;
+            font-size: 0.9em;
+        }
+        .walk-cycle {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        .walk-cycle img {
+            width: 120px;
+            height: auto;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        .movement-sequence {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        .movement-sequence img {
+            width: 150px;
+            height: auto;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        .description {
+            background: #34495e;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+            color: #ecf0f1;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            background: #2c3e50;
+            border-radius: 10px;
+            color: #bdc3c7;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🎭 Character Showcase</h1>
+        <p>Demonstration of the new character composite object system</p>
+    </div>
+    
+    <div class="nav">
+        <a href="index.html">🏠 Home</a>
+        <a href="assets.html">🎨 Assets</a>
+        <a href="tests.html">🧪 Test Sequences</a>
+        <a href="character_showcase.html">🎭 Character Showcase</a>
+    </div>
+    
+    <div class="showcase-section">
+        <h2 class="showcase-title">Character Directions</h2>
+        <div class="description">
+            The character can face in four different directions: forward (toward camera), left, right, and back (away from camera).
+            Each direction uses appropriate directional assets for realistic rendering.
+        </div>
+        <div class="image-grid">
+
+            <div class="image-item">
+                <img src="character_showcase/character_direction_back.png" alt="Back">
+                <div class="image-caption">Back</div>
+            </div>
+            <div class="image-item">
+                <img src="character_showcase/character_direction_forward.png" alt="Forward">
+                <div class="image-caption">Forward</div>
+            </div>
+            <div class="image-item">
+                <img src="character_showcase/character_direction_left.png" alt="Left">
+                <div class="image-caption">Left</div>
+            </div>
+            <div class="image-item">
+                <img src="character_showcase/character_direction_right.png" alt="Right">
+                <div class="image-caption">Right</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="showcase-section">
+        <h2 class="showcase-title">Character States</h2>
+        <div class="description">
+            The character has different animation states: idle (standing still), walking left, walking right, and jumping.
+            Each state has its own animation cycle and appropriate directional assets.
+        </div>
+        <div class="image-grid">
+
+            <div class="image-item">
+                <img src="character_showcase/character_state_idle.png" alt="Idle">
+                <div class="image-caption">Idle</div>
+            </div>
+            <div class="image-item">
+                <img src="character_showcase/character_state_jumping.png" alt="Jumping">
+                <div class="image-caption">Jumping</div>
+            </div>
+            <div class="image-item">
+                <img src="character_showcase/character_state_walking_left.png" alt="Walking Left">
+                <div class="image-caption">Walking Left</div>
+            </div>
+            <div class="image-item">
+                <img src="character_showcase/character_state_walking_right.png" alt="Walking Right">
+                <div class="image-caption">Walking Right</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="showcase-section">
+        <h2 class="showcase-title">Walk Cycle Animation</h2>
+        <div class="description">
+            The character features smooth walk cycle animations with 4 frames per direction.
+            Arms and legs move in opposition to create realistic walking motion.
+        </div>
+        <h3>Walking Left</h3>
+        <div class="walk-cycle">
+            <img src="character_showcase/character_walk_left_00.png" alt="Walk Left Frame">            <img src="character_showcase/character_walk_left_01.png" alt="Walk Left Frame">            <img src="character_showcase/character_walk_left_02.png" alt="Walk Left Frame">            <img src="character_showcase/character_walk_left_03.png" alt="Walk Left Frame">            <img src="character_showcase/character_walk_left_04.png" alt="Walk Left Frame">            <img src="character_showcase/character_walk_left_05.png" alt="Walk Left Frame">            <img src="character_showcase/character_walk_left_06.png" alt="Walk Left Frame">            <img src="character_showcase/character_walk_left_07.png" alt="Walk Left Frame">
+        </div>
+        <h3>Walking Right</h3>
+        <div class="walk-cycle">
+            <img src="character_showcase/character_walk_right_00.png" alt="Walk Right Frame">            <img src="character_showcase/character_walk_right_01.png" alt="Walk Right Frame">            <img src="character_showcase/character_walk_right_02.png" alt="Walk Right Frame">            <img src="character_showcase/character_walk_right_03.png" alt="Walk Right Frame">            <img src="character_showcase/character_walk_right_04.png" alt="Walk Right Frame">            <img src="character_showcase/character_walk_right_05.png" alt="Walk Right Frame">            <img src="character_showcase/character_walk_right_06.png" alt="Walk Right Frame">            <img src="character_showcase/character_walk_right_07.png" alt="Walk Right Frame">
+        </div>
+    </div>
+    
+    <div class="showcase-section">
+        <h2 class="showcase-title">Movement Sequence</h2>
+        <div class="description">
+            Complete movement sequence: idle → walk right → idle → walk left → idle.
+            This demonstrates the character's ability to transition between states smoothly.
+        </div>
+        <div class="movement-sequence">
+            <img src="character_showcase/character_movement_000_idle.png" alt="Movement Frame">            <img src="character_showcase/character_movement_005_idle.png" alt="Movement Frame">            <img src="character_showcase/character_movement_010_idle.png" alt="Movement Frame">            <img src="character_showcase/character_movement_015_idle.png" alt="Movement Frame">            <img src="character_showcase/character_movement_020_idle.png" alt="Movement Frame">            <img src="character_showcase/character_movement_025_idle.png" alt="Movement Frame">            <img src="character_showcase/character_movement_030_walk_right.png" alt="Movement Frame">            <img src="character_showcase/character_movement_035_walk_right.png" alt="Movement Frame">            <img src="character_showcase/character_movement_040_walk_right.png" alt="Movement Frame">            <img src="character_showcase/character_movement_045_walk_right.png" alt="Movement Frame">            <img src="character_showcase/character_movement_050_walk_right.png" alt="Movement Frame">            <img src="character_showcase/character_movement_055_walk_right.png" alt="Movement Frame">            <img src="character_showcase/character_movement_060_walk_right.png" alt="Movement Frame">            <img src="character_showcase/character_movement_065_walk_right.png" alt="Movement Frame">            <img src="character_showcase/character_movement_070_walk_right.png" alt="Movement Frame">            <img src="character_showcase/character_movement_075_walk_right.png" alt="Movement Frame">            <img src="character_showcase/character_movement_080_walk_right.png" alt="Movement Frame">            <img src="character_showcase/character_movement_085_walk_right.png" alt="Movement Frame">            <img src="character_showcase/character_movement_090_idle.png" alt="Movement Frame">            <img src="character_showcase/character_movement_095_idle.png" alt="Movement Frame">            <img src="character_showcase/character_movement_100_idle.png" alt="Movement Frame">            <img src="character_showcase/character_movement_105_idle.png" alt="Movement Frame">            <img src="character_showcase/character_movement_110_idle.png" alt="Movement Frame">            <img src="character_showcase/character_movement_115_idle.png" alt="Movement Frame">            <img src="character_showcase/character_movement_120_walk_left.png" alt="Movement Frame">            <img src="character_showcase/character_movement_125_walk_left.png" alt="Movement Frame">            <img src="character_showcase/character_movement_130_walk_left.png" alt="Movement Frame">            <img src="character_showcase/character_movement_135_walk_left.png" alt="Movement Frame">            <img src="character_showcase/character_movement_140_walk_left.png" alt="Movement Frame">            <img src="character_showcase/character_movement_145_walk_left.png" alt="Movement Frame">            <img src="character_showcase/character_movement_150_walk_left.png" alt="Movement Frame">            <img src="character_showcase/character_movement_155_walk_left.png" alt="Movement Frame">            <img src="character_showcase/character_movement_160_walk_left.png" alt="Movement Frame">            <img src="character_showcase/character_movement_165_walk_left.png" alt="Movement Frame">            <img src="character_showcase/character_movement_170_walk_left.png" alt="Movement Frame">            <img src="character_showcase/character_movement_175_walk_left.png" alt="Movement Frame">            <img src="character_showcase/character_movement_180_idle.png" alt="Movement Frame">            <img src="character_showcase/character_movement_185_idle.png" alt="Movement Frame">            <img src="character_showcase/character_movement_190_idle.png" alt="Movement Frame">            <img src="character_showcase/character_movement_195_idle.png" alt="Movement Frame">            <img src="character_showcase/character_movement_200_idle.png" alt="Movement Frame">            <img src="character_showcase/character_movement_205_idle.png" alt="Movement Frame">
+        </div>
+    </div>
+    
+    <div class="footer">
+        <p>Generated on 2025-10-15 23:27:22</p>
+        <p>Git Hash: 78dbaf7 | Full Hash: 78dbaf73427ec6abd164e945db0f91fd28e90438</p>
+        <p>The Dark Closet - Character Composite Object System</p>
+    </div>
+</body>
+</html>
