@@ -21,8 +21,8 @@ class TestAssetGeneration:
         """Test that character assets are generated correctly."""
         assets = generate_character_assets(temp_assets_dir)
 
-        # Check that all expected assets were generated
-        expected_assets = [
+        # Check that all expected basic assets were generated
+        expected_basic_assets = [
             "head",
             "torso",
             "left_arm",
@@ -36,14 +36,30 @@ class TestAssetGeneration:
             "hat",
         ]
 
-        assert len(assets) == len(
-            expected_assets
-        ), f"Expected {len(expected_assets)} assets, got {len(assets)}"
+        # Check that basic assets exist
+        for asset in expected_basic_assets:
+            assert asset in assets, f"Expected basic asset {asset} not found"
 
-        for asset_name in expected_assets:
-            assert asset_name in assets, f"Asset '{asset_name}' not generated"
-            asset_path = Path(assets[asset_name])
-            assert asset_path.exists(), f"Asset file '{asset_path}' does not exist"
+        # Check that directional assets were generated
+        directions = ["left", "right", "forward", "back"]
+        for direction in directions:
+            for part in ["head", "torso", "left_arm", "right_arm", "left_leg", "right_leg"]:
+                asset_key = f"{part}_{direction}"
+                assert asset_key in assets, f"Expected directional asset {asset_key} not found"
+
+        # Check that walk cycle assets were generated
+        walk_directions = ["left", "right"]
+        for direction in walk_directions:
+            for frame in range(4):
+                asset_key = f"walk_{direction}_{frame}"
+                assert asset_key in assets, f"Expected walk cycle asset {asset_key} not found"
+
+        # Should have significantly more assets now
+        assert len(assets) >= 40, f"Expected at least 40 assets (basic + directional + walk cycles), got {len(assets)}"
+
+        # Check that all assets exist on disk
+        for asset_name, asset_path in assets.items():
+            assert Path(asset_path).exists(), f"Asset file '{asset_path}' does not exist"
 
     @pytest.mark.unit
     @pytest.mark.asset
