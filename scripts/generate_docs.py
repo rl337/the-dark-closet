@@ -470,19 +470,19 @@ def generate_test_sequences():
 def generate_character_showcase():
     """Generate character showcase screenshots."""
     print("Generating character showcase...")
-    
+
     # Create test game
     config = GameConfig(1024, 768, "Character Showcase", 60)
     time_provider = ControlledTimeProvider(1.0 / 60.0)
-    app = GameApp(config, time_provider)
-    
+    GameApp(config, time_provider)  # Initialize pygame
+
     # Create showcase directory
     showcase_dir = Path("docs/character_showcase")
     showcase_dir.mkdir(parents=True, exist_ok=True)
-    
+
     # Test surface
     surface = pygame.Surface((1024, 768))
-    
+
     # 1. Character Directions Showcase
     print("  Generating character directions...")
     directions = [
@@ -491,18 +491,18 @@ def generate_character_showcase():
         (CharacterDirection.RIGHT, "right"),
         (CharacterDirection.BACK, "back"),
     ]
-    
+
     for direction, name in directions:
         character = Character(x=400, y=300)
         character.set_direction(direction)
         character.idle()
-        
+
         surface.fill((18, 22, 30))  # Sky background
         character.draw(surface, camera_x=0, camera_y=0)
-        
+
         filename = f"character_direction_{name}.png"
         pygame.image.save(surface, str(showcase_dir / filename))
-    
+
     # 2. Character States Showcase
     print("  Generating character states...")
     states = [
@@ -511,55 +511,58 @@ def generate_character_showcase():
         (CharacterState.WALKING_RIGHT, "walking_right"),
         (CharacterState.JUMPING, "jumping"),
     ]
-    
+
     for state, name in states:
         character = Character(x=400, y=300)
         character.set_state(state)
-        
+
         if state == CharacterState.WALKING_LEFT:
             character.set_direction(CharacterDirection.LEFT)
         elif state == CharacterState.WALKING_RIGHT:
             character.set_direction(CharacterDirection.RIGHT)
         else:
             character.set_direction(CharacterDirection.FORWARD)
-        
+
         surface.fill((18, 22, 30))  # Sky background
         character.draw(surface, camera_x=0, camera_y=0)
-        
+
         filename = f"character_state_{name}.png"
         pygame.image.save(surface, str(showcase_dir / filename))
-    
+
     # 3. Walk Cycle Showcase
     print("  Generating walk cycles...")
-    for direction_name, direction in [("left", CharacterDirection.LEFT), ("right", CharacterDirection.RIGHT)]:
+    for direction_name, direction in [
+        ("left", CharacterDirection.LEFT),
+        ("right", CharacterDirection.RIGHT),
+    ]:
         character = Character(x=400, y=300)
         character.set_direction(direction)
-        
+
         if direction_name == "left":
             character.walk_left()
         else:
             character.walk_right()
-        
+
         # Generate walk cycle frames
         for frame in range(8):  # 2 complete cycles
             character.update(1.0 / 60.0)  # 60 FPS
-            
+
             # Move character horizontally
             if direction_name == "left":
                 character.move(-3, 0)  # Move left
             else:
-                character.move(3, 0)   # Move right
-            
+                character.move(3, 0)  # Move right
+
             surface.fill((18, 22, 30))  # Sky background
             character.draw(surface, camera_x=0, camera_y=0)
-            
+
             filename = f"character_walk_{direction_name}_{frame:02d}.png"
             pygame.image.save(surface, str(showcase_dir / filename))
-    
+
     # 4. Character Movement Sequence
     print("  Generating movement sequence...")
     character = Character(x=100, y=300)
-    
+
     # Movement sequence: idle -> walk right -> idle -> walk left -> idle
     sequence = [
         ("idle", 30, 0, 0),
@@ -568,7 +571,7 @@ def generate_character_showcase():
         ("walk_left", 60, -3, 0),  # Move left
         ("idle", 30, 0, 0),
     ]
-    
+
     frame_count = 0
     for phase_name, duration, dx, dy in sequence:
         # Set character state
@@ -578,23 +581,25 @@ def generate_character_showcase():
             character.walk_left()
         elif phase_name == "walk_right":
             character.walk_right()
-        
+
         # Run phase
         for frame in range(duration):
             character.update(1.0 / 60.0)  # 60 FPS
             character.move(dx, dy)
-            
+
             surface.fill((18, 22, 30))  # Sky background
             character.draw(surface, camera_x=0, camera_y=0)
-            
+
             # Save every 5th frame for the showcase
             if frame_count % 5 == 0:
                 filename = f"character_movement_{frame_count:03d}_{phase_name}.png"
                 pygame.image.save(surface, str(showcase_dir / filename))
-            
+
             frame_count += 1
-    
-    print(f"Generated character showcase with {len(list(showcase_dir.glob('*.png')))} images")
+
+    print(
+        f"Generated character showcase with {len(list(showcase_dir.glob('*.png')))} images"
+    )
     return showcase_dir
 
 
@@ -1348,23 +1353,23 @@ def generate_tests_html(test_sequences, git_hash, git_hash_full):
 def generate_character_showcase_html(git_hash, git_hash_full):
     """Generate the character showcase HTML page."""
     print("Generating character showcase HTML...")
-    
+
     showcase_dir = Path("docs/character_showcase")
-    
+
     # Get showcase images
     direction_images = sorted(showcase_dir.glob("character_direction_*.png"))
     state_images = sorted(showcase_dir.glob("character_state_*.png"))
     walk_images = sorted(showcase_dir.glob("character_walk_*.png"))
     movement_images = sorted(showcase_dir.glob("character_movement_*.png"))
-    
-    character_html = f"""<!DOCTYPE html>
+
+    character_html = """<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Character Showcase - The Dark Closet</title>
     <style>
-        body {{
+        body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             max-width: 1200px;
             margin: 0 auto;
@@ -1372,19 +1377,19 @@ def generate_character_showcase_html(git_hash, git_hash_full):
             background: #1a1a1a;
             color: #ffffff;
             line-height: 1.6;
-        }}
-        .header {{
+        }
+        .header {
             text-align: center;
             margin-bottom: 40px;
             padding: 20px;
             background: linear-gradient(135deg, #2c3e50, #34495e);
             border-radius: 10px;
-        }}
-        .nav {{
+        }
+        .nav {
             text-align: center;
             margin: 20px 0;
-        }}
-        .nav a {{
+        }
+        .nav a {
             display: inline-block;
             margin: 0 15px;
             padding: 10px 20px;
@@ -1393,87 +1398,87 @@ def generate_character_showcase_html(git_hash, git_hash_full):
             text-decoration: none;
             border-radius: 5px;
             transition: background 0.3s;
-        }}
-        .nav a:hover {{
+        }
+        .nav a:hover {
             background: #2980b9;
-        }}
-        .showcase-section {{
+        }
+        .showcase-section {
             background: #2c2c2c;
             padding: 20px;
             border-radius: 10px;
             margin: 30px 0;
-        }}
-        .showcase-title {{
+        }
+        .showcase-title {
             font-size: 1.5em;
             color: #3498db;
             margin-bottom: 20px;
             text-align: center;
-        }}
-        .image-grid {{
+        }
+        .image-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 20px;
             margin: 20px 0;
-        }}
-        .image-item {{
+        }
+        .image-item {
             text-align: center;
             background: #1a1a1a;
             padding: 15px;
             border-radius: 8px;
             border: 1px solid #34495e;
-        }}
-        .image-item img {{
+        }
+        .image-item img {
             max-width: 100%;
             height: auto;
             border-radius: 5px;
             box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-        }}
-        .image-caption {{
+        }
+        .image-caption {
             margin-top: 10px;
             color: #bdc3c7;
             font-size: 0.9em;
-        }}
-        .walk-cycle {{
+        }
+        .walk-cycle {
             display: flex;
             flex-wrap: wrap;
             gap: 10px;
             justify-content: center;
             margin: 20px 0;
-        }}
-        .walk-cycle img {{
+        }
+        .walk-cycle img {
             width: 120px;
             height: auto;
             border-radius: 5px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-        }}
-        .movement-sequence {{
+        }
+        .movement-sequence {
             display: flex;
             flex-wrap: wrap;
             gap: 10px;
             justify-content: center;
             margin: 20px 0;
-        }}
-        .movement-sequence img {{
+        }
+        .movement-sequence img {
             width: 150px;
             height: auto;
             border-radius: 5px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-        }}
-        .description {{
+        }
+        .description {
             background: #34495e;
             padding: 15px;
             border-radius: 5px;
             margin: 20px 0;
             color: #ecf0f1;
-        }}
-        .footer {{
+        }
+        .footer {
             text-align: center;
             margin-top: 40px;
             padding: 20px;
             background: #2c3e50;
             border-radius: 10px;
             color: #bdc3c7;
-        }}
+        }
     </style>
 </head>
 <body>
@@ -1497,16 +1502,18 @@ def generate_character_showcase_html(git_hash, git_hash_full):
         </div>
         <div class="image-grid">
 """
-    
+
     # Add direction images
     for img_path in direction_images:
-        img_name = img_path.stem.replace("character_direction_", "").replace("_", " ").title()
+        img_name = (
+            img_path.stem.replace("character_direction_", "").replace("_", " ").title()
+        )
         character_html += f"""
             <div class="image-item">
                 <img src="character_showcase/{img_path.name}" alt="{img_name}">
                 <div class="image-caption">{img_name}</div>
             </div>"""
-    
+
     character_html += """
         </div>
     </div>
@@ -1519,16 +1526,18 @@ def generate_character_showcase_html(git_hash, git_hash_full):
         </div>
         <div class="image-grid">
 """
-    
+
     # Add state images
     for img_path in state_images:
-        img_name = img_path.stem.replace("character_state_", "").replace("_", " ").title()
+        img_name = (
+            img_path.stem.replace("character_state_", "").replace("_", " ").title()
+        )
         character_html += f"""
             <div class="image-item">
                 <img src="character_showcase/{img_path.name}" alt="{img_name}">
                 <div class="image-caption">{img_name}</div>
             </div>"""
-    
+
     character_html += """
         </div>
     </div>
@@ -1542,23 +1551,23 @@ def generate_character_showcase_html(git_hash, git_hash_full):
         <h3>Walking Left</h3>
         <div class="walk-cycle">
 """
-    
+
     # Add left walk cycle images
     left_walk_images = [img for img in walk_images if "left" in img.name]
     for img_path in left_walk_images:
         character_html += f'            <img src="character_showcase/{img_path.name}" alt="Walk Left Frame">'
-    
+
     character_html += """
         </div>
         <h3>Walking Right</h3>
         <div class="walk-cycle">
 """
-    
+
     # Add right walk cycle images
     right_walk_images = [img for img in walk_images if "right" in img.name]
     for img_path in right_walk_images:
         character_html += f'            <img src="character_showcase/{img_path.name}" alt="Walk Right Frame">'
-    
+
     character_html += """
         </div>
     </div>
@@ -1571,11 +1580,11 @@ def generate_character_showcase_html(git_hash, git_hash_full):
         </div>
         <div class="movement-sequence">
 """
-    
+
     # Add movement sequence images
     for img_path in movement_images:
         character_html += f'            <img src="character_showcase/{img_path.name}" alt="Movement Frame">'
-    
+
     character_html += f"""
         </div>
     </div>
@@ -1587,7 +1596,7 @@ def generate_character_showcase_html(git_hash, git_hash_full):
     </div>
 </body>
 </html>"""
-    
+
     return character_html
 
 
