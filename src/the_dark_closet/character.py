@@ -161,7 +161,7 @@ class Character:
     def idle(self) -> None:
         """Set character to idle state."""
         self.set_state(CharacterState.IDLE)
-        self.set_direction(CharacterDirection.FORWARD)
+        # Don't reset direction - keep current direction
 
     def update(self, delta_time: float) -> None:
         """Update character animation."""
@@ -238,28 +238,33 @@ class Character:
         ]
 
         for part in parts_order:
-            if part in self._assets:
-                # Get the asset for this part and direction
-                asset = self._get_directional_asset(part)
-                if asset is None:
-                    continue
+            # Get the asset for this part and direction
+            asset = self._get_directional_asset(part)
+            if asset is None:
+                continue
 
-                # Scale the asset
-                scaled_asset = pygame.transform.scale(
-                    asset, (int(256 * scale_x), int(256 * scale_y))
-                )
+            # Scale the asset
+            scaled_asset = pygame.transform.scale(
+                asset, (int(256 * scale_x), int(256 * scale_y))
+            )
 
-                # Position the part relative to character center
-                offset_x, offset_y = self._part_offsets[part]
-                part_x = center_x + offset_x - scaled_asset.get_width() // 2
-                part_y = center_y + offset_y - scaled_asset.get_height() // 2
+            # Position the part relative to character center
+            offset_x, offset_y = self._part_offsets[part]
+            
+            # Add walk cycle animation offsets
+            walk_offset_x, walk_offset_y = self._get_walk_cycle_offset(part)
+            offset_x += walk_offset_x
+            offset_y += walk_offset_y
+            
+            part_x = center_x + offset_x - scaled_asset.get_width() // 2
+            part_y = center_y + offset_y - scaled_asset.get_height() // 2
 
-                # Apply camera offset
-                part_x -= camera_x
-                part_y -= camera_y
+            # Apply camera offset
+            part_x -= camera_x
+            part_y -= camera_y
 
-                # Blit the asset
-                surface.blit(scaled_asset, (int(part_x), int(part_y)))
+            # Blit the asset
+            surface.blit(scaled_asset, (int(part_x), int(part_y)))
 
     def _draw_facial_features(
         self,
@@ -317,16 +322,7 @@ class Character:
         """
         Get the appropriate asset for a body part based on current direction and state.
         """
-        # Handle walk cycle assets
-        if self.state in [CharacterState.WALKING_LEFT, CharacterState.WALKING_RIGHT]:
-            direction_str = (
-                "left" if self.state == CharacterState.WALKING_LEFT else "right"
-            )
-            walk_asset_key = f"walk_{direction_str}_{self.animation_frame}"
-            if walk_asset_key in self._assets:
-                return self._assets[walk_asset_key]
-
-        # Handle directional assets
+        # Always use directional assets based on current direction
         direction_str = self.direction.value
         directional_asset_key = f"{part}_{direction_str}"
         if directional_asset_key in self._assets:
@@ -335,6 +331,33 @@ class Character:
         # Fallback to basic asset
         return self._assets.get(part)
 
+    def _get_walk_cycle_offset(self, part: str) -> Tuple[float, float]:
+        """Get walk cycle animation offset for a body part."""
+        if self.state not in [CharacterState.WALKING_LEFT, CharacterState.WALKING_RIGHT]:
+            return (0, 0)
+        
+        # Calculate walk cycle offset based on animation frame
+        import math
+        walk_cycle_progress = self.animation_frame / self.walk_cycle_frames
+        walk_offset = 3 * math.sin(walk_cycle_progress * 2 * math.pi)
+        
+        # Apply different offsets to different body parts for realistic walking
+        if part in ["left_arm", "right_arm"]:
+            # Arms swing opposite to each other
+            if part == "left_arm":
+                return (0, walk_offset)
+            else:  # right_arm
+                return (0, -walk_offset)
+        elif part in ["left_leg", "right_leg"]:
+            # Legs alternate
+            if part == "left_leg":
+                return (0, walk_offset)
+            else:  # right_leg
+                return (0, -walk_offset)
+        else:
+            # Head and torso have subtle movement
+            return (0, walk_offset * 0.3)
+    
     def _draw_center_mass_dot(
         self,
         surface: pygame.Surface,

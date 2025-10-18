@@ -77,7 +77,7 @@ class TestCharacterWalkCycle:
         # Return to idle
         character.idle()
         assert character.state == CharacterState.IDLE
-        assert character.direction == CharacterDirection.FORWARD
+        assert character.direction == CharacterDirection.LEFT  # Direction should be preserved
 
     def test_character_animation_update(self):
         """Test character animation updates correctly."""
@@ -183,6 +183,7 @@ class TestCharacterWalkCycle:
 
         # Test right direction
         character.set_direction(CharacterDirection.RIGHT)
+        surface.fill((0, 0, 0))  # Clear surface
         character.draw(surface, camera_x=0, camera_y=0)
         right_pixels = pygame.surfarray.array3d(surface)
 
