@@ -102,7 +102,9 @@ class TestCharacterWalkCycleSequence:
 
         # Verify character is in idle state (direction preserved from last action)
         assert character.state == CharacterState.IDLE
-        assert character.direction == CharacterDirection.RIGHT  # Last action was walk_right
+        assert (
+            character.direction == CharacterDirection.RIGHT
+        )  # Last action was walk_right
 
     def test_walk_cycle_asset_generation(self):
         """Test that walk cycle assets are generated correctly."""
@@ -155,7 +157,9 @@ class TestCharacterWalkCycleSequence:
 
         character.idle()
         assert character.state == CharacterState.IDLE
-        assert character.direction == CharacterDirection.RIGHT  # Direction preserved from walk_right
+        assert (
+            character.direction == CharacterDirection.RIGHT
+        )  # Direction preserved from walk_right
 
     def test_character_animation_timing(self):
         """Test character animation timing is consistent."""
