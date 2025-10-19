@@ -322,8 +322,8 @@ class Character:
         """
         Get the appropriate asset for a body part based on current direction and state.
         """
-        # Always use directional assets based on current direction
-        direction_str = self.direction.value
+        # Convert enum direction to lowercase string for asset keys
+        direction_str = self.direction.value.lower()
         directional_asset_key = f"{part}_{direction_str}"
         if directional_asset_key in self._assets:
             return self._assets[directional_asset_key]

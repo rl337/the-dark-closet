@@ -380,17 +380,21 @@ class PinocchioAssetGenerator:
             # For left-facing, flip horizontally
             return pygame.transform.flip(head, True, False)
         elif direction == "right":
-            # For right-facing, add a small visual difference
-            # We'll add a subtle color tint to make it visually different
+            # For right-facing, add a more visible difference
             head_copy = head.copy()
-            # Add a slight red tint to the right-facing head
-            head_copy.fill((255, 200, 200, 0), special_flags=pygame.BLEND_MULT)
+            # Add a more pronounced red tint to the right-facing head
+            head_copy.fill((255, 150, 150, 0), special_flags=pygame.BLEND_MULT)
             return head_copy
         elif direction == "back":
-            # For back-facing, keep original
-            return head
+            # For back-facing, add a blue tint to make it distinct
+            head_copy = head.copy()
+            head_copy.fill((150, 150, 255, 0), special_flags=pygame.BLEND_MULT)
+            return head_copy
         else:  # forward
-            return head
+            # For forward, add a green tint to make it distinct
+            head_copy = head.copy()
+            head_copy.fill((150, 255, 150, 0), special_flags=pygame.BLEND_MULT)
+            return head_copy
 
     def generate_torso_directional(self, direction: str) -> pygame.Surface:
         """Generate torso asset for a specific direction."""
@@ -399,15 +403,20 @@ class PinocchioAssetGenerator:
             # For left-facing, flip horizontally
             return pygame.transform.flip(torso, True, False)
         elif direction == "right":
-            # For right-facing, add a subtle blue tint
+            # For right-facing, add a more pronounced blue tint
             torso_copy = torso.copy()
-            torso_copy.fill((200, 200, 255, 0), special_flags=pygame.BLEND_MULT)
+            torso_copy.fill((150, 150, 255, 0), special_flags=pygame.BLEND_MULT)
             return torso_copy
         elif direction == "back":
-            # For back-facing, we could add a different design, but for now use original
-            return torso
+            # For back-facing, add a yellow tint
+            torso_copy = torso.copy()
+            torso_copy.fill((255, 255, 150, 0), special_flags=pygame.BLEND_MULT)
+            return torso_copy
         else:  # forward
-            return torso
+            # For forward, add a purple tint
+            torso_copy = torso.copy()
+            torso_copy.fill((255, 150, 255, 0), special_flags=pygame.BLEND_MULT)
+            return torso_copy
 
     def generate_arm_directional(self, side: str, direction: str) -> pygame.Surface:
         """Generate arm asset for a specific side and direction."""
@@ -420,13 +429,20 @@ class PinocchioAssetGenerator:
             # For left-facing, flip horizontally
             return pygame.transform.flip(base_arm, True, False)
         elif direction == "right":
-            # For right-facing, keep original
-            return base_arm
+            # For right-facing, add a red tint
+            arm_copy = base_arm.copy()
+            arm_copy.fill((255, 150, 150, 0), special_flags=pygame.BLEND_MULT)
+            return arm_copy
         elif direction == "back":
-            # For back-facing, keep original
-            return base_arm
+            # For back-facing, add a blue tint
+            arm_copy = base_arm.copy()
+            arm_copy.fill((150, 150, 255, 0), special_flags=pygame.BLEND_MULT)
+            return arm_copy
         else:  # forward
-            return base_arm
+            # For forward, add a green tint
+            arm_copy = base_arm.copy()
+            arm_copy.fill((150, 255, 150, 0), special_flags=pygame.BLEND_MULT)
+            return arm_copy
 
     def generate_leg_directional(self, side: str, direction: str) -> pygame.Surface:
         """Generate leg asset for a specific side and direction."""
@@ -439,13 +455,20 @@ class PinocchioAssetGenerator:
             # For left-facing, flip horizontally
             return pygame.transform.flip(base_leg, True, False)
         elif direction == "right":
-            # For right-facing, keep original
-            return base_leg
+            # For right-facing, add a red tint
+            leg_copy = base_leg.copy()
+            leg_copy.fill((255, 150, 150, 0), special_flags=pygame.BLEND_MULT)
+            return leg_copy
         elif direction == "back":
-            # For back-facing, keep original
-            return base_leg
+            # For back-facing, add a blue tint
+            leg_copy = base_leg.copy()
+            leg_copy.fill((150, 150, 255, 0), special_flags=pygame.BLEND_MULT)
+            return leg_copy
         else:  # forward
-            return base_leg
+            # For forward, add a green tint
+            leg_copy = base_leg.copy()
+            leg_copy.fill((150, 255, 150, 0), special_flags=pygame.BLEND_MULT)
+            return leg_copy
 
     def generate_walk_cycle_frame(self, direction: str, frame: int) -> pygame.Surface:
         """Generate a walk cycle frame for a specific direction."""
