@@ -452,16 +452,16 @@ class PinocchioAssetGenerator:
         # For walk cycles, we'll just return the basic directional assets
         # The actual animation will be handled by the character's positioning logic
         # This creates a placeholder that the character can use for walk cycle assets
-        
+
         # Create a simple surface that indicates this is a walk cycle frame
         surface = self.create_surface()
         center_x = self.width // 2
         center_y = self.height // 2
-        
+
         # Draw a simple indicator that this is a walk cycle frame
         # The actual body parts will be drawn separately by the character
         pygame.draw.circle(surface, (255, 255, 255, 0), (center_x, center_y), 1)
-        
+
         return surface
 
     def generate_all_assets(self, output_dir: Path) -> Dict[str, str]:

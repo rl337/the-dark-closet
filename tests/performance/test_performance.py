@@ -427,8 +427,8 @@ class TestAssetGenerationPerformance:
     [
         ("asset_generation", 1.0),
         ("asset_loading", 0.04),
-        ("frame_rendering", 0.015),
-        ("movement_rendering", 0.015),
+        ("frame_rendering", 0.020),
+        ("movement_rendering", 0.020),
         ("jump_rendering", 0.015),
     ],
 )

@@ -77,7 +77,9 @@ class TestCharacterWalkCycle:
         # Return to idle
         character.idle()
         assert character.state == CharacterState.IDLE
-        assert character.direction == CharacterDirection.LEFT  # Direction should be preserved
+        assert (
+            character.direction == CharacterDirection.LEFT
+        )  # Direction should be preserved
 
     def test_character_animation_update(self):
         """Test character animation updates correctly."""

@@ -249,15 +249,15 @@ class Character:
             )
 
             # Position the part relative to character center
-            offset_x, offset_y = self._part_offsets[part]
-            
+            base_offset_x, base_offset_y = self._part_offsets[part]
+
             # Add walk cycle animation offsets
             walk_offset_x, walk_offset_y = self._get_walk_cycle_offset(part)
-            offset_x += walk_offset_x
-            offset_y += walk_offset_y
-            
-            part_x = center_x + offset_x - scaled_asset.get_width() // 2
-            part_y = center_y + offset_y - scaled_asset.get_height() // 2
+            final_offset_x = float(base_offset_x) + walk_offset_x
+            final_offset_y = float(base_offset_y) + walk_offset_y
+
+            part_x = center_x + final_offset_x - scaled_asset.get_width() // 2
+            part_y = center_y + final_offset_y - scaled_asset.get_height() // 2
 
             # Apply camera offset
             part_x -= camera_x
@@ -333,14 +333,18 @@ class Character:
 
     def _get_walk_cycle_offset(self, part: str) -> Tuple[float, float]:
         """Get walk cycle animation offset for a body part."""
-        if self.state not in [CharacterState.WALKING_LEFT, CharacterState.WALKING_RIGHT]:
+        if self.state not in [
+            CharacterState.WALKING_LEFT,
+            CharacterState.WALKING_RIGHT,
+        ]:
             return (0, 0)
-        
+
         # Calculate walk cycle offset based on animation frame
         import math
+
         walk_cycle_progress = self.animation_frame / self.walk_cycle_frames
         walk_offset = 3 * math.sin(walk_cycle_progress * 2 * math.pi)
-        
+
         # Apply different offsets to different body parts for realistic walking
         if part in ["left_arm", "right_arm"]:
             # Arms swing opposite to each other
@@ -357,7 +361,7 @@ class Character:
         else:
             # Head and torso have subtle movement
             return (0, walk_offset * 0.3)
-    
+
     def _draw_center_mass_dot(
         self,
         surface: pygame.Surface,
